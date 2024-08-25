@@ -1,0 +1,9 @@
+[package]
+name = "repository"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain = { path = "../domain" }
+tools = { path = "../tools" }
+rusqlite = "0.32.1"

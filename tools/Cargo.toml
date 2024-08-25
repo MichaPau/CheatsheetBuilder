@@ -1,0 +1,13 @@
+[package]
+name = "tools"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain = { path = "../domain" }
+
+
+walkdir = "2.5.0"
+rand = "0.8.5"
+pulldown-cmark = "0.12.0"
+

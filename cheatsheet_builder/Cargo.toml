@@ -1,0 +1,11 @@
+[package]
+name = "cheatsheet_builder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain = { path = "../domain" }
+repository = { path = "../repository" }
+
+tools = { path = "../tools" }
+
