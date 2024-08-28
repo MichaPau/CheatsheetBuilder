@@ -1,12 +1,13 @@
 //use std::{collections::HashMap, fs, path::{Path, PathBuf}};
 
-use domain::{
+use repository::{
     //entities::entry::{CreateSnippet, CreateTag}, 
     ports::ports::Service,
+    tools,
  };
 
 use repository::memory::hashmap_store::HashMapStore;
-//use tools;
+
 
 //https://github.com/howtocodeit/hexarch
 //https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust#service-the-heart-of-hexagonal-architecture
@@ -25,7 +26,7 @@ fn main() {
 
     let tag_list = tag_map.iter().filter(|(&id, _)| id == 7).map(|tag_entry| *tag_entry.0).collect();
     println!("{:?}", tag_list);
-    let list = service.get_list(Some(tag_list), None).unwrap();
+    let list = service.get_snippet_list(Some(tag_list), None).unwrap();
 
     for item in list {
         println!("{:#?}", item);

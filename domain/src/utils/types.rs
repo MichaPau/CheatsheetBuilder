@@ -15,11 +15,20 @@ impl From<u64> for Timestamp {
     }
 }
 
+impl From<Timestamp> for u64 {
+    fn from(value: Timestamp) -> u64 {
+        value.0
+    }
+}
+
 
 impl Timestamp {
     pub fn from_utc_now() -> Self {
         Self(SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs())
     }
+
+    
+    
 }
 
 pub struct SearchPattern {

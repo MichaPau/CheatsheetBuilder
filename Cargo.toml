@@ -2,5 +2,5 @@
 resolver = "2"
 
 members = [
-    "cheatsheet_builder", "domain", "repository", "tools",
+    "cheatsheet_builder", "domain", "repository",
 ]

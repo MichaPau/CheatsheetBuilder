@@ -2,6 +2,7 @@ use domain::entities::entry::*;
 use domain::utils::types::SearchPattern;
 
 use crate::errors::CheatsheetError;
+use crate::types::TagListItem;
 
 pub trait SnippetStore {
     fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError>;
@@ -9,7 +10,7 @@ pub trait SnippetStore {
     fn delete_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError>;
     fn remove_tag_from_all(&self, tag_id:TagID) -> Result<usize, CheatsheetError>;
     fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError>;
-    fn get_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError>;
+    fn get_snippet_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError>;
     fn search_by_title(&self, pattern: SearchPattern) -> Result<SnippetList, CheatsheetError>;
     fn search_by_content(&self, pattern: SearchPattern) -> Result<SnippetList, CheatsheetError>;
 }
@@ -17,9 +18,10 @@ pub trait SnippetStore {
 pub trait TagStore {
     fn add_tag(&self, tag: CreateTag) -> Result<Tag, CheatsheetError>;
     fn update_title(&self, id: TagID, new_title: String) -> Result<bool, CheatsheetError>;
-    fn update_parent(&self, id: TagID, new_parent_id: TagID) -> Result<bool, CheatsheetError>;
+    fn update_parent(&self, id: TagID, new_parent_id: Option<TagID>) -> Result<bool, CheatsheetError>;
     fn get_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
     fn delete_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
+    fn get_list(&self) -> Result<TagList, CheatsheetError>; 
     
 }
 
@@ -48,7 +50,10 @@ impl <R> Service<R> where R: SnippetStore + TagStore {
         Ok(true)
     }
 
-    pub fn get_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError> {
-        self.store.get_list(tag_filter, time_boundry)
+    pub fn get_tag_list(&self) -> Result<TagList, CheatsheetError> {
+        self.store.get_list()
+    }
+    pub fn get_snippet_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError> {
+        self.store.get_snippet_list(tag_filter, time_boundry)
     }
 }

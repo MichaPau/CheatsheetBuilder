@@ -1,13 +1,13 @@
 use std::{cell::RefCell, collections::HashMap};
 
 use domain::{
-    entities::{entry::*, errors::*},
-    ports::ports::{
-        CheatsheetStore, 
-        TagStore
-    }, utils::types::SearchPattern,
+    entities::entry::*,
+    
+    utils::types::SearchPattern,
     
 };
+
+use crate::{errors::CheatsheetError, ports::ports::{SnippetStore, TagStore}};
 
 
 
@@ -36,14 +36,14 @@ impl Default for HashMapStore {
         }
     }
 }
-impl CheatsheetStore for HashMapStore {
-    fn add_entry(&self, snippet: CreateSnippet) -> Result<Snippet, CheatsheetError> {
+impl SnippetStore for HashMapStore {
+    fn add_entry(&mut self, snippet: CreateSnippet) -> Result<Snippet, CheatsheetError> {
         let new_key: TagID = match self.snippet_store.borrow().keys().max() {
             Some(max_value) => *max_value+1,
             None => 0,
         };
 
-        let new_snippet = Snippet::new(new_key, snippet.title, snippet.text, snippet.tags);
+        let new_snippet = Snippet::new(new_key, snippet.title, snippet.text, snippet.tags, Timestamp::from_utc_now());
         
         self.snippet_store.borrow_mut().insert(new_key.clone(), new_snippet.clone());
 
@@ -88,7 +88,7 @@ impl CheatsheetStore for HashMapStore {
         }
         Ok(remove_count)
     }
-    fn get_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError> {
+    fn get_snippet_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError> {
         
         let list: SnippetList = self.snippet_store.borrow().values().map(|item| item.to_owned()).collect();
 
@@ -155,7 +155,7 @@ impl TagStore for HashMapStore {
         let new_tag = Tag {
             id: new_key,
             title: tag.title,
-            parent: tag.parent,
+            parent_id: tag.parent_id,
             tag_type: tag.tag_type,
 
         };
@@ -170,10 +170,10 @@ impl TagStore for HashMapStore {
         let _ = id;
         Err(CheatsheetError::NotImplemented("HashmapStore::get_tag not implemented".into()))
     }
-    fn update_parent(&self, id: TagID, new_parent_id: TagID) -> Result<bool, CheatsheetError> {
+    fn update_parent(&self, id: TagID, new_parent_id: Option<TagID>) -> Result<bool, CheatsheetError> {
         match self.tag_store.borrow_mut().get_mut(&id) {
             Some(entry) => {
-                entry.parent = Some(new_parent_id);
+                entry.parent_id = new_parent_id;
                 Ok(true)
             },
             None => Ok(false)
@@ -197,6 +197,10 @@ impl TagStore for HashMapStore {
         }
         
     }
+    fn get_list(&self) -> Result<TagList, CheatsheetError> {
+        Err(CheatsheetError::NotImplemented("get_list not implelented".into()))
+
+    }
 
     
 }
@@ -209,19 +213,3 @@ impl HashMapStore {
     }
 }
 
-#[test]
-fn test_mock() {
-    let store = HashMapStore::new();
-    store.add_tag(CreateTag {
-        title: "first".into(),
-        tag_type: TagType::Normal,
-        parent: None,
-    }).unwrap();
-    store.add_tag(CreateTag {
-        title: "folder_01".into(),
-        tag_type: TagType::Category,
-        parent: None,
-    }).unwrap();
-
-    store._print_stores();
-}

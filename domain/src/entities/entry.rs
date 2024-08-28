@@ -1,5 +1,5 @@
 
-use crate::{entities::errors::CheatsheetError, utils::types::Timestamp as TimestampImpl};
+use crate::utils::types::Timestamp as TimestampImpl;
 
 pub type SnippetID = usize;
 pub type TagID = usize;
@@ -20,14 +20,14 @@ pub struct Snippet {
 }
 
 impl Snippet {
-    pub fn new(id: SnippetID, title: String, text: String, tags: Vec<TagID>) -> Self {
+    pub fn new(id: SnippetID, title: String, text: String, tags: Vec<TagID>, created_at: Timestamp) -> Self {
         Self {
             id,
             title,
             text,
             tags,
-            created_at: Timestamp::from_utc_now(),
-            updated_at: Timestamp::from_utc_now(),
+            created_at: created_at.clone(),
+            updated_at: created_at,
         }
     }
 }
@@ -39,16 +39,16 @@ pub struct CreateSnippet {
 }
 
 impl CreateSnippet {
-    pub fn new(title: String, text: String, mut tags: Vec<TagID>) -> Result<Self, CheatsheetError> {
+    pub fn new(title: String, text: String, tags: Vec<TagID>) -> Self {
         
-        if tags.len() == 0 {
-            tags.push(0);
-        }
-        Ok( Self {
+        // if tags.len() == 0 {
+        //     tags.push(0);
+        // }
+        Self {
             title,
             text,
             tags
-        })
+        }
     }
 }
 
@@ -56,23 +56,34 @@ impl CreateSnippet {
 pub struct CreateTag {
     pub title: String,
     pub tag_type: TagType,
-    pub parent: Option<TagID>,
+    pub parent_id: Option<TagID>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Tag {
     pub id: TagID,
     pub title: String,
-    pub parent: Option<TagID>,
+    pub parent_id: Option<TagID>,
     pub tag_type: TagType,
 }
 
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum TagType {
-    Normal,
-    Untagged,
-    Category,
+    Untagged = 0,
+    Normal = 1,
+    Category = 2,
+}
+
+impl From<usize> for TagType {
+    fn from(value: usize) -> Self {
+        match value {
+            0 => TagType::Untagged,
+            1 => TagType::Normal,
+            2 => TagType::Category,
+            _ => TagType::Untagged,
+        }
+    }
 }
 
 

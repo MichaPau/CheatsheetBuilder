@@ -41,7 +41,7 @@ fn _create_dummy_hash_store() {
     let mut all_tags = vec![];
 
     for t in tag_list {
-        let ct = CreateTag {parent: None, tag_type: domain::entities::entry::TagType::Normal, title: t.to_string()};
+        let ct = CreateTag {parent_id: None, tag_type: domain::entities::entry::TagType::Normal, title: t.to_string()};
         //let tag = service.add_tag(ct).unwrap();
         
         all_tags.push(ct);
@@ -121,7 +121,7 @@ pub fn _parse_joplin_export<R>(service: &mut Service<R>, p: &str) where R: Snipp
                 let t = CreateTag {
                     title: item.0,
                     tag_type: TagType::Normal,
-                    parent: if parent_tag_id == 0 { None } else { Some(parent_tag_id)},
+                    parent_id: if parent_tag_id == 0 { None } else { Some(parent_tag_id)},
                 };
                 
                 let tag = service.add_tag(t).unwrap();
