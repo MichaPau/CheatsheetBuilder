@@ -2,7 +2,7 @@ use domain::entities::entry::*;
 use domain::utils::types::SearchPattern;
 
 use crate::errors::CheatsheetError;
-use crate::types::TagListItem;
+
 
 pub trait SnippetStore {
     fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError>;

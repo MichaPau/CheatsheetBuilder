@@ -31,7 +31,7 @@ impl Snippet {
         }
     }
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CreateSnippet {
     pub title: String, 
     pub text: String,

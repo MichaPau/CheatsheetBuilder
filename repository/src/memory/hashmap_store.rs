@@ -98,7 +98,7 @@ impl SnippetStore for HashMapStore {
 
             if let Some(tags) = &tag_filter {
                 tag_flag = entry.tags.iter().any(|item| tags.contains(item));
-                println!("{:?} - {:?} - {}", entry.tags, tags, tag_flag);
+                //println!("{:?} - {:?} - {}", entry.tags, tags, tag_flag);
                 // tag_flag = entry.tags.iter().an
             } else {
                 tag_flag = true;
