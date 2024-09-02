@@ -1,4 +1,5 @@
 
+use std::collections::hash_map::Entry::Vacant;
 use std::collections::HashMap;
 
 use std::ffi::OsStr;
@@ -23,9 +24,9 @@ use rand::prelude::IteratorRandom;
 
 use walkdir::WalkDir;
 
-use crate::ports::ports::Service;
-use crate::ports::ports::SnippetStore;
-use crate::ports::ports::TagStore;
+use crate::ports::stores::Service;
+use crate::ports::stores::SnippetStore;
+use crate::ports::stores::TagStore;
 
     
 #[allow(unused)]
@@ -91,18 +92,18 @@ pub fn _parse_joplin_export<R>(service: &mut Service<R>, p: &str) where R: Snipp
     for item in path_vec {
 
         let p = item.strip_prefix("./data").unwrap_or(&item);
-        let f_os = p.file_name().unwrap_or(&OsStr::new("undefined"));
+        let f_os = p.file_name().unwrap_or(OsStr::new("undefined"));
         
         let file_name = f_os.to_owned().into_string().unwrap();
 
 
         
-        let mut comp_list_temp: Vec<_> = p.components().into_iter().map(|entry|entry.as_os_str().to_owned().into_string().unwrap()).collect();
+        let mut comp_list_temp: Vec<_> = p.components().map(|entry|entry.as_os_str().to_owned().into_string().unwrap()).collect();
         comp_list_temp.pop();
 
         let mut state = String::new();
         let comp_list: Vec<_> = comp_list_temp.iter().map(|item| {
-            if state.len() != 0 {
+            if !state.is_empty() {
                 state.push('/');
             }
             state.push_str(item);
@@ -114,10 +115,8 @@ pub fn _parse_joplin_export<R>(service: &mut Service<R>, p: &str) where R: Snipp
         let mut parent_tag_id: usize = 0;
         let mut tags_for_file: Vec<TagID> = vec![];
         for item in comp_list {
-            if tag_set.contains_key(&item.1) {
-                parent_tag_id = *tag_set.get(&item.1).unwrap();
-                tags_for_file.push(parent_tag_id);
-            } else {
+            
+            if let Vacant(_v) = tag_set.entry(item.1.clone()) {
                 let t = CreateTag {
                     title: item.0,
                     tag_type: TagType::Normal,
@@ -128,8 +127,27 @@ pub fn _parse_joplin_export<R>(service: &mut Service<R>, p: &str) where R: Snipp
                 parent_tag_id = tag.id;
                 tags_for_file.push(parent_tag_id);
                 tag_set.insert(item.1, parent_tag_id);
-              
+                
+            } else {
+                parent_tag_id = *tag_set.get(&item.1).unwrap();
+                tags_for_file.push(parent_tag_id);
             }
+            // if tag_set.contains_key(&item.1) {
+            //     parent_tag_id = *tag_set.get(&item.1).unwrap();
+            //     tags_for_file.push(parent_tag_id);
+            // } else {
+            //     let t = CreateTag {
+            //         title: item.0,
+            //         tag_type: TagType::Normal,
+            //         parent_id: if parent_tag_id == 0 { None } else { Some(parent_tag_id)},
+            //     };
+                
+            //     let tag = service.add_tag(t).unwrap();
+            //     parent_tag_id = tag.id;
+            //     tags_for_file.push(parent_tag_id);
+            //     tag_set.insert(item.1, parent_tag_id);
+              
+            // }
         }
         
         let snippet_text = match std::fs::read_to_string(item.clone()) {
@@ -145,15 +163,20 @@ pub fn _parse_joplin_export<R>(service: &mut Service<R>, p: &str) where R: Snipp
             tags: tags_for_file,
         };
 
-        match service.add_entry(snippet) {
-            Err(e) => {
-                println!("File:{:?}", file_name);
-                println!("Text:{:?}", snippet_text);
-                println!("Error: {:?}", e);
-            }
-
-            _ => (),
+        if let Err(e) = service.add_entry(snippet) {
+            println!("File:{:?}", file_name);
+            println!("Text:{:?}", snippet_text);
+            println!("Error: {:?}", e);
         }
+        // match service.add_entry(snippet) {
+        //     Err(e) => {
+        //         println!("File:{:?}", file_name);
+        //         println!("Text:{:?}", snippet_text);
+        //         println!("Error: {:?}", e);
+        //     }
+
+        //     _ => (),
+        // }
 
         
     }

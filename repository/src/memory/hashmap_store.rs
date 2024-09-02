@@ -7,7 +7,7 @@ use domain::{
     
 };
 
-use crate::{errors::CheatsheetError, ports::ports::{SnippetStore, TagStore}};
+use crate::{errors::CheatsheetError, ports::stores::{SnippetStore, TagStore}};
 
 
 
@@ -45,7 +45,7 @@ impl SnippetStore for HashMapStore {
 
         let new_snippet = Snippet::new(new_key, snippet.title, snippet.text, snippet.tags, Timestamp::from_utc_now());
         
-        self.snippet_store.borrow_mut().insert(new_key.clone(), new_snippet.clone());
+        self.snippet_store.borrow_mut().insert(new_key, new_snippet.clone());
 
         Ok(new_snippet)
     }
@@ -161,7 +161,7 @@ impl TagStore for HashMapStore {
         };
 
         
-        self.tag_store.borrow_mut().insert(new_key.clone(), new_tag.clone());
+        self.tag_store.borrow_mut().insert(new_key, new_tag.clone());
 
         Ok(new_tag)
     }

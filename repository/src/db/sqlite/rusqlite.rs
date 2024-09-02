@@ -6,7 +6,7 @@ use std::path::Path;
 use domain::{entities::entry::*, utils::types::{SearchPattern, Timestamp}};
 use rusqlite::{Connection, OpenFlags, Row};
 
-use crate::{errors::CheatsheetError, ports::ports::{SnippetStore, TagStore}};
+use crate::{errors::CheatsheetError, ports::stores::{SnippetStore, TagStore}};
 
 pub struct Rusqlite {
     pub conn: Connection,
@@ -221,7 +221,7 @@ impl SnippetStore for Rusqlite {
         })?;
 
         
-        let result: Vec<Snippet> = snippet_iter.flat_map(|s|s).collect();
+        let result: Vec<Snippet> = snippet_iter.flatten().collect();
 
         Ok(result)
     }
@@ -312,7 +312,8 @@ impl TagStore for Rusqlite {
             )
         })?;
 
-        let result: Vec<Tag> = tag_iter.flat_map(|s|s).collect();
+        //let result: Vec<Tag> = tag_iter.flat_map(|s|s).collect();
+        let result: Vec<Tag> = tag_iter.flatten().collect();
         Ok(result)
     }
     
