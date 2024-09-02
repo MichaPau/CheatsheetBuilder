@@ -6,9 +6,9 @@ pub mod ports {
 pub mod errors;
 pub mod types;
 
-pub mod tools {
-    pub mod parse_joplin;
-}
+// pub mod tools {
+//     pub mod parse_joplin;
+// }
 
 pub mod db {
     pub mod sqlite {

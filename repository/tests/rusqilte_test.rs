@@ -1,4 +1,4 @@
-use domain::{entities::entry::{CreateSnippet, CreateTag, TagType}, utils::types::Timestamp};
+use domain::{entities::entry::{CreateSnippet, CreateTag}, utils::types::Timestamp};
 
 use core::time;
 use std::{sync::{LazyLock, Mutex}, thread};
@@ -8,6 +8,7 @@ use repository::{db::sqlite::rusqlite_db::{self, Rusqlite}, ports::stores::{Snip
 static STATIC_DB: LazyLock<Mutex<Rusqlite>> = LazyLock::new(|| {
 
     let db = rusqlite_db::Rusqlite::new_in_memory().unwrap();
+    //let db = rusqlite_db::Rusqlite::new("../data/test_db.db").unwrap();
     
 
     Mutex::new(db)
@@ -22,28 +23,28 @@ fn test_inserts() -> TestResult {
 
     let hierarque_tags: Vec<TagListItem> = vec![
         TagListItem {
-            tag: CreateTag { title: "one".into(), tag_type: TagType::Normal, parent_id: None },
+            tag: CreateTag { title: "one".into(), ..Default::default() },
             childs: vec![
-                CreateTag { title: "one_sub_1".into(), tag_type: TagType::Normal, parent_id: None },
-                CreateTag { title: "one_sub_2".into(), tag_type: TagType::Normal, parent_id: None }
+                CreateTag { title: "one_sub_1".into(), ..Default::default() },
+                CreateTag { title: "one_sub_2".into(), ..Default::default() }
             ],
         },
         TagListItem {
-            tag: CreateTag { title: "two".into(), tag_type: TagType::Normal, parent_id: None },
+            tag: CreateTag { title: "two".into(), ..Default::default()},
             childs: vec![
-                CreateTag { title: "two_sub_1".into(), tag_type: TagType::Normal, parent_id: None }
+                CreateTag { title: "two_sub_1".into(), ..Default::default() }
             ],
         },
         TagListItem {
-            tag: CreateTag { title: "three".into(), tag_type: TagType::Normal, parent_id: None },
+            tag: CreateTag { title: "three".into(), ..Default::default() },
             childs: vec![],
         },
         TagListItem {
-            tag: CreateTag { title: "all".into(), tag_type: TagType::Normal, parent_id: None },
+            tag: CreateTag { title: "all".into(), ..Default::default() },
             childs: vec![],
         },
         TagListItem {
-            tag: CreateTag { title: "some".into(), tag_type: TagType::Normal, parent_id: None },
+            tag: CreateTag { title: "some".into(), ..Default::default() },
             childs: vec![],
         },
     ];
@@ -63,21 +64,26 @@ fn test_inserts() -> TestResult {
 
     assert_eq!(tag_list.len(), tag_count);
     
+   
     let snippets_data = vec![
-        CreateSnippet::new("first".into(), "first content".into(), vec![7, 1]),
-        CreateSnippet::new("first again".into(), "first again content".into(), vec![7, 2]),
-        CreateSnippet::new("second".into(), "second content".into(), vec![4, 7, 8]),
-        CreateSnippet::new("third".into(), "third content".into(), vec![6, 7]),
-        CreateSnippet::new("third again".into(), "third again content".into(), vec![7, 8]),
+        CreateSnippet::new("first".into(), "first content".into(), vec![tag_list[0].clone(), tag_list[6].clone()]),
+        CreateSnippet::new("first again".into(), "first again content".into(), vec![tag_list[1].clone(), tag_list[6].clone()]),
+        CreateSnippet::new("second".into(), "second content".into(), vec![tag_list[3].clone(), tag_list[6].clone(), tag_list[7].clone()]),
+        CreateSnippet::new("third".into(), "third content".into(), vec![tag_list[5].clone(), tag_list[6].clone()]),
+        CreateSnippet::new("third again".into(), "third again content".into(), vec![tag_list[7].clone(), tag_list[6].clone()]),
 
     ];
 
     for item in snippets_data.iter() {
-        db.add_entry(item.clone()).unwrap();
+        let added = db.add_entry(item.clone()).unwrap();
+        println!("added: {:?}", added);
     }
 
+    let fetched = db.get_entry(1).unwrap();
+    println!("fetched: {:?}", fetched);
+
     let snippet_list = db.get_snippet_list(None, None).unwrap();
-    println!("ts first: {}", snippet_list.get(0).unwrap().updated_at);
+    //println!("ts first: {}", snippet_list.get(0).unwrap().updated_at);
     assert_eq!(snippet_list.len(), snippets_data.len());
 
     Ok(())
@@ -109,11 +115,20 @@ fn test_list_filter() -> TestResult {
 #[test]
 fn test_new_funcs() -> TestResult {
     let db = STATIC_DB.lock().unwrap();
-    let s1 = db.get_entry(1).unwrap();
+    let snippet = db.get_entry(1).unwrap();
 
-    println!("{:?}", s1);
-    assert_eq!(s1.tags, [1, 7]);
+    println!("{:?}", snippet);
+    assert_eq!(snippet.tags.len(), 2);
 
+    println!("debug tags: {:#?}", snippet.tags);
+
+    let deleted = db.delete_entry(1).unwrap();
+
+    assert_eq!(deleted.id, 1);
+
+    let snippet_result = db.get_entry(1);
+
+    assert!(snippet_result.is_err());
     Ok(())
 }
 #[test]

@@ -12,6 +12,7 @@ use domain::entities::entry::CreateSnippet;
 //use domain::entities::entry;
 //use domain::entities::entry::CreateSnippet;
 use domain::entities::entry::CreateTag;
+use domain::entities::entry::Tag;
 use domain::entities::entry::TagID;
 //use domain::entities::entry::TagList;
 use domain::entities::entry::TagType;
@@ -42,7 +43,7 @@ fn _create_dummy_hash_store() {
     let mut all_tags = vec![];
 
     for t in tag_list {
-        let ct = CreateTag {parent_id: None, tag_type: domain::entities::entry::TagType::Normal, title: t.to_string()};
+        let ct = CreateTag { title: t.to_string(), ..Default::default()};
         //let tag = service.add_tag(ct).unwrap();
         
         all_tags.push(ct);
@@ -113,7 +114,7 @@ pub fn _parse_joplin_export<R>(service: &mut Service<R>, p: &str) where R: Snipp
         // println!("{:?}", comp_list);
 
         let mut parent_tag_id: usize = 0;
-        let mut tags_for_file: Vec<TagID> = vec![];
+        let mut tags_for_file: Vec<Tag> = vec![];
         for item in comp_list {
             
             if let Vacant(_v) = tag_set.entry(item.1.clone()) {
@@ -121,11 +122,12 @@ pub fn _parse_joplin_export<R>(service: &mut Service<R>, p: &str) where R: Snipp
                     title: item.0,
                     tag_type: TagType::Normal,
                     parent_id: if parent_tag_id == 0 { None } else { Some(parent_tag_id)},
+                    tag_style: None,
                 };
                 
                 let tag = service.add_tag(t).unwrap();
                 parent_tag_id = tag.id;
-                tags_for_file.push(parent_tag_id);
+                tags_for_file.push(tag);
                 tag_set.insert(item.1, parent_tag_id);
                 
             } else {

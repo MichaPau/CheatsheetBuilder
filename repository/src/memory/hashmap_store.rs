@@ -80,7 +80,7 @@ impl SnippetStore for HashMapStore {
         let mut remove_count = 0;
         for (_, value) in store.iter_mut() {
             let c1 = value.tags.len();
-            value.tags.retain(|tag| *tag != tag_id);
+            value.tags.retain(|tag| tag.id != tag_id);
 
             if c1 > value.tags.len() {
                 remove_count += 1;
@@ -97,7 +97,7 @@ impl SnippetStore for HashMapStore {
             let time_flag;
 
             if let Some(tags) = &tag_filter {
-                tag_flag = entry.tags.iter().any(|item| tags.contains(item));
+                tag_flag = entry.tags.iter().any(|item| tags.contains(&item.id));
                 //println!("{:?} - {:?} - {}", entry.tags, tags, tag_flag);
                 // tag_flag = entry.tags.iter().an
             } else {
@@ -157,6 +157,7 @@ impl TagStore for HashMapStore {
             title: tag.title,
             parent_id: tag.parent_id,
             tag_type: tag.tag_type,
+            tag_style: tag.tag_style,
 
         };
 

@@ -69,7 +69,8 @@ impl Rusqlite {
                 tag_id INTEGER PRIMARY KEY,
                 title TEXT NOT NULL,
                 parent_id INTEGER,
-                tag_type INTEGER
+                tag_type INTEGER,
+                tag_color INTEGER
             )", 
             ()
         )?;
@@ -88,6 +89,8 @@ impl Rusqlite {
 
         Ok(true)
     }
+
+    #[allow(dead_code)]
     fn get_tag_ids_for_snippet(&self, snippet_id: SnippetID) -> rusqlite::Result<Vec<TagID>> {
         
         let mut stmt = self.conn.prepare("SELECT tag_id FROM Snippet_Tags WHERE snippet_id = ?1 ORDER BY tag_id")?;
@@ -97,7 +100,19 @@ impl Rusqlite {
 
         Ok(tag_ids)
     }
-    pub fn create_snippet_from_row(&self, row: &Row) -> rusqlite::Result<Snippet> {
+
+    fn get_tags_for_snippet(&self, snippet_id: SnippetID) -> rusqlite::Result<Vec<Tag>>  {
+        
+        let mut stmt = self.conn.prepare("SELECT * FROM Tag INNER JOIN Snippet_Tags ON Snippet_Tags.snippet_id = ?1 AND Tag.tag_id = Snippet_Tags.tag_id ORDER BY tag_id")?;
+        let tag_iter = stmt.query_map([snippet_id], |row| {
+            self.create_tag_from_row(row)
+        })?;
+
+        let result: Vec<Tag> = tag_iter.flatten().collect();
+        Ok(result)
+        //Ok(tag_ids)
+    }
+    fn create_snippet_from_row(&self, row: &Row) -> rusqlite::Result<Snippet> {
         let c_time: u64  = row.get(3)?;
         let u_time: u64 = row.get(4).unwrap_or(c_time);
         
@@ -106,10 +121,22 @@ impl Rusqlite {
             id: snippet_id,
             title: row.get(1)?,
             text: row.get(2)?,
-            tags: self.get_tag_ids_for_snippet(snippet_id)?,
+            tags: self.get_tags_for_snippet(snippet_id)?,
             created_at: Timestamp::from(c_time),
             updated_at: Timestamp::from(u_time),
         })
+    }
+    fn create_tag_from_row(&self, row: &Row) -> rusqlite::Result<Tag> {
+        let type_value: usize = row.get(3)?;
+        Ok(
+            Tag {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                parent_id: row.get::<usize, Option<usize>>(2)?,
+                tag_type: TagType::from(type_value),
+                tag_style: row.get::<usize, Option<u32>>(4)?,
+            }
+        )
     }
 }
 #[allow(unused)]
@@ -127,8 +154,8 @@ impl SnippetStore for Rusqlite {
         {
             let mut stmt = tx.prepare("INSERT INTO Snippet_Tags (snippet_id, tag_id) VALUES (?1, ?2)")?;
 
-            for tag_id in &entry.tags {
-                stmt.execute((snippet_id, tag_id))?;
+            for tag in &entry.tags {
+                stmt.execute((snippet_id, tag.id))?;
             }
         }
         tx.commit()?;
@@ -146,11 +173,15 @@ impl SnippetStore for Rusqlite {
 
     fn delete_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
         let mut to_delete = self.conn.query_row(
-            "SELECT * FROM Snippets WHERE snippet_id = ?1", 
+            "SELECT * FROM Snippet WHERE snippet_id = ?1", 
             [id], |r| {
                 self.create_snippet_from_row(r)
             })?;
         
+        self.conn.execute(
+            "DELETE FROM Snippet_Tags WHERE snippet_id = ?1", 
+            [id]
+        )?;
         self.conn.execute(
             "DELETE FROM Snippet WHERE snippet_id = ?1",
             [id]
@@ -204,20 +235,21 @@ impl SnippetStore for Rusqlite {
         let mut stmt = self.conn.prepare(&sql)?;
         let snippet_iter = stmt.query_map([], |row| {
             
-            let snippet_id = row.get(0)?;
+            self.create_snippet_from_row(row)
+            // let snippet_id = row.get(0)?;
 
-            let tag_ids = self.get_tag_ids_for_snippet(snippet_id)?;
+            // let tag_ids = self.get_tag_ids_for_snippet(snippet_id)?;
 
-            let c_time: u64  = row.get(3)?;
-            let u_time: u64 = row.get(4).unwrap_or(c_time);
-            Ok(Snippet {
-                id: snippet_id,
-                title: row.get(1)?,
-                text: row.get(2)?,
-                tags: tag_ids,
-                created_at: Timestamp::from(c_time),
-                updated_at: Timestamp::from(u_time),
-            })
+            // let c_time: u64  = row.get(3)?;
+            // let u_time: u64 = row.get(4).unwrap_or(c_time);
+            // Ok(Snippet {
+            //     id: snippet_id,
+            //     title: row.get(1)?,
+            //     text: row.get(2)?,
+            //     tags: tag_ids,
+            //     created_at: Timestamp::from(c_time),
+            //     updated_at: Timestamp::from(u_time),
+            // })
         })?;
 
         
@@ -239,13 +271,14 @@ impl SnippetStore for Rusqlite {
 
 }
 
+
 #[allow(unused)]
 impl TagStore for Rusqlite {
     fn add_tag(&self, tag: CreateTag) -> Result<Tag, CheatsheetError> {
         
         self.conn.execute(
-            "INSERT INTO Tag (title, parent_id, tag_type) VALUES (?1, ?2, ?3)",
-            (&tag.title, tag.parent_id, tag.tag_type as u32)
+            "INSERT INTO Tag (title, parent_id, tag_type, tag_color) VALUES (?1, ?2, ?3, ?4)",
+            (&tag.title, tag.parent_id, tag.tag_type as u32, tag.tag_style)
         )?;
 
         let tag_id = self.conn.last_insert_rowid();
@@ -256,6 +289,7 @@ impl TagStore for Rusqlite {
                 title: tag.title,
                 parent_id: tag.parent_id,
                 tag_type: tag.tag_type,
+                tag_style: tag.tag_style,
 
             }
         )
@@ -268,22 +302,32 @@ impl TagStore for Rusqlite {
     }
     fn get_tag(&self, id: TagID) -> Result<Tag, CheatsheetError> {
         
-        let mut stmt = self.conn.prepare("SELECT * FROM Tag WHERE tag_id = ?")?;
-        let mut rows = stmt.query([&id])?;
+        let mut tag = self.conn.query_row(
+            "SELECT * FROM Tag WHERE tag_id = ?1", 
+            [id], |r| {
+                self.create_tag_from_row(r)
+            })?;
+        
+        Ok(tag)
 
-        if let Some(row) = rows.next()? {
-            let type_value: usize = row.get(3)?;
-            Ok(
-                Tag {
-                    id: row.get(0)?,
-                    title: row.get(1)?,
-                    parent_id: row.get(2)?,
-                    tag_type: TagType::from(type_value),
-                }
-            )
-        } else {
-            Err(CheatsheetError::StoreError(format!("no tag for tag_id: {id}")))
-        }
+        // let mut stmt = self.conn.prepare("SELECT * FROM Tag WHERE tag_id = ?")?;
+        // let mut rows = stmt.query([&id])?;
+
+        // if let Some(row) = rows.next()? {
+        //     self.create_tag_from_row(row)
+        //     // let type_value: usize = row.get(3)?;
+        //     // Ok(
+        //     //     Tag {
+        //     //         id: row.get(0)?,
+        //     //         title: row.get(1)?,
+        //     //         parent_id: row.get::<usize, Option<usize>>(2)?,
+        //     //         tag_type: TagType::from(type_value),
+        //     //         tag_style: row.get::<usize, Option<u32>>(4)?,
+        //     //     }
+        //     // )
+        // } else {
+        //     Err(CheatsheetError::StoreError(format!("no tag for tag_id: {id}")))
+        // }
        
         
     }
@@ -300,16 +344,18 @@ impl TagStore for Rusqlite {
         let mut stmt = self.conn.prepare("SELECT * FROM Tag")?;
         let tag_iter = stmt.query_map([], |row| {
            
-            let type_value: usize = row.get(3)?;
-            Ok(
-                Tag {
-                    id: row.get(0)?,
-                    title: row.get(1)?,
-                    parent_id: row.get::<usize, Option<usize>>(2)?,
-                    tag_type: TagType::from(type_value),
+           self.create_tag_from_row(row)
+            // let type_value: usize = row.get(3)?;
+            // Ok(
+            //     Tag {
+            //         id: row.get(0)?,
+            //         title: row.get(1)?,
+            //         parent_id: row.get::<usize, Option<usize>>(2)?,
+            //         tag_type: TagType::from(type_value),
+            //         tag_style: row.get::<usize, Option<u32>>(4)?,
                 
-                }
-            )
+            //     }
+            // )
         })?;
 
         //let result: Vec<Tag> = tag_iter.flat_map(|s|s).collect();

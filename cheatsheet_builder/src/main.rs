@@ -2,8 +2,7 @@
 
 use repository::{
     //entities::entry::{CreateSnippet, CreateTag}, 
-    ports::ports::Service,
-    tools,
+    ports::stores::Service,
  };
 
 use repository::memory::hashmap_store::HashMapStore;
@@ -16,21 +15,21 @@ use repository::memory::hashmap_store::HashMapStore;
 fn main() {
     println!("Hello, cheatsheet builder!");
 
-    let store = HashMapStore::new();
-    let mut service = Service::new(store);
+    // let store = HashMapStore::new();
+    // let mut service = Service::new(store);
 
-    tools::parse_joplin::_parse_joplin_export(&mut service, "./data");
+    // tools::parse_joplin::_parse_joplin_export(&mut service, "./data");
 
-    let tag_map = service.store.tag_store.borrow();
-    //let snippet_map = service.store.snippet_store.borrow();
+    // let tag_map = service.store.tag_store.borrow();
+    
 
-    let tag_list = tag_map.iter().filter(|(&id, _)| id == 7).map(|tag_entry| *tag_entry.0).collect();
-    println!("{:?}", tag_list);
-    let list = service.get_snippet_list(Some(tag_list), None).unwrap();
+    // let tag_list = tag_map.iter().filter(|(&id, _)| id == 7).map(|tag_entry| *tag_entry.0).collect();
+    // println!("{:?}", tag_list);
+    // let list = service.get_snippet_list(Some(tag_list), None).unwrap();
 
-    for item in list {
-        println!("{:#?}", item);
-    }
+    // for item in list {
+    //     println!("{:#?}", item);
+    // }
     //println!("{:#?}", tag_map);
     //println!("{:#?}", snippet_map);
 
