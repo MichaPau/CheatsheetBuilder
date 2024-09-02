@@ -3,11 +3,11 @@ use domain::{entities::entry::{CreateSnippet, CreateTag, TagType}, utils::types:
 use core::time;
 use std::{sync::{LazyLock, Mutex}, thread};
 
-use repository::{db::sqlite::rusqlite::{self, Rusqlite}, ports::stores::{SnippetStore, TagStore}, types::TagListItem};
+use repository::{db::sqlite::rusqlite_db::{self, Rusqlite}, ports::stores::{SnippetStore, TagStore}, types::TagListItem};
 
 static STATIC_DB: LazyLock<Mutex<Rusqlite>> = LazyLock::new(|| {
 
-    let db = rusqlite::Rusqlite::new_in_memory().unwrap();
+    let db = rusqlite_db::Rusqlite::new_in_memory().unwrap();
     
 
     Mutex::new(db)

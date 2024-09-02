@@ -12,7 +12,7 @@ pub mod tools {
 
 pub mod db {
     pub mod sqlite {
-        pub mod rusqlite;
+        pub mod rusqlite_db;
     }
 }
 
