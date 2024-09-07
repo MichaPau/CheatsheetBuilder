@@ -2,10 +2,10 @@
 
 use repository::{
     //entities::entry::{CreateSnippet, CreateTag}, 
-    ports::stores::Service,
+    ports::services::Service,
  };
 
-use repository::memory::hashmap_store::HashMapStore;
+//use repository::memory::hashmap_store::HashMapStore;
 
 
 //https://github.com/howtocodeit/hexarch

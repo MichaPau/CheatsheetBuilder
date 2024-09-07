@@ -1,4 +1,4 @@
-use domain::{entities::entry::{CreateSnippet, CreateTag}, utils::types::Timestamp};
+use domain::{entities::entry::{CreateSnippet, CreateTag, TagType}, utils::types::Timestamp};
 
 use core::time;
 use std::{sync::{LazyLock, Mutex}, thread};
@@ -18,7 +18,7 @@ static STATIC_DB: LazyLock<Mutex<Rusqlite>> = LazyLock::new(|| {
 type TestResult<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 #[test]
-fn test_inserts() -> TestResult {
+fn test_01_inserts() -> TestResult {
     let mut db = STATIC_DB.lock().unwrap();
 
     let hierarque_tags: Vec<TagListItem> = vec![
@@ -60,7 +60,7 @@ fn test_inserts() -> TestResult {
         }
     }
 
-    let tag_list = db.get_list().unwrap();
+    let tag_list = db.get_tag_list().unwrap();
 
     assert_eq!(tag_list.len(), tag_count);
     
@@ -75,12 +75,12 @@ fn test_inserts() -> TestResult {
     ];
 
     for item in snippets_data.iter() {
-        let added = db.add_entry(item.clone()).unwrap();
-        println!("added: {:?}", added);
+        let _added = db.add_entry(item.clone()).unwrap();
+        //println!("added: {:?}", added);
     }
 
-    let fetched = db.get_entry(1).unwrap();
-    println!("fetched: {:?}", fetched);
+    //let fetched = db.get_entry(1).unwrap();
+    //println!("fetched: {:?}", fetched);
 
     let snippet_list = db.get_snippet_list(None, None).unwrap();
     //println!("ts first: {}", snippet_list.get(0).unwrap().updated_at);
@@ -90,7 +90,7 @@ fn test_inserts() -> TestResult {
 }
 #[test]
 #[ignore = "check sleep workaround"]
-fn test_list_filter() -> TestResult {
+fn test_02_list_filter() -> TestResult {
     
     let db = STATIC_DB.lock().unwrap();
     
@@ -113,14 +113,13 @@ fn test_list_filter() -> TestResult {
 }
 
 #[test]
-fn test_new_funcs() -> TestResult {
+fn test_03_delete_entry() -> TestResult {
     let db = STATIC_DB.lock().unwrap();
     let snippet = db.get_entry(1).unwrap();
 
-    println!("{:?}", snippet);
+    
     assert_eq!(snippet.tags.len(), 2);
 
-    println!("debug tags: {:#?}", snippet.tags);
 
     let deleted = db.delete_entry(1).unwrap();
 
@@ -131,11 +130,51 @@ fn test_new_funcs() -> TestResult {
     assert!(snippet_result.is_err());
     Ok(())
 }
+
 #[test]
-fn test_update_tags() -> TestResult {
+fn test_04_add_tags() -> TestResult {
+    let mut db = STATIC_DB.lock().unwrap();
+
+    let tags = db.get_tag_list().unwrap();
+    //snippet 2 tags -> 1, 6 (index)
+    let count = db.add_tags(2, vec![tags[2].clone(), tags[4].clone()]).unwrap();
+
+    assert_eq!(count, 2);
+
+    let snippet = db.get_entry(2).unwrap();
+
+    assert_eq!(snippet.tags.len(), 4);
+
+    let count = db.add_tags(2, vec![tags[2].clone(), tags[4].clone()]).unwrap();
+
+    assert_eq!(count, 0);
+
+    //test add already tagged with
+    let snippet = db.get_entry(2).unwrap();
+
+    assert_eq!(snippet.tags.len(), 4);
+
+    Ok(())
+}
+#[test]
+fn test_05_update_tags() -> TestResult {
    
-    let _db = STATIC_DB.lock().unwrap();
+    let db = STATIC_DB.lock().unwrap();
     
+    db.update_tag_parent(2, Some(4)).unwrap();
+    db.update_tag_title(2, "sub1 to sub2".into()).unwrap();
+    db.update_tag_type(2, TagType::Category).unwrap();
+
+    let tag = db.get_tag(2).unwrap();
+
+    assert_eq!(tag.title, "sub1 to sub2");
+    assert_eq!(tag.parent_id, Some(4));
+    assert_eq!(TagType::from(tag.tag_type), TagType::Category);
+
+    let tag_list = db.get_tag_hierarchy(2).unwrap();
+    println!("{:#?}", tag_list);
+
+    assert_eq!(tag_list.len(), 2);
     Ok(())
 }
 

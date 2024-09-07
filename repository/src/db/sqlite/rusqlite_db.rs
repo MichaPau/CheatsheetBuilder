@@ -8,6 +8,7 @@ use rusqlite::{Connection, OpenFlags, Row};
 
 use crate::{errors::CheatsheetError, ports::stores::{SnippetStore, TagStore}};
 
+#[derive(Debug)]
 pub struct Rusqlite {
     pub conn: Connection,
 }
@@ -82,7 +83,9 @@ impl Rusqlite {
                 tag_id INTEGER,
 
                 FOREIGN KEY (snippet_id) REFERENCES Snippet (snippet_id),
-                FOREIGN KEY (tag_id) REFERENCES Tag (tag_id)
+                FOREIGN KEY (tag_id) REFERENCES Tag (tag_id),
+
+                UNIQUE(snippet_id, tag_id) ON CONFLICT IGNORE
             )", 
             ()
         )?;
@@ -128,13 +131,17 @@ impl Rusqlite {
     }
     fn create_tag_from_row(&self, row: &Row) -> rusqlite::Result<Tag> {
         let type_value: usize = row.get(3)?;
+        let style = match row.get::<usize, Option<u32>>(4)? {
+            Some(v) => Some(TagStyle {color: Color::Decimal(v)}),
+            None => None,
+        };
         Ok(
             Tag {
                 id: row.get(0)?,
                 title: row.get(1)?,
                 parent_id: row.get::<usize, Option<usize>>(2)?,
                 tag_type: TagType::from(type_value),
-                tag_style: row.get::<usize, Option<u32>>(4)?,
+                tag_style: style,
             }
         )
     }
@@ -197,6 +204,23 @@ impl SnippetStore for Rusqlite {
             })?;
         Ok(snippet)
     }
+    fn add_tags(&mut self, snippet_id: SnippetID, tags: Vec<Tag>) -> Result<usize, CheatsheetError> {
+        
+        let mut count = 0;
+        let tx = self.conn.transaction()?;
+        {
+            let mut stmt = tx.prepare("INSERT INTO Snippet_Tags (snippet_id, tag_id) VALUES (?1, ?2)")?;
+
+            for tag in &tags {
+                if let Ok(c) = stmt.execute((snippet_id, tag.id)) {
+                    count += c;
+                }
+            }
+        }
+        tx.commit()?;
+
+        Ok(count)
+    }
     fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError> {
         let ts = u64::from(Timestamp::from_utc_now());
 
@@ -206,11 +230,28 @@ impl SnippetStore for Rusqlite {
         )?;
 
         Ok(true)
-        //Err(CheatsheetError::NotImplemented("".into()))
     }
 
+    fn remove_tag(&self, snippet_id: SnippetID, tag_id:TagID) -> Result<bool, CheatsheetError> {
+        match self.conn.execute(
+            "DELETE FROM Snippet_Tags WHERE snippet_id = ?1 AND tag_id = ?2", 
+            (snippet_id, tag_id)
+        ) {
+            Ok(count) => Ok(true),
+            Err(e) => Err(CheatsheetError::StoreError(e.to_string())),
+        }
+    }
     fn remove_tag_from_all(&self, tag_id:TagID) -> Result<usize, CheatsheetError> {
-        Err(CheatsheetError::NotImplemented("".into()))
+
+        match self.conn.execute(
+            "DELETE FROM Snippet_Tags WHERE tag_id = ?1", 
+            [tag_id]
+        ) {
+            Ok(count) => Ok(count),
+            Err(e) => Err(CheatsheetError::StoreError(e.to_string())),
+        }
+
+        
     }
     fn get_snippet_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError> {
         
@@ -234,22 +275,7 @@ impl SnippetStore for Rusqlite {
 
         let mut stmt = self.conn.prepare(&sql)?;
         let snippet_iter = stmt.query_map([], |row| {
-            
             self.create_snippet_from_row(row)
-            // let snippet_id = row.get(0)?;
-
-            // let tag_ids = self.get_tag_ids_for_snippet(snippet_id)?;
-
-            // let c_time: u64  = row.get(3)?;
-            // let u_time: u64 = row.get(4).unwrap_or(c_time);
-            // Ok(Snippet {
-            //     id: snippet_id,
-            //     title: row.get(1)?,
-            //     text: row.get(2)?,
-            //     tags: tag_ids,
-            //     created_at: Timestamp::from(c_time),
-            //     updated_at: Timestamp::from(u_time),
-            // })
         })?;
 
         
@@ -275,10 +301,10 @@ impl SnippetStore for Rusqlite {
 #[allow(unused)]
 impl TagStore for Rusqlite {
     fn add_tag(&self, tag: CreateTag) -> Result<Tag, CheatsheetError> {
-        
+        let color_option: Option<u32> = tag.tag_style.clone().map(|o| o.color.into());
         self.conn.execute(
             "INSERT INTO Tag (title, parent_id, tag_type, tag_color) VALUES (?1, ?2, ?3, ?4)",
-            (&tag.title, tag.parent_id, tag.tag_type as u32, tag.tag_style)
+            (&tag.title, tag.parent_id, tag.tag_type as u32, color_option)
         )?;
 
         let tag_id = self.conn.last_insert_rowid();
@@ -297,7 +323,18 @@ impl TagStore for Rusqlite {
     }
 
     fn delete_tag(&self, id: TagID) -> Result<Tag, CheatsheetError> {
-        Err(CheatsheetError::NotImplemented("delete_tag not implemented".into()))
+        let mut to_delete = self.conn.query_row(
+            "SELECT * FROM Tag WHERE tag_id = ?1", 
+            [id], |r| {
+                self.create_tag_from_row(r)
+            })?;
+        
+        
+        self.conn.execute(
+            "DELETE FROM Tag WHERE tag_id = ?1",
+            [id]
+        )?;
+        Ok(to_delete)
         
     }
     fn get_tag(&self, id: TagID) -> Result<Tag, CheatsheetError> {
@@ -309,58 +346,70 @@ impl TagStore for Rusqlite {
             })?;
         
         Ok(tag)
-
-        // let mut stmt = self.conn.prepare("SELECT * FROM Tag WHERE tag_id = ?")?;
-        // let mut rows = stmt.query([&id])?;
-
-        // if let Some(row) = rows.next()? {
-        //     self.create_tag_from_row(row)
-        //     // let type_value: usize = row.get(3)?;
-        //     // Ok(
-        //     //     Tag {
-        //     //         id: row.get(0)?,
-        //     //         title: row.get(1)?,
-        //     //         parent_id: row.get::<usize, Option<usize>>(2)?,
-        //     //         tag_type: TagType::from(type_value),
-        //     //         tag_style: row.get::<usize, Option<u32>>(4)?,
-        //     //     }
-        //     // )
-        // } else {
-        //     Err(CheatsheetError::StoreError(format!("no tag for tag_id: {id}")))
-        // }
-       
         
     }
-    fn update_parent(&self, id: TagID, new_parent_id: Option<TagID>) -> Result<bool, CheatsheetError> {
-        Err(CheatsheetError::NotImplemented("update_parent not implemented".into()))
+    fn update_tag_parent(&self, id: TagID, new_parent_id: Option<TagID>) -> Result<bool, CheatsheetError> {
+        self.conn.execute(
+            "UPDATE Tag SET parent_id = ?1 WHERE tag_id = ?2",
+            (new_parent_id, id)
+        )?;
+
+        Ok(true)
         
     }
-    fn update_title(&self, id: TagID, new_title: String) -> Result<bool, CheatsheetError> {
-        Err(CheatsheetError::NotImplemented("update_title implemented".into()))
+    fn update_tag_title(&self, id: TagID, new_title: String) -> Result<bool, CheatsheetError> {
+        self.conn.execute(
+            "UPDATE Tag SET title = ?1 WHERE tag_id = ?2",
+            (new_title, id)
+        )?;
+
+        Ok(true)
     }
 
-    fn get_list(&self) -> Result<TagList, CheatsheetError> {
+    fn update_tag_type(&self, id: TagID, new_type: TagType) -> Result<bool, CheatsheetError> {
+        self.conn.execute(
+            "UPDATE Tag SET tag_type = ?1 WHERE tag_id = ?2",
+            (new_type as usize, id)
+        )?;
+
+        Ok(true)
+    }
+
+    fn get_tag_list(&self) -> Result<TagList, CheatsheetError> {
 
         let mut stmt = self.conn.prepare("SELECT * FROM Tag")?;
         let tag_iter = stmt.query_map([], |row| {
-           
            self.create_tag_from_row(row)
-            // let type_value: usize = row.get(3)?;
-            // Ok(
-            //     Tag {
-            //         id: row.get(0)?,
-            //         title: row.get(1)?,
-            //         parent_id: row.get::<usize, Option<usize>>(2)?,
-            //         tag_type: TagType::from(type_value),
-            //         tag_style: row.get::<usize, Option<u32>>(4)?,
-                
-            //     }
-            // )
         })?;
 
         //let result: Vec<Tag> = tag_iter.flat_map(|s|s).collect();
         let result: Vec<Tag> = tag_iter.flatten().collect();
         Ok(result)
+    }
+
+    fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError> {
+        // let mut tag = self.conn.query_row(
+        //     "SELECT * FROM Tag WHERE tag_id = ?1", 
+        //     [id], |r| {
+        //         self.create_tag_from_row(r)
+        //     })?;
+        
+        // Ok(tag)
+        let mut id_check = Some(tag_id);
+        let mut list: TagList = vec![];
+
+        while let Some(id) = id_check {
+            let mut tag = self.conn.query_row(
+                "SELECT * FROM Tag WHERE tag_id = ?1", 
+                [id], |r| {
+                    self.create_tag_from_row(r)
+                })?;
+            
+            id_check = tag.parent_id.clone();
+            list.push(tag);
+            
+        } 
+        Ok(list)
     }
     
 }

@@ -1,5 +1,6 @@
 pub mod ports {
     pub mod stores;
+    pub mod services;
 }
 
 
@@ -16,9 +17,9 @@ pub mod db {
     }
 }
 
-pub mod memory {
-    pub mod hashmap_store;
-}
+// pub mod memory {
+//     pub mod hashmap_store;
+// }
 
 // #[cfg(test)]
 // mod test {

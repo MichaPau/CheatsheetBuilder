@@ -58,7 +58,7 @@ pub struct CreateTag {
     pub title: String,
     pub tag_type: TagType,
     pub parent_id: Option<TagID>,
-    pub tag_style: Option<TagColor>,
+    pub tag_style: Option<TagStyle>,
 }
 
 impl Default for CreateTag {
@@ -77,7 +77,7 @@ pub struct Tag {
     pub title: String,
     pub parent_id: Option<TagID>,
     pub tag_type: TagType,
-    pub tag_style: Option<TagColor>,
+    pub tag_style: Option<TagStyle>,
 }
 
 
@@ -95,9 +95,45 @@ impl From<usize> for TagType {
             0 => TagType::Untagged,
             1 => TagType::Normal,
             2 => TagType::Category,
-            _ => TagType::Untagged,
+            _ => TagType::Normal,
         }
     }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Color {
+    RGB((u8, u8, u8)),
+    Decimal(u32),
+}
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct TagStyle {
+    pub color: Color,
+}
+
+impl Into<u32> for Color {
+    fn into(self) -> u32 {
+        match self {
+            Color::RGB((r, g, b)) => {
+                let c: u32 = ((r as u32) << 16) + ((g as u32) << 8) + (b as u32);
+                c
+            },
+            Color::Decimal(v) => v,
+        }
+    }
+}
+
+#[test]
+fn tag_styles() {
+    let style = TagStyle {
+        color: Color::RGB((255, 255, 255)),
+    };
+    let style2 = TagStyle {
+        color: Color::Decimal(16777215),
+    };
+    let v1:u32 = style.color.into();
+    let v2:u32 = style2.color.into();
+
+    assert_eq!(v1, v2);
 }
 
 
