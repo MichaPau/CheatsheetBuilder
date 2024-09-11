@@ -9,7 +9,9 @@ domain = { path = "../domain" }
 repository = { path = "../repository" }
 crossterm = { version = "0.28.1", optional = true }
 ratatui = { version = "0.28.1", optional = true }
+xilem = { path = "../../../forks/xilem/xilem", optional = true }
 
 [features]
 default = ["tui"]
 tui = ["crossterm", "ratatui"]
+gui = ["xilem"]
