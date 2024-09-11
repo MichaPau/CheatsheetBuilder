@@ -6,7 +6,7 @@ use std::path::Path;
 use domain::{entities::entry::*, utils::types::{SearchPattern, Timestamp}};
 use rusqlite::{Connection, OpenFlags, Row};
 
-use crate::{errors::CheatsheetError, ports::stores::{SnippetStore, TagStore}};
+use crate::{errors::CheatsheetError, ports::stores::{SnippetStore, TagStore}, types::TagListItem};
 
 #[derive(Debug)]
 pub struct Rusqlite {
@@ -45,14 +45,69 @@ impl Rusqlite {
     pub fn new_in_memory() -> rusqlite::Result<Self> {
         let conn = Connection::open_in_memory()?;
 
-        let db = Self {
+        let mut db = Self {
             conn,
         };
 
         db.create_default_tables()?;
+        db.create_dummy_entries();
         Ok(db)
     }
 
+    pub fn create_dummy_entries(&mut self) {
+        let hierarque_tags: Vec<TagListItem> = vec![
+            TagListItem {
+                tag: CreateTag { title: "one".into(), ..Default::default() },
+                childs: vec![
+                    CreateTag { title: "one_sub_1".into(), ..Default::default() },
+                    CreateTag { title: "one_sub_2".into(), ..Default::default() }
+                ],
+            },
+            TagListItem {
+                tag: CreateTag { title: "two".into(), ..Default::default()},
+                childs: vec![
+                    CreateTag { title: "two_sub_1".into(), ..Default::default() }
+                ],
+            },
+            TagListItem {
+                tag: CreateTag { title: "three".into(), ..Default::default() },
+                childs: vec![],
+            },
+            TagListItem {
+                tag: CreateTag { title: "all".into(), ..Default::default() },
+                childs: vec![],
+            },
+            TagListItem {
+                tag: CreateTag { title: "some".into(), ..Default::default() },
+                childs: vec![],
+            },
+        ];
+
+
+
+        for item in hierarque_tags {
+            let tag_added = self.add_tag(item.tag).unwrap();
+            for mut sub_item in item.childs {
+                sub_item.parent_id = Some(tag_added.id);
+                let _ = self.add_tag(sub_item).unwrap();
+            }
+        }
+        
+        let tag_list = self.get_tag_list().unwrap();
+        let snippets_data = vec![
+            CreateSnippet::new("first".into(), "first content".into(), vec![tag_list[0].clone(), tag_list[6].clone()]),
+            CreateSnippet::new("first again".into(), "first again content".into(), vec![tag_list[1].clone(), tag_list[6].clone()]),
+            CreateSnippet::new("second".into(), "second content".into(), vec![tag_list[3].clone(), tag_list[6].clone(), tag_list[7].clone()]),
+            CreateSnippet::new("third".into(), "third content".into(), vec![tag_list[5].clone(), tag_list[6].clone()]),
+            CreateSnippet::new("third again".into(), "third again content".into(), vec![tag_list[7].clone(), tag_list[6].clone()]),
+
+        ];
+
+        for item in snippets_data.iter() {
+            let _added = self.add_entry(item.clone()).unwrap();
+            //println!("added: {:?}", added);
+        }
+    }
     fn create_default_tables(&self) -> rusqlite::Result<bool> {
         self.conn.execute(
             "CREATE TABLE IF NOT EXISTS Snippet (

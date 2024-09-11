@@ -1,23 +1,25 @@
 //use std::{collections::HashMap, fs, path::{Path, PathBuf}};
 
-use repository::{
-    //entities::entry::{CreateSnippet, CreateTag}, 
-    ports::services::Service,
- };
+// use repository::{
+//     //entities::entry::{CreateSnippet, CreateTag}, 
+//     // db::sqlite::rusqlite_db::Rusqlite, ports::{services::Service, stores::{SnippetStore, TagStore}}
+//  };
 
 //use repository::memory::hashmap_store::HashMapStore;
 
-
+use presentation::tui::ratatui::ratatui;
 //https://github.com/howtocodeit/hexarch
 //https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust#service-the-heart-of-hexagonal-architecture
 
 
 fn main() {
-    println!("Hello, cheatsheet builder!");
+    println!("Hello, cheatsheet builder!!");
 
-    // let store = HashMapStore::new();
+    // let store = Rusqlite::new_in_memory().unwrap();
     // let mut service = Service::new(store);
 
+    
+    ratatui::setup().unwrap();
     // tools::parse_joplin::_parse_joplin_export(&mut service, "./data");
 
     // let tag_map = service.store.tag_store.borrow();

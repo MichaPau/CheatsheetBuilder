@@ -1,0 +1,15 @@
+[package]
+name = "presentation"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+domain = { path = "../domain" }
+repository = { path = "../repository" }
+crossterm = { version = "0.28.1", optional = true }
+ratatui = { version = "0.28.1", optional = true }
+
+[features]
+default = ["tui"]
+tui = ["crossterm", "ratatui"]

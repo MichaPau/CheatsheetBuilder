@@ -4,17 +4,18 @@ use crate::errors::CheatsheetError;
 
 use super::stores::{SnippetStore, TagStore};
 
-pub struct Service<R> where R: SnippetStore + TagStore + Send + Sync + Clone + 'static {
+pub struct Service<R> where R: SnippetStore + TagStore {
     pub store: R,
 }
 
-impl <R> Service<R> where R: SnippetStore + TagStore + Send + Sync + Clone + 'static{
+impl <R> Service<R> where R: SnippetStore + TagStore {
     pub fn new(store: R) -> Self {
         Self {
             store,
         }
     }
 
+    
     pub fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
         self.store.get_entry(id)
     }
