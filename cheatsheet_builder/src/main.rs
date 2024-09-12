@@ -7,7 +7,8 @@
 
 //use repository::memory::hashmap_store::HashMapStore;
 
-use presentation::tui::ratatui::ratatui;
+//use presentation::tui::ratatui::ratatui;
+use presentation::gui::xilem::xilem;
 //https://github.com/howtocodeit/hexarch
 //https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust#service-the-heart-of-hexagonal-architecture
 
@@ -19,7 +20,9 @@ fn main() {
     // let mut service = Service::new(store);
 
     
-    ratatui::setup().unwrap();
+    //ratatui::setup().unwrap();
+    xilem::run_xilem();
+
     // tools::parse_joplin::_parse_joplin_export(&mut service, "./data");
 
     // let tag_map = service.store.tag_store.borrow();

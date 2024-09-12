@@ -6,6 +6,6 @@ edition = "2021"
 [dependencies]
 domain = { path = "../domain" }
 repository = { path = "../repository" }
-presentation = { path = "../presentation" } 
+presentation = { path = "../presentation", features = ["gui"]} 
 
 
