@@ -2,14 +2,18 @@ use domain::entities::entry::{CreateSnippet, CreateTag, Snippet, SnippetID, Snip
 
 use crate::errors::CheatsheetError;
 
-use super::stores::{SnippetStore, TagStore};
+use super::stores::StateTrait;
 
-pub struct Service<R> where R: SnippetStore + TagStore {
-    pub store: R,
+//#[derive(Debug)]
+// pub struct Service<R> where R: StateTrait {
+//     pub store: R,
+//}
+pub struct Service {
+    pub store: Box<dyn StateTrait>,
 }
 
-impl <R> Service<R> where R: SnippetStore + TagStore {
-    pub fn new(store: R) -> Self {
+impl Service {
+    pub fn new(store: Box<dyn StateTrait>) -> Self {
         Self {
             store,
         }
@@ -61,10 +65,10 @@ impl <R> Service<R> where R: SnippetStore + TagStore {
         Ok(deleted_tag)
     }
 
-    pub fn get_tag_list(&self) -> Result<TagList, CheatsheetError> {
-        self.store.get_tag_list()
+    pub fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError> {
+        self.store.get_tag_list(type_filter)
     }
-    pub fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<Vec<Tag>, CheatsheetError> {
+    pub fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError> {
         self.store.get_tag_hierarchy(tag_id)
     }
     

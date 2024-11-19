@@ -1,23 +1,21 @@
-
-
-use std::path::Path;
-
+use std::{path::Path, sync::Mutex};
 
 use domain::{entities::entry::*, utils::types::{SearchPattern, Timestamp}};
 use rusqlite::{Connection, OpenFlags, Row};
 
-use crate::{errors::CheatsheetError, ports::stores::{SnippetStore, TagStore}, types::TagListItem};
+use crate::{errors::CheatsheetError, ports::stores::{SnippetStore, TagStore, StateTrait}, types::TagListItem};
 
 #[derive(Debug)]
 pub struct Rusqlite {
-    pub conn: Connection,
+    pub conn: Mutex<Connection>,
 }
+
 
 impl Rusqlite {
     pub fn new<P: AsRef<Path>>(path: P) -> rusqlite::Result<Self> {
         let conn = Connection::open(path)?;
         let db = Self {
-            conn,
+            conn: Mutex::new(conn),
         };
 
         db.create_default_tables()?;
@@ -30,10 +28,10 @@ impl Rusqlite {
             path,
             OpenFlags::SQLITE_OPEN_READ_WRITE
             | OpenFlags::SQLITE_OPEN_URI
-            | OpenFlags::SQLITE_OPEN_NO_MUTEX,)?;
+            | OpenFlags::SQLITE_OPEN_NO_MUTEX)?;
         
         let db = Self {
-            conn,
+            conn: Mutex::new(conn),
         };
 
         //db.create_default_tables()?;
@@ -43,10 +41,14 @@ impl Rusqlite {
 
 
     pub fn new_in_memory() -> rusqlite::Result<Self> {
-        let conn = Connection::open_in_memory()?;
+        let conn = Connection::open_in_memory_with_flags(
+            OpenFlags::SQLITE_OPEN_READ_WRITE
+            | OpenFlags::SQLITE_OPEN_URI
+            | OpenFlags::SQLITE_OPEN_NO_MUTEX
+        )?;
 
         let mut db = Self {
-            conn,
+            conn: Mutex::new(conn),
         };
 
         db.create_default_tables()?;
@@ -55,30 +57,33 @@ impl Rusqlite {
     }
 
     pub fn create_dummy_entries(&mut self) {
+        println!("create dummy data");
         let hierarque_tags: Vec<TagListItem> = vec![
             TagListItem {
-                tag: CreateTag { title: "one".into(), ..Default::default() },
+                tag: CreateTag { title: "one".into(), tag_type: TagType::Category,  ..Default::default() },
                 childs: vec![
-                    CreateTag { title: "one_sub_1".into(), ..Default::default() },
-                    CreateTag { title: "one_sub_2".into(), ..Default::default() }
+                    CreateTag { title: "one_sub_1".into(), tag_type: TagType::Category, ..Default::default() },
+                    CreateTag { title: "one_sub_2".into(), tag_type: TagType::Category, ..Default::default() }
                 ],
             },
             TagListItem {
-                tag: CreateTag { title: "two".into(), ..Default::default()},
+                tag: CreateTag { title: "two".into(), tag_type: TagType::Category, ..Default::default()},
                 childs: vec![
-                    CreateTag { title: "two_sub_1".into(), ..Default::default() }
+                    CreateTag { title: "two_sub_1".into(), tag_type: TagType::Category, ..Default::default() }
                 ],
             },
             TagListItem {
-                tag: CreateTag { title: "three".into(), ..Default::default() },
+                tag: CreateTag { title: "three".into(), tag_type: TagType::Category, ..Default::default() },
+                childs: vec![
+                    CreateTag { title: "three_sub_1".into(), tag_type: TagType::Category, ..Default::default() }
+                ],
+            },
+            TagListItem {
+                tag: CreateTag { title: "all".into(), tag_type: TagType::Category, ..Default::default() },
                 childs: vec![],
             },
             TagListItem {
-                tag: CreateTag { title: "all".into(), ..Default::default() },
-                childs: vec![],
-            },
-            TagListItem {
-                tag: CreateTag { title: "some".into(), ..Default::default() },
+                tag: CreateTag { title: "some".into(), tag_type: TagType::Category, ..Default::default() },
                 childs: vec![],
             },
         ];
@@ -93,7 +98,7 @@ impl Rusqlite {
             }
         }
         
-        let tag_list = self.get_tag_list().unwrap();
+        let tag_list = self.get_tag_list(None).unwrap();
         let snippets_data = vec![
             CreateSnippet::new("first".into(), "first content".into(), vec![tag_list[0].clone(), tag_list[6].clone()]),
             CreateSnippet::new("first again".into(), "first again content".into(), vec![tag_list[1].clone(), tag_list[6].clone()]),
@@ -109,7 +114,8 @@ impl Rusqlite {
         }
     }
     fn create_default_tables(&self) -> rusqlite::Result<bool> {
-        self.conn.execute(
+        println!("createdefault tables");
+        self.conn.lock().unwrap().execute(
             "CREATE TABLE IF NOT EXISTS Snippet (
                 snippet_id INTEGER PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -120,7 +126,7 @@ impl Rusqlite {
             ()
         )?;
 
-        self.conn.execute(
+        self.conn.lock().unwrap().execute(
             "CREATE TABLE IF NOT EXISTS Tag (
                 tag_id INTEGER PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -131,7 +137,7 @@ impl Rusqlite {
             ()
         )?;
 
-        self.conn.execute(
+        self.conn.lock().unwrap().execute(
             "CREATE TABLE IF NOT EXISTS Snippet_Tags (
                 id INTEGER PRIMARY KEY,
                 snippet_id INTEGER NOT NULL,
@@ -149,19 +155,23 @@ impl Rusqlite {
     }
 
     #[allow(dead_code)]
-    fn get_tag_ids_for_snippet(&self, snippet_id: SnippetID) -> rusqlite::Result<Vec<TagID>> {
+    fn get_tag_ids_for_snippet(&self, snippet_id: SnippetID, conn: &Connection) -> rusqlite::Result<Vec<TagID>> {
         
-        let mut stmt = self.conn.prepare("SELECT tag_id FROM Snippet_Tags WHERE snippet_id = ?1 ORDER BY tag_id")?;
+        //let c = self.conn.try_lock().unwrap();
+        let mut stmt = conn.prepare("SELECT tag_id FROM Snippet_Tags WHERE snippet_id = ?1 ORDER BY tag_id")?;
         let rows = stmt.query_map([snippet_id], |row| row.get::<usize, usize>(0))?;
         
         let tag_ids: Vec<TagID> = rows.into_iter().map(Result::unwrap).collect();
 
+        //std::mem::drop(c);
         Ok(tag_ids)
     }
 
-    fn get_tags_for_snippet(&self, snippet_id: SnippetID) -> rusqlite::Result<Vec<Tag>>  {
+    fn get_tags_for_snippet(&self, snippet_id: SnippetID, conn: &Connection) -> rusqlite::Result<Vec<Tag>>  {
         
-        let mut stmt = self.conn.prepare("SELECT * FROM Tag INNER JOIN Snippet_Tags ON Snippet_Tags.snippet_id = ?1 AND Tag.tag_id = Snippet_Tags.tag_id ORDER BY tag_id")?;
+        //let c = self.conn.try_lock().unwrap();
+
+        let mut stmt = conn.prepare("SELECT * FROM Tag INNER JOIN Snippet_Tags ON Snippet_Tags.snippet_id = ?1 AND Tag.tag_id = Snippet_Tags.tag_id ORDER BY tag_id")?;
         let tag_iter = stmt.query_map([snippet_id], |row| {
             self.create_tag_from_row(row)
         })?;
@@ -170,7 +180,7 @@ impl Rusqlite {
         Ok(result)
         //Ok(tag_ids)
     }
-    fn create_snippet_from_row(&self, row: &Row) -> rusqlite::Result<Snippet> {
+    fn create_snippet_from_row(&self, row: &Row, conn: &Connection) -> rusqlite::Result<Snippet> {
         let c_time: u64  = row.get(3)?;
         let u_time: u64 = row.get(4).unwrap_or(c_time);
         
@@ -179,7 +189,7 @@ impl Rusqlite {
             id: snippet_id,
             title: row.get(1)?,
             text: row.get(2)?,
-            tags: self.get_tags_for_snippet(snippet_id)?,
+            tags: self.get_tags_for_snippet(snippet_id, conn)?,
             created_at: Timestamp::from(c_time),
             updated_at: Timestamp::from(u_time),
         })
@@ -201,18 +211,22 @@ impl Rusqlite {
         )
     }
 }
+
+impl StateTrait for Rusqlite {}
 #[allow(unused)]
 impl SnippetStore for Rusqlite {
     fn add_entry(&mut self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError> {
 
+        let mut c = self.conn.try_lock().unwrap();
+
         let ts = u64::from(Timestamp::from_utc_now());
-        self.conn.execute(
+        c.execute(
             "INSERT INTO Snippet (title, text, created_at, updated_at) VALUES (?1, ?2, ?3, ?4)",
             (&entry.title, &entry.text, ts, ts)
         )?;
 
-        let snippet_id = self.conn.last_insert_rowid();
-        let tx = self.conn.transaction()?;
+        let snippet_id = c.last_insert_rowid();
+        let tx = c.transaction()?;
         {
             let mut stmt = tx.prepare("INSERT INTO Snippet_Tags (snippet_id, tag_id) VALUES (?1, ?2)")?;
 
@@ -234,17 +248,20 @@ impl SnippetStore for Rusqlite {
     }
 
     fn delete_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
-        let mut to_delete = self.conn.query_row(
+        
+        let c = self.conn.try_lock().unwrap();
+
+        let mut to_delete = c.query_row(
             "SELECT * FROM Snippet WHERE snippet_id = ?1", 
             [id], |r| {
-                self.create_snippet_from_row(r)
+                self.create_snippet_from_row(r, &c)
             })?;
         
-        self.conn.execute(
+        c.execute(
             "DELETE FROM Snippet_Tags WHERE snippet_id = ?1", 
             [id]
         )?;
-        self.conn.execute(
+        c.execute(
             "DELETE FROM Snippet WHERE snippet_id = ?1",
             [id]
         )?;
@@ -252,17 +269,23 @@ impl SnippetStore for Rusqlite {
         
     }
     fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
-        let mut snippet = self.conn.query_row(
+        println!("1: {:?}", self.conn);
+        let mut c = self.conn.try_lock().unwrap();
+        println!("2: {:?}", c);
+        let mut snippet = c.query_row(
             "SELECT * FROM Snippet WHERE snippet_id = ?1", 
             [id], |r| {
-                self.create_snippet_from_row(r)
+                self.create_snippet_from_row(r, &c)
             })?;
+        println!("3");
         Ok(snippet)
     }
     fn add_tags(&mut self, snippet_id: SnippetID, tags: Vec<Tag>) -> Result<usize, CheatsheetError> {
         
+        let mut c = self.conn.try_lock().unwrap();
+
         let mut count = 0;
-        let tx = self.conn.transaction()?;
+        let tx = c.transaction()?;
         {
             let mut stmt = tx.prepare("INSERT INTO Snippet_Tags (snippet_id, tag_id) VALUES (?1, ?2)")?;
 
@@ -277,9 +300,12 @@ impl SnippetStore for Rusqlite {
         Ok(count)
     }
     fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError> {
+        
         let ts = u64::from(Timestamp::from_utc_now());
 
-        self.conn.execute(
+        let c = self.conn.try_lock().unwrap();
+        
+        c.execute(
             "UPDATE Snippet SET text = ?1, updated_at = ?2 WHERE snippet_id = ?3",
             (new_text, ts, id)
         )?;
@@ -288,7 +314,10 @@ impl SnippetStore for Rusqlite {
     }
 
     fn remove_tag(&self, snippet_id: SnippetID, tag_id:TagID) -> Result<bool, CheatsheetError> {
-        match self.conn.execute(
+
+        let c = self.conn.try_lock().unwrap();
+
+        match c.execute(
             "DELETE FROM Snippet_Tags WHERE snippet_id = ?1 AND tag_id = ?2", 
             (snippet_id, tag_id)
         ) {
@@ -298,7 +327,9 @@ impl SnippetStore for Rusqlite {
     }
     fn remove_tag_from_all(&self, tag_id:TagID) -> Result<usize, CheatsheetError> {
 
-        match self.conn.execute(
+        let c = self.conn.try_lock().unwrap();
+
+        match c.execute(
             "DELETE FROM Snippet_Tags WHERE tag_id = ?1", 
             [tag_id]
         ) {
@@ -309,7 +340,7 @@ impl SnippetStore for Rusqlite {
         
     }
     fn get_snippet_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError> {
-        
+
         let mut sql = String::from("SELECT * FROM Snippet");
 
         let mut tag_filtered = false;
@@ -326,16 +357,19 @@ impl SnippetStore for Rusqlite {
             sql.push_str(&temp);
         }
 
-        // println!("the query: {}", sql);
+        let c = self.conn.try_lock().unwrap();
+        //println!("the query: {}", sql);
 
-        let mut stmt = self.conn.prepare(&sql)?;
+        
+
+        let mut stmt = c.prepare(&sql)?;
         let snippet_iter = stmt.query_map([], |row| {
-            self.create_snippet_from_row(row)
+            self.create_snippet_from_row(row, &c)
         })?;
 
         
         let result: Vec<Snippet> = snippet_iter.flatten().collect();
-
+        //print!("result: {:?}", result);
         Ok(result)
     }
 
@@ -356,13 +390,16 @@ impl SnippetStore for Rusqlite {
 #[allow(unused)]
 impl TagStore for Rusqlite {
     fn add_tag(&self, tag: CreateTag) -> Result<Tag, CheatsheetError> {
+
+        let c = self.conn.try_lock().unwrap();
+
         let color_option: Option<u32> = tag.tag_style.clone().map(|o| o.color.into());
-        self.conn.execute(
+        c.execute(
             "INSERT INTO Tag (title, parent_id, tag_type, tag_color) VALUES (?1, ?2, ?3, ?4)",
             (&tag.title, tag.parent_id, tag.tag_type as u32, color_option)
         )?;
 
-        let tag_id = self.conn.last_insert_rowid();
+        let tag_id = c.last_insert_rowid();
 
         Ok(
             Tag {
@@ -378,14 +415,17 @@ impl TagStore for Rusqlite {
     }
 
     fn delete_tag(&self, id: TagID) -> Result<Tag, CheatsheetError> {
-        let mut to_delete = self.conn.query_row(
+
+        let c = self.conn.try_lock().unwrap();
+
+        let mut to_delete = c.query_row(
             "SELECT * FROM Tag WHERE tag_id = ?1", 
             [id], |r| {
                 self.create_tag_from_row(r)
             })?;
         
         
-        self.conn.execute(
+        c.execute(
             "DELETE FROM Tag WHERE tag_id = ?1",
             [id]
         )?;
@@ -394,7 +434,9 @@ impl TagStore for Rusqlite {
     }
     fn get_tag(&self, id: TagID) -> Result<Tag, CheatsheetError> {
         
-        let mut tag = self.conn.query_row(
+        let c = self.conn.try_lock().unwrap();
+
+        let mut tag = c.query_row(
             "SELECT * FROM Tag WHERE tag_id = ?1", 
             [id], |r| {
                 self.create_tag_from_row(r)
@@ -404,7 +446,10 @@ impl TagStore for Rusqlite {
         
     }
     fn update_tag_parent(&self, id: TagID, new_parent_id: Option<TagID>) -> Result<bool, CheatsheetError> {
-        self.conn.execute(
+
+        let c = self.conn.try_lock().unwrap();
+
+        c.execute(
             "UPDATE Tag SET parent_id = ?1 WHERE tag_id = ?2",
             (new_parent_id, id)
         )?;
@@ -413,7 +458,10 @@ impl TagStore for Rusqlite {
         
     }
     fn update_tag_title(&self, id: TagID, new_title: String) -> Result<bool, CheatsheetError> {
-        self.conn.execute(
+
+        let c = self.conn.try_lock().unwrap();
+
+        c.execute(
             "UPDATE Tag SET title = ?1 WHERE tag_id = ?2",
             (new_title, id)
         )?;
@@ -422,7 +470,10 @@ impl TagStore for Rusqlite {
     }
 
     fn update_tag_type(&self, id: TagID, new_type: TagType) -> Result<bool, CheatsheetError> {
-        self.conn.execute(
+
+        let c = self.conn.try_lock().unwrap();
+
+        c.execute(
             "UPDATE Tag SET tag_type = ?1 WHERE tag_id = ?2",
             (new_type as usize, id)
         )?;
@@ -430,15 +481,17 @@ impl TagStore for Rusqlite {
         Ok(true)
     }
 
-    fn get_tag_list(&self) -> Result<TagList, CheatsheetError> {
+    fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError> {
 
-        let mut stmt = self.conn.prepare("SELECT * FROM Tag")?;
+        let c = self.conn.try_lock().unwrap();
+
+        let mut stmt = c.prepare("SELECT * FROM Tag")?;
         let tag_iter = stmt.query_map([], |row| {
            self.create_tag_from_row(row)
         })?;
 
         //let result: Vec<Tag> = tag_iter.flat_map(|s|s).collect();
-        let result: Vec<Tag> = tag_iter.flatten().collect();
+        let result: TagList = tag_iter.flatten().collect();
         Ok(result)
     }
 
@@ -451,10 +504,12 @@ impl TagStore for Rusqlite {
         
         // Ok(tag)
         let mut id_check = Some(tag_id);
-        let mut list: TagList = vec![];
+        let mut list: TagList = TagList::from(Vec::new());
+
+        let c = self.conn.try_lock().unwrap();
 
         while let Some(id) = id_check {
-            let mut tag = self.conn.query_row(
+            let mut tag = c.query_row(
                 "SELECT * FROM Tag WHERE tag_id = ?1", 
                 [id], |r| {
                     self.create_tag_from_row(r)

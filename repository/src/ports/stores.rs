@@ -3,6 +3,10 @@ use domain::utils::types::SearchPattern;
 
 use crate::errors::CheatsheetError;
 
+//use super::services::Service;
+
+pub trait StateTrait: SnippetStore + TagStore + Send + Sync + 'static {}
+
 
 pub trait SnippetStore {
     fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError>;
@@ -24,8 +28,8 @@ pub trait TagStore {
     fn update_tag_type(&self, tag_id: TagID, new_type: TagType) -> Result<bool, CheatsheetError>;
     fn get_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
     fn delete_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
-    fn get_tag_list(&self) -> Result<TagList, CheatsheetError>;
-    fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<Vec<Tag>, CheatsheetError>;
+    fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError>;
+    fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError>;
     
 }
 

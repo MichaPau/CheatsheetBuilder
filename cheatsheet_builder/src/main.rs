@@ -7,21 +7,36 @@
 
 //use repository::memory::hashmap_store::HashMapStore;
 
+use std::env;
+use tauri_gui_lib;
 //use presentation::tui::ratatui::ratatui;
-use presentation::gui::xilem::xilem;
+// use presentation::gui::xilem::xilem::{self, AppState};
+//use presentation::tui::cursive::cursive;
+use repository::{db::sqlite::rusqlite_db::Rusqlite, ports::services::Service, types::AppState};
 //https://github.com/howtocodeit/hexarch
 //https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust#service-the-heart-of-hexagonal-architecture
 
 
+
 fn main() {
-    println!("Hello, cheatsheet builder!!");
+    env::set_var("RUST_BACKTRACE", "1");
+    println!("Hello, cheatsheet builder!");
 
-    // let store = Rusqlite::new_in_memory().unwrap();
-    // let mut service = Service::new(store);
+    let store = Rusqlite::new_in_memory().unwrap();
+    let service = Service::new(Box::new(store));
 
-    
+    let app_state = AppState {
+        service,
+    };
+
+    tauri_gui_lib::run(app_state);
+    //cursive::run_cursive(app_state);
+    // let test_01 = app_state.service.get_entry(1).unwrap();
+    // println!("debug1:{:#?}", test_01);
+    // let test = app_state.service.get_snippet_list(None, None).unwrap();
+    // println!("debug2:{:#?}", test);
     //ratatui::setup().unwrap();
-    xilem::run_xilem();
+    // xilem::run_xilem(app_state);
 
     // tools::parse_joplin::_parse_joplin_export(&mut service, "./data");
 

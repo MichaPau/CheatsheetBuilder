@@ -60,7 +60,7 @@ fn test_01_inserts() -> TestResult {
         }
     }
 
-    let tag_list = db.get_tag_list().unwrap();
+    let tag_list = db.get_tag_list(None).unwrap();
 
     assert_eq!(tag_list.len(), tag_count);
     
@@ -135,7 +135,7 @@ fn test_03_delete_entry() -> TestResult {
 fn test_04_add_tags() -> TestResult {
     let mut db = STATIC_DB.lock().unwrap();
 
-    let tags = db.get_tag_list().unwrap();
+    let tags = db.get_tag_list(None).unwrap();
     //snippet 2 tags -> 1, 6 (index)
     let count = db.add_tags(2, vec![tags[2].clone(), tags[4].clone()]).unwrap();
 

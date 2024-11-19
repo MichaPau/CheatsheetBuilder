@@ -1,5 +1,7 @@
 use std::time::SystemTime;
 
+//use crate::entities::entry::{Tag, TagID, TagList};
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Timestamp(u64);
 
@@ -42,3 +44,20 @@ pub enum SearchType {
     EndWith,
     Contains,
 }
+
+// pub struct HierarchyIterator<'a> {
+//     tags: &'a TagList,
+//     parent_id: Option<TagID>,
+// }
+
+// impl<'a> Iterator for HierarchyIterator<'a> {
+//     type Item = (usize, &'a Tag);
+
+//     fn next(&mut self) -> Option<Self::Item> {
+
+
+//         None
+//     }
+// }
+
+

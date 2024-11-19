@@ -7,11 +7,25 @@ edition = "2021"
 
 domain = { path = "../domain" }
 repository = { path = "../repository" }
+
+#ratatui
 crossterm = { version = "0.28.1", optional = true }
 ratatui = { version = "0.28.1", optional = true }
-xilem = { path = "../../../forks/xilem/xilem", optional = true }
+
+#xilem
+# xilem = { path = "../../../forks/xilem/xilem", optional = true }
+xilem = { git = "https://github.com/linebender/xilem", optional = true}
+winit = { version = "0.30.5", optional = true }
+
+#cursive
+cursive = { version = "0.21.1", optional = true }
+cursive_tree_view = { version = "0.9", optional = true}
+
+
 
 [features]
-default = ["tui"]
-tui = ["crossterm", "ratatui"]
-gui = ["xilem"]
+default = ["tui_cursive"]
+tui_ratatui = ["crossterm", "ratatui"]
+tui_cursive = ["cursive", "cursive_tree_view"]
+gui_xilem = ["xilem", "winit"]
+gui_dioxus = []

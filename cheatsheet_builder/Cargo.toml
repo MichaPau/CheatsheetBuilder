@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 domain = { path = "../domain" }
 repository = { path = "../repository" }
-presentation = { path = "../presentation", features = ["gui"]} 
+# presentation = { path = "../presentation", features = ["tui_cursive"]}
+tauri-gui = { path = "../presentation/src/gui/tauri-gui/src-tauri" }
 
 

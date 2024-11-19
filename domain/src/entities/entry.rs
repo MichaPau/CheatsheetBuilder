@@ -1,14 +1,61 @@
 
+use core::fmt;
+use std::ops::{Deref, DerefMut};
+
 use crate::utils::types::Timestamp as TimestampImpl;
 
 pub type SnippetID = usize;
 pub type TagID = usize;
 
 pub type SnippetList = Vec<Snippet>;
-pub type TagList = Vec<Tag>;
+pub type TagList2 = Vec<Tag>;
 
 pub type Timestamp = TimestampImpl;
 pub type TagColor = u32;
+
+#[derive(Debug)]
+pub struct TagList{ pub inner: Vec<Tag>}
+
+impl Deref for TagList {
+    type Target = Vec<Tag>;
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl DerefMut for TagList {
+    
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
+}
+
+impl From<Vec<Tag>> for TagList {
+    fn from(value: Vec<Tag>) -> Self {
+        TagList { inner: value}
+    }
+}
+
+impl FromIterator<Tag> for TagList {
+    fn from_iter<T: IntoIterator<Item = Tag>>(iter: T) -> Self {
+        let mut c = TagList { inner: vec![]};
+
+        for i in iter {
+            c.inner.push(i)
+        }
+
+        c
+    }
+}
+impl TagList {
+    
+
+    pub fn get_child_tags(&self, id: Option<TagID>) -> Self {
+        let childs: TagList = self.inner.iter().cloned().filter(|item| item.parent_id == id).collect();
+        childs
+    }
+}
+
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Snippet {
@@ -80,6 +127,11 @@ pub struct Tag {
     pub tag_style: Option<TagStyle>,
 }
 
+impl fmt::Display for Tag {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.title)
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[non_exhaustive]
