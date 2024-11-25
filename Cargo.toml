@@ -1,10 +1,16 @@
 [workspace]
 resolver = "2"
 
+members = [
+     "cheatsheet_builder", "domain", "repository", "presentation"
+]
+
+# default-members = ["presentation/src/gui/tauri-gui/src-tauri"]
+
 # members = [
-#     "cheatsheet_builder", "domain", "presentation", "repository",
+#     "domain", "repository", "presentation/src/gui/tauri-gui/src-tauri"
 # ]
 
-members = [
-    "domain", "repository", "presentation/src/gui/tauri-gui/src-tauri"
-]
+# members = [
+#     "domain", "repository", "presentation/src/gui/tauri-gui/src-tauri"
+# ]

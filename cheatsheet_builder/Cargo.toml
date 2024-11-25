@@ -4,9 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-domain = { path = "../domain" }
+domain = { path = "../domain", features= ["serde"] }
 repository = { path = "../repository" }
-# presentation = { path = "../presentation", features = ["tui_cursive"]}
-tauri-gui = { path = "../presentation/src/gui/tauri-gui/src-tauri" }
+presentation = { path = "../presentation", features = ["gui_tauri"]}
+#presentation = { path = "../presentation"}
+#presentation = { path = "../presentation", features = ["tui_cursive"]}
+# tauri-gui = { path = "../presentation/src/gui/tauri-gui/src-tauri" }
+
 
 

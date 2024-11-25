@@ -13,6 +13,9 @@ pub type TagList2 = Vec<Tag>;
 pub type Timestamp = TimestampImpl;
 pub type TagColor = u32;
 
+#[cfg(feature= "serde")]
+use serde::Serialize;
+
 #[derive(Debug)]
 pub struct TagList{ pub inner: Vec<Tag>}
 
@@ -58,6 +61,7 @@ impl TagList {
 
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Snippet {
     pub id: SnippetID,
     pub title: String,
@@ -119,6 +123,7 @@ impl Default for CreateTag {
     }
 }
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Tag {
     pub id: TagID,
     pub title: String,
@@ -133,8 +138,26 @@ impl fmt::Display for Tag {
     }
 }
 
+// #[cfg(feature = "serde")]
+// impl serde::Serialize for Tag {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//         where
+//             S: serde::Serializer {
+        
+//         use serde::ser::SerializeStruct;
+//         let mut state = serializer.serialize_struct("Tag", 5)?;
+//         state.serialize_field("id", &self.id)?;
+//         state.serialize_field("title", &self.title)?;
+//         state.serialize_field("parent_id", &self.parent_id)?;
+//         state.serialize_field("tag_type", &self.tag_type)?;
+//         state.serialize_field("tag_style", &self.tag_style)?;
+//         state.end()
+//     }
+//}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[non_exhaustive]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum TagType {
     Untagged = 0,
     Normal = 1,
@@ -153,11 +176,13 @@ impl From<usize> for TagType {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum Color {
     RGB((u8, u8, u8)),
     Decimal(u32),
 }
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct TagStyle {
     pub color: Color,
 }

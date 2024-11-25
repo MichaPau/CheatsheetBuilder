@@ -19,3 +19,13 @@ pub mod gui {
         //pub mod xilem_web;
     } 
 }
+// #[cfg(feature = "gui_tauri")]
+
+// pub mod gui {
+//     pub mod tauri_gui {
+//         pub use tauri_gui_solid_lib;
+
+        
+        
+//     }
+// }

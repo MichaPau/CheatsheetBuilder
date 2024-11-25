@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "tauri-gui",
+        "title": "tauri-gui-test",
         "width": 800,
         "height": 600
       }

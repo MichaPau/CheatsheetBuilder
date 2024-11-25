@@ -24,8 +24,9 @@ tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
-domain = { path = "../../../../../domain" }
+#domain = { path = "../../../../../domain" }
 repository = { path = "../../../../../repository" }
+#presentation = { path = "../../../../../presentation" }
 
 [[bin]]
 name = "cheatsheet_builder"

@@ -8,28 +8,33 @@
 //use repository::memory::hashmap_store::HashMapStore;
 
 use std::env;
-use tauri_gui_lib;
+//use presentation::gui::tauri_gui::tauri_gui_lib;
+//use tauri_gui_solid_lib;
+
+
 //use presentation::tui::ratatui::ratatui;
 // use presentation::gui::xilem::xilem::{self, AppState};
-//use presentation::tui::cursive::cursive;
+
 use repository::{db::sqlite::rusqlite_db::Rusqlite, ports::services::Service, types::AppState};
+//use presentation::tui::cursive::cursive;
 //https://github.com/howtocodeit/hexarch
 //https://www.howtocodeit.com/articles/master-hexagonal-architecture-rust#service-the-heart-of-hexagonal-architecture
 
 
 
 fn main() {
+
     env::set_var("RUST_BACKTRACE", "1");
-    println!("Hello, cheatsheet builder!");
+    println!("Hello, cheatsheet builder new tauri!");
 
     let store = Rusqlite::new_in_memory().unwrap();
     let service = Service::new(Box::new(store));
 
-    let app_state = AppState {
+    let _app_state = AppState {
         service,
     };
 
-    tauri_gui_lib::run(app_state);
+    //tauri_gui_solid_lib::run(app_state);
     //cursive::run_cursive(app_state);
     // let test_01 = app_state.service.get_entry(1).unwrap();
     // println!("debug1:{:#?}", test_01);

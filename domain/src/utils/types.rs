@@ -1,8 +1,10 @@
 use std::time::SystemTime;
-
+#[cfg(feature= "serde")]
+use serde::Serialize;
 //use crate::entities::entry::{Tag, TagID, TagList};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct Timestamp(u64);
 
 impl std::fmt::Display for Timestamp {

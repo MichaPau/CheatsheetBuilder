@@ -60,7 +60,7 @@ impl Rusqlite {
         println!("create dummy data");
         let hierarque_tags: Vec<TagListItem> = vec![
             TagListItem {
-                tag: CreateTag { title: "one".into(), tag_type: TagType::Category,  ..Default::default() },
+                tag: CreateTag { title: "one".into(), tag_type: TagType::Category, tag_style: Some(TagStyle {color: Color::RGB((255, 255, 255))}),  ..Default::default() },
                 childs: vec![
                     CreateTag { title: "one_sub_1".into(), tag_type: TagType::Category, ..Default::default() },
                     CreateTag { title: "one_sub_2".into(), tag_type: TagType::Category, ..Default::default() }
