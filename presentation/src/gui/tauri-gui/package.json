@@ -3,15 +3,18 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "workspaces": ["frontends/*"],
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "start": "vite",
+    "dev": "bunx --bun vite",
+    "build": "vite build",
+    "serve": "vite preview",
     "tauri": "tauri"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-shell": "^2"
+    "@tauri-apps/plugin-shell": "^2",
+    "lit-solo": "workspace:*"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",

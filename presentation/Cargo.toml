@@ -21,7 +21,8 @@ winit = { version = "0.30.5", optional = true }
 cursive = { version = "0.21.1", optional = true }
 cursive_tree_view = { version = "0.9", optional = true}
 
-tauri-gui-solid = { path = "./src/gui/tauri-gui-solid/src-tauri", optional = true }
+#tauri-gui-solid = { path = "./src/gui/tauri-gui-solid/src-tauri", optional = true }
+tauri-gui = { path = "./src/gui/tauri-gui/src-tauri", optional = true }
 
 [features]
 default = ["tui_cursive"]
@@ -29,4 +30,4 @@ tui_ratatui = ["crossterm", "ratatui"]
 tui_cursive = ["cursive", "cursive_tree_view"]
 gui_xilem = ["xilem", "winit"]
 gui_dioxus = []
-gui_tauri = ["tauri-gui-solid"]
+gui_tauri = ["tauri-gui"]

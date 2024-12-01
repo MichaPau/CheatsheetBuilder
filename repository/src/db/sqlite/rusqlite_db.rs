@@ -448,7 +448,9 @@ impl TagStore for Rusqlite {
     fn update_tag_parent(&self, id: TagID, new_parent_id: Option<TagID>) -> Result<bool, CheatsheetError> {
 
         let c = self.conn.try_lock().unwrap();
-
+        if new_parent_id == Some(id) {
+            return Ok(false);
+        }
         c.execute(
             "UPDATE Tag SET parent_id = ?1 WHERE tag_id = ?2",
             (new_parent_id, id)

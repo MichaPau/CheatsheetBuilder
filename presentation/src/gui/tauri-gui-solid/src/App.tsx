@@ -1,4 +1,5 @@
-import { createSignal, For, onMount } from "solid-js";
+import { createSignal, onMount, createContext } from "solid-js";
+import { createStore } from "solid-js/store";
 
 import '@shoelace-style/shoelace/dist/components/button/button.js';
 import '@shoelace-style/shoelace/dist/components/tree/tree.js';
@@ -14,8 +15,14 @@ import { SnippetList } from "./components/SnippetList";
 
 
 
+
 function App() {
   
+  const AppContext = createContext();
+
+  const [cState, setcState] = createStore({
+    categories: [] as Array<Tag>,
+  });
   //const [name, setName] = createSignal("");
   const [categories, setCategories] = createSignal([] as Array<Tag>);
   const [snippets, setSnippets] = createSignal([] as Array<Snippet> )
@@ -26,12 +33,21 @@ function App() {
   onMount(async () => {
     console.log("onMount");
     let cats: Array<Tag> = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+    console.log(cats);
     let snippets: Array<Snippet> = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
     setCategories(cats);
     setSnippets(snippets);
     if(containerRef) {
       console.log("add listener");
-      containerRef.addEventListener("test_event", (e: Event) => console.log("custom event", (e as CustomEvent).detail));
+      containerRef.addEventListener("test_event", async (e: Event) => {
+        const detail = (e as CustomEvent).detail;
+        console.log("custom event", detail);
+        let update_result = await invoke("set_tag_parent_id", {tagId: detail.from, newParentId: detail.to}).catch(err => console.log(err));
+        if (update_result) {
+          let cats: Array<Tag> = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+          setCategories(cats);
+        }
+      });
     }
       
 

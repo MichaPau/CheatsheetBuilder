@@ -1,7 +1,7 @@
 //import { children } from "solid-js/types/server/reactive.js";
 import { Tag } from "../types";
 import { createStore } from "solid-js/store";
-import { createEffect, For, onMount } from "solid-js";
+import { children, createEffect, For, onMount } from "solid-js";
 import { SlTreeItem } from "@shoelace-style/shoelace";
 
 type TreeCategory = { item: Tag; children: Array<TreeCategory> };
@@ -34,6 +34,8 @@ function buildTreeArray(flatArray: Array<Tag>) {
         }
     });
 
+    // const _root = { item: {id: 0, title: "root", parent_id: null, tag_type:"Category", tag_style: null}, children: []}; 
+    // result.unshift(_root);
     return result;
 }
 
@@ -64,6 +66,7 @@ export function Categories(props: { data: Array<Tag> }) {
 
     return (
         <>
+            <CategoryNode data={{item: {id: 0, title: "root", parent_id: null, tag_type:"Category", tag_style: null}, children: []}}/>
             <sl-tree prop:selection="multiple">
                 <For each={data}>
                     {(item: TreeCategory) => <CategoryNode data={item} />}
@@ -93,7 +96,8 @@ function CategoryNode(props: { data: TreeCategory }) {
         console.log("Drop on:", data.id, ";", data.title);
         let tag = JSON.parse(ev.dataTransfer?.getData("text/plain")!);
         console.log("Drop from:", tag.id,  ";", tag.title);
-        let ce = new CustomEvent("test_event", { detail: {from: tag.id, to: data.id}, bubbles: true, composed: true});
+        const to_id: number | null = data.id != 0 ? data.id : null;
+        let ce = new CustomEvent("test_event", { detail: {from: tag.id, to: to_id}, bubbles: true, composed: true});
         if (itemRef) itemRef.dispatchEvent(ce);
     };
 

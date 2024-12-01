@@ -17,6 +17,7 @@ pub type TagColor = u32;
 use serde::Serialize;
 
 #[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
 pub struct TagList{ pub inner: Vec<Tag>}
 
 impl Deref for TagList {
