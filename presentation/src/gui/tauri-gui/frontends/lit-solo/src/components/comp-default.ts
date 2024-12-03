@@ -10,9 +10,6 @@ export class Comp extends LitElement {
     css `
       :host {
         display: block;
-        border: 1px solid red;
-        width: 100%;
-        height: 100vh;
       }
     `
   ];
@@ -22,7 +19,6 @@ export class Comp extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    console.log("connectedCallback");
   }
   render() {
     return html``;
