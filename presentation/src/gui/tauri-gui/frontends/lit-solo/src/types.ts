@@ -1,3 +1,5 @@
+
+
 export type Tag = {
     id: number,
     title: string,
@@ -10,6 +12,7 @@ export type Snippet = {
     id: number,
     title: string,
     text: string,
+    text_type: number,
     tags: Array<Tag>,
     created_at: number,
     updated_at: number,
@@ -21,6 +24,8 @@ export type TreeCategory = {
     open: boolean | undefined,
     children: Array<TreeCategory>
 };
+
+//export const md = markdownit();
 
 declare global {
   interface HTMLElementEventMap {

@@ -1,4 +1,7 @@
-use domain::entities::entry::{CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType, Timestamp};
+use domain::entities::entry::{
+    CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType,
+    Timestamp,
+};
 
 use crate::errors::CheatsheetError;
 
@@ -14,12 +17,9 @@ pub struct Service {
 
 impl Service {
     pub fn new(store: Box<dyn StateTrait>) -> Self {
-        Self {
-            store,
-        }
+        Self { store }
     }
 
-    
     pub fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
         self.store.get_entry(id)
     }
@@ -30,16 +30,31 @@ impl Service {
     pub fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError> {
         self.store.update_text(id, new_text)
     }
+    pub fn update_title(&self, id: SnippetID, new_title: String) -> Result<bool, CheatsheetError> {
+        self.store.update_title(id, new_title)
+    }
     pub fn delete_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
         self.store.delete_entry(id)
     }
-    pub fn add_tags(&mut self, snippet_id: SnippetID, tags: Vec<Tag>) -> Result<usize, CheatsheetError> {
+    pub fn add_tags(
+        &mut self,
+        snippet_id: SnippetID,
+        tags: Vec<Tag>,
+    ) -> Result<usize, CheatsheetError> {
         self.store.add_tags(snippet_id, tags)
     }
-    pub fn remove_tag(&self, snippet_id: SnippetID, tag_id:TagID) -> Result<bool, CheatsheetError> {
+    pub fn remove_tag(
+        &self,
+        snippet_id: SnippetID,
+        tag_id: TagID,
+    ) -> Result<bool, CheatsheetError> {
         self.store.remove_tag(snippet_id, tag_id)
     }
-    pub fn get_snippet_list(&self, tag_filter: Option<Vec<TagID>>, time_boundry: Option<(Timestamp, Timestamp)>) -> Result<SnippetList, CheatsheetError> {
+    pub fn get_snippet_list(
+        &self,
+        tag_filter: Option<Vec<TagID>>,
+        time_boundry: Option<(Timestamp, Timestamp)>,
+    ) -> Result<SnippetList, CheatsheetError> {
         self.store.get_snippet_list(tag_filter, time_boundry)
     }
 
@@ -53,10 +68,18 @@ impl Service {
     pub fn update_tag_title(&self, id: TagID, new_title: String) -> Result<bool, CheatsheetError> {
         self.store.update_tag_title(id, new_title)
     }
-    pub fn update_tag_parent(&self, id: TagID, new_parent_id: Option<TagID>) -> Result<bool, CheatsheetError> {
+    pub fn update_tag_parent(
+        &self,
+        id: TagID,
+        new_parent_id: Option<TagID>,
+    ) -> Result<bool, CheatsheetError> {
         self.store.update_tag_parent(id, new_parent_id)
     }
-    pub fn update_tag_type(&self, tag_id: TagID, new_type: TagType) -> Result<bool, CheatsheetError> {
+    pub fn update_tag_type(
+        &self,
+        tag_id: TagID,
+        new_type: TagType,
+    ) -> Result<bool, CheatsheetError> {
         self.store.update_tag_type(tag_id, new_type)
     }
     pub fn delete_tag(&self, tag_id: TagID) -> Result<Tag, CheatsheetError> {
@@ -71,5 +94,4 @@ impl Service {
     pub fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError> {
         self.store.get_tag_hierarchy(tag_id)
     }
-    
 }

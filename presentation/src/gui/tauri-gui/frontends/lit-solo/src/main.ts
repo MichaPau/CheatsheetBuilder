@@ -9,9 +9,11 @@ import './components/snippet-list.js';
 import './components/settings-logger.js';
 
 import '@shoelace-style/shoelace/dist/components/button/button.js';
+import '@shoelace-style/shoelace/dist/components/card/card.js';
+import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
 import '@shoelace-style/shoelace/dist/components/tree/tree.js';
 import '@shoelace-style/shoelace/dist/components/tree-item/tree-item.js';
-import '@shoelace-style/shoelace/dist/components/card/card.js';
+
 
 import '@shoelace-style/shoelace/dist/themes/light.css';
 import '@shoelace-style/shoelace/dist/themes/dark.css';
@@ -21,6 +23,7 @@ import mainStyles from './styles/mainStyle.js';
 
 import { appContext, AppSettings } from './utils/app-context.js';
 import { MainController } from './controllers/main-controller.js';
+//import { MainController } from './test-controllers/main-controller.js';
 
 
 

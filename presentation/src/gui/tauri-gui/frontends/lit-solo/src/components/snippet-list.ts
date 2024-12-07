@@ -4,6 +4,9 @@ import { customElement, property } from 'lit/decorators.js';
 import mainStyles from '../styles/mainStyle.js';
 
 import { Snippet } from '../types.js';
+
+import './snippet.js';
+
 @customElement('snippet-list')
 export class Comp extends LitElement {
   static styles = [
@@ -25,9 +28,10 @@ export class Comp extends LitElement {
   render() {
     return html`
         <div class="snippet-container">
-            ${this.snippets.map((snippet) => 
+            ${this.snippets.map((snippet) =>
                 html`
-                    <sl-card class="snippet-item">
+                    <snippet-item .snippet=${snippet}></snippet-item>
+                    <!-- <sl-card class="snippet-item">
                         <div slot="header">
                             ${snippet.title}
                         </div>
@@ -37,7 +41,7 @@ export class Comp extends LitElement {
                             )}
                         </div>
                         ${snippet.text}
-                    </sl-card>
+                    </sl-card> -->
                 `
             )}
         </div>

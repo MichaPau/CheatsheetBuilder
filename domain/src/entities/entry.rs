@@ -1,4 +1,3 @@
-
 use core::fmt;
 use std::ops::{Deref, DerefMut};
 
@@ -13,12 +12,14 @@ pub type TagList2 = Vec<Tag>;
 pub type Timestamp = TimestampImpl;
 pub type TagColor = u32;
 
-#[cfg(feature= "serde")]
+#[cfg(feature = "serde")]
 use serde::Serialize;
 
 #[derive(Debug)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
-pub struct TagList{ pub inner: Vec<Tag>}
+pub struct TagList {
+    pub inner: Vec<Tag>,
+}
 
 impl Deref for TagList {
     type Target = Vec<Tag>;
@@ -28,7 +29,6 @@ impl Deref for TagList {
 }
 
 impl DerefMut for TagList {
-    
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.inner
     }
@@ -36,13 +36,13 @@ impl DerefMut for TagList {
 
 impl From<Vec<Tag>> for TagList {
     fn from(value: Vec<Tag>) -> Self {
-        TagList { inner: value}
+        TagList { inner: value }
     }
 }
 
 impl FromIterator<Tag> for TagList {
     fn from_iter<T: IntoIterator<Item = Tag>>(iter: T) -> Self {
-        let mut c = TagList { inner: vec![]};
+        let mut c = TagList { inner: vec![] };
 
         for i in iter {
             c.inner.push(i)
@@ -52,14 +52,16 @@ impl FromIterator<Tag> for TagList {
     }
 }
 impl TagList {
-    
-
     pub fn get_child_tags(&self, id: Option<TagID>) -> Self {
-        let childs: TagList = self.inner.iter().cloned().filter(|item| item.parent_id == id).collect();
+        let childs: TagList = self
+            .inner
+            .iter()
+            .cloned()
+            .filter(|item| item.parent_id == id)
+            .collect();
         childs
     }
 }
-
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
@@ -67,17 +69,26 @@ pub struct Snippet {
     pub id: SnippetID,
     pub title: String,
     pub text: String,
+    pub text_type: TextType,
     pub tags: Vec<Tag>,
     pub created_at: Timestamp,
     pub updated_at: Timestamp,
 }
 
 impl Snippet {
-    pub fn new(id: SnippetID, title: String, text: String, tags: Vec<Tag>, created_at: Timestamp) -> Self {
+    pub fn new(
+        id: SnippetID,
+        title: String,
+        text: String,
+        text_type: TextType,
+        tags: Vec<Tag>,
+        created_at: Timestamp,
+    ) -> Self {
         Self {
             id,
             title,
             text,
+            text_type,
             tags,
             created_at: created_at.clone(),
             updated_at: created_at,
@@ -86,25 +97,39 @@ impl Snippet {
 }
 #[derive(Debug, Clone)]
 pub struct CreateSnippet {
-    pub title: String, 
+    pub title: String,
     pub text: String,
     pub tags: Vec<Tag>,
+    pub text_type: TextType,
 }
 
 impl CreateSnippet {
-    pub fn new(title: String, text: String, tags: Vec<Tag>) -> Self {
-        
-        // if tags.len() == 0 {
-        //     tags.push(0);
-        // }
+    pub fn new(title: String, text: String, text_type: TextType, tags: Vec<Tag>) -> Self {
         Self {
             title,
             text,
-            tags
+            text_type,
+            tags,
         }
     }
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[non_exhaustive]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+pub enum TextType {
+    Text = 0,
+    Markdown = 1,
+}
 
+impl From<usize> for TextType {
+    fn from(value: usize) -> Self {
+        match value {
+            0 => TextType::Text,
+            1 => TextType::Markdown,
+            _ => TextType::Text,
+        }
+    }
+}
 #[derive(Debug, Clone)]
 pub struct CreateTag {
     pub title: String,
@@ -144,7 +169,7 @@ impl fmt::Display for Tag {
 //     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
 //         where
 //             S: serde::Serializer {
-        
+
 //         use serde::ser::SerializeStruct;
 //         let mut state = serializer.serialize_struct("Tag", 5)?;
 //         state.serialize_field("id", &self.id)?;
@@ -194,7 +219,7 @@ impl Into<u32> for Color {
             Color::RGB((r, g, b)) => {
                 let c: u32 = ((r as u32) << 16) + ((g as u32) << 8) + (b as u32);
                 c
-            },
+            }
             Color::Decimal(v) => v,
         }
     }
@@ -208,16 +233,8 @@ fn tag_styles() {
     let style2 = TagStyle {
         color: Color::Decimal(16777215),
     };
-    let v1:u32 = style.color.into();
-    let v2:u32 = style2.color.into();
+    let v1: u32 = style.color.into();
+    let v2: u32 = style2.color.into();
 
     assert_eq!(v1, v2);
 }
-
-
-
-
-
-
-
-

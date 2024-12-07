@@ -16,6 +16,10 @@ export class Categories extends LitElement {
       :host {
         display: block;
       }
+
+      #root-item::part(checkbox){
+          visibilty: false;
+      }
     `
   ];
 
@@ -66,6 +70,13 @@ export class Categories extends LitElement {
       this.dispatchEvent(ce);
   };
 
+  on_root_drop(ev: DragEvent) {
+    console.log("on root drop");
+    let tag = JSON.parse(ev.dataTransfer?.getData("text/plain")!);
+    console.log("Drop from:", tag.id,  ";", tag.title);
+    let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: undefined }, bubbles: true, composed: true });
+    this.dispatchEvent(ce);
+  }
   renderTemplate(node: TreeCategory): any {
 
     return html`
@@ -87,7 +98,12 @@ export class Categories extends LitElement {
 
   render() {
     return html`
+
+        <sl-tree-item id="root-item" @drop=${this.on_root_drop} @dragover=${(ev: DragEvent) => { ev.preventDefault()}}>
+            Root
+        </sl-tree-item>
         <sl-tree selection="multiple" @sl-selection-change=${this.onTreeItemChange}>
+
             ${this.category_tree.map((node) => {
                 return this.renderTemplate(node);
             }

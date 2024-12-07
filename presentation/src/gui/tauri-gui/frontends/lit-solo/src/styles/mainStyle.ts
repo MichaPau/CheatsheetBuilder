@@ -69,6 +69,12 @@ export default css`
   width: 80%;
 }
 .snippet-item::part(body) {
-  min-height: 13em;
+  min-height: 2em;
+}
+.snippet-title-label {
+    display: inline-block;
+    line-height: 1.5em;
+    width: 100%;
+
 }
 `;

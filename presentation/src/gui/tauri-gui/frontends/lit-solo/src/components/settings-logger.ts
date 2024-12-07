@@ -40,7 +40,7 @@ export class SettingsLogger extends LitElement {
                     html`<div>id: ${ id }</div>`
                 )}
             </div>
-            <div>
+            <div class="id-container">
                 Selected categories ids:
                 ${this.appSettings.selected_categories.map((id) =>
                     html`<div>id: ${ id }</div>`
