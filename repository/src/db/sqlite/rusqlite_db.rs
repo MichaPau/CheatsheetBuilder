@@ -127,6 +127,14 @@ impl Rusqlite {
                 },
                 childs: vec![],
             },
+            TagListItem {
+                tag: CreateTag {
+                    title: "normal".into(),
+                    tag_type: TagType::Normal,
+                    ..Default::default()
+                },
+                childs: vec![],
+            },
         ];
 
         for item in hierarque_tags {
@@ -138,12 +146,17 @@ impl Rusqlite {
         }
 
         let tag_list = self.get_tag_list(None).unwrap();
+        println!("tag_list:{:?}", tag_list);
         let snippets_data = vec![
             CreateSnippet::new(
                 "first".into(),
                 "first content".into(),
                 TextType::Text,
-                vec![tag_list[0].clone(), tag_list[6].clone()],
+                vec![
+                    tag_list[0].clone(),
+                    tag_list[6].clone(),
+                    tag_list[9].clone(),
+                ],
             ),
             CreateSnippet::new(
                 "first again".into(),
@@ -452,6 +465,14 @@ impl SnippetStore for Rusqlite {
         let snippet_iter = stmt.query_map([], |row| self.create_snippet_from_row(row, &c))?;
 
         let result: Vec<Snippet> = snippet_iter.flatten().collect();
+
+        // for tag in &result[0].tags {
+        //     match tag.tag_type {
+        //         TagType::Normal => println!("found normal tag"),
+        //         TagType::Category => println!("founf category tag"),
+        //         _ => println!("found something else"),
+        //     }
+        // }
         //print!("result: {:?}", result);
         Ok(result)
     }
@@ -548,7 +569,13 @@ impl TagStore for Rusqlite {
     fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError> {
         let c = self.conn.try_lock().unwrap();
 
-        let mut stmt = c.prepare("SELECT * FROM Tag")?;
+        let mut sql: String = String::from("SELECT * FROM Tag");
+        if let Some(tag_type) = type_filter {
+            let temp = format!(" WHERE tag_type = {}", tag_type as usize);
+            sql.push_str(&temp);
+        }
+        //let mut stmt = c.prepare("SELECT * FROM Tag")?;
+        let mut stmt = c.prepare(&sql)?;
         let tag_iter = stmt.query_map([], |row| self.create_tag_from_row(row))?;
 
         //let result: Vec<Tag> = tag_iter.flat_map(|s|s).collect();

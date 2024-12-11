@@ -11,6 +11,16 @@ pub fn get_categories(app_state: State<'_, AppState>) -> Result<Vec<Tag>, Cheats
 }
 
 #[tauri::command]
+pub fn get_parent_tags(
+    tag_id: usize,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<Tag>, CheatsheetError> {
+    match app_state.service.get_tag_hierarchy(tag_id) {
+        Ok(result) => Ok(result.inner),
+        Err(e) => Err(e),
+    }
+}
+#[tauri::command]
 pub fn set_tag_parent_id(
     tag_id: usize,
     new_parent_id: Option<usize>,
@@ -20,7 +30,9 @@ pub fn set_tag_parent_id(
 }
 #[tauri::command]
 pub fn get_snippets(app_state: State<'_, AppState>) -> Result<Vec<Snippet>, CheatsheetError> {
-    app_state.service.get_snippet_list(None, None)
+    let r = app_state.service.get_snippet_list(None, None);
+    //println!("{:?}", r);
+    r
     // let snippet_result = app_state.service.get_snippet_list(None, None).unwrap();
 
     // let snippet_vec: Vec<Snippet> = snippet_result.iter().map(|s| s.clone()).collect();

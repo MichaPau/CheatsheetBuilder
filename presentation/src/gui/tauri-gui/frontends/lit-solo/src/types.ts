@@ -4,7 +4,7 @@ export type Tag = {
     id: number,
     title: string,
     parent_id: number | null,
-    tag_type: string,
+    tag_type: "Category" | "Normal" | "Untagged",
     tag_style: object | null
 };
 
@@ -12,7 +12,7 @@ export type Snippet = {
     id: number,
     title: string,
     text: string,
-    text_type: number,
+    text_type: string,
     tags: Array<Tag>,
     created_at: number,
     updated_at: number,
@@ -30,5 +30,6 @@ export type TreeCategory = {
 declare global {
   interface HTMLElementEventMap {
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;
+    'get-parent-tags': CustomEvent<{tag_id: number}>;
   }
 }

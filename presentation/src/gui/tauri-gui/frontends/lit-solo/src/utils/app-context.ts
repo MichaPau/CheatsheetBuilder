@@ -5,4 +5,4 @@ export type AppSettings = {
   open_categories: Array<string>,
   selected_categories: Array<string>,
 }
-export const appContext = createContext<AppSettings>('app-context');
+export const appContext = createContext<AppSettings>(Symbol('app-context'));

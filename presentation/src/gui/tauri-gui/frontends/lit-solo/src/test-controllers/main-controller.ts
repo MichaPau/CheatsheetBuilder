@@ -5,7 +5,6 @@ import { buildTreeArray } from '../utils/utils.js';
 
 import { Snippet, Tag } from "../types";
 
-import { Database } from "bun:sqlite";
 
 export class MainController implements ReactiveController {
   private host: App;
@@ -21,7 +20,7 @@ export class MainController implements ReactiveController {
     //const cats = this.db.query("select * from Tag where tag_type = 1");
 
     const load_categories: Array<Tag> = [
-      { id: 1, title: "Root", tag_type: "1", parent_id: null, tag_style: null },
+      { id: 1, title: "Root", tag_type: 1, parent_id: null, tag_style: null },
     ];
     this.host.categories = buildTreeArray(load_categories);
 

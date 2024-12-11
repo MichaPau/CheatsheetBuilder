@@ -4,9 +4,9 @@
 use repository::{db::sqlite::rusqlite_db::Rusqlite, ports::services::Service, types::AppState};
 
 fn main() {
-    //let store = Rusqlite::new_in_memory().unwrap();
+    let store = Rusqlite::new_in_memory().unwrap();
     //println!("current:{:?}", std::env::current_dir());
-    let store = Rusqlite::open("../../../../../data/dev_db.db").unwrap();
+    //let store = Rusqlite::open("../../../../../data/dev_db.db").unwrap();
     let service = Service::new(Box::new(store));
 
     let app_state = AppState { service };

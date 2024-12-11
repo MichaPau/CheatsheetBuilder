@@ -4,8 +4,8 @@
     "version": "0.1.0",
     "type": "module",
     "dependencies": {
+        "@lit-labs/motion": "^1.0.7",
         "@shoelace-style/shoelace": "^2.18.0",
-        "markdown-it": "^14.1.0",
         "marked": "^15.0.3"
     },
     "devDependencies": {

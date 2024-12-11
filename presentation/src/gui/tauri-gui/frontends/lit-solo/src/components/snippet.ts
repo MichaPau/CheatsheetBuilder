@@ -7,6 +7,7 @@ import { Snippet } from '../types.js';
 import { SnippetController } from '../controllers/snippet-controller.js';
 
 import './snippet-editor.js';
+import './snippet-tag-list.js';
 
 @customElement('snippet-item')
 export class SnippetContainer extends LitElement {
@@ -93,9 +94,7 @@ export class SnippetContainer extends LitElement {
                         />
             </div>
             <div slot="footer">
-                ${this.snippet.tags.map((tag) =>
-                    html`<div>${tag.title}</div>`
-                )}
+                <snippet-tag-list .tag_list=${this.snippet.tags}></snippet-tag-list>
             </div>
 
             <snippet-editor .text_data=${this.snippet.text}></snippet-editor>

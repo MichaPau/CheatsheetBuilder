@@ -150,6 +150,7 @@ impl Default for CreateTag {
 }
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
+#[serde(tag = "type")]
 pub struct Tag {
     pub id: TagID,
     pub title: String,
@@ -182,8 +183,8 @@ impl fmt::Display for Tag {
 //}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[non_exhaustive]
 #[cfg_attr(feature = "serde", derive(Serialize))]
+#[non_exhaustive]
 pub enum TagType {
     Untagged = 0,
     Normal = 1,
