@@ -21,5 +21,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["frontends/lit-solo/src"]
+  "include": ["frontends/lit-sl/src"]
 }
