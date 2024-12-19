@@ -11,9 +11,7 @@ export default css`
 
     }
 
-:root {
-  color-scheme: normal light dark;
-}
+
 
 #app-container {
   width: 100%;
@@ -50,31 +48,10 @@ export default css`
 .footer {
   grid-area: footer;
   /* background-color: #f4f4f4; */
-  padding: 20px;
+  padding: 0.25em;
 }
 
-.snippet-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 1em;
-  width: 100%;
-  height: 100%;
 
-}
 
-.snippet-item {
-  flex: 1;
-  width: 80%;
-}
-.snippet-item::part(body) {
-  min-height: 2em;
-}
-.snippet-title-label {
-    display: inline-block;
-    line-height: 1.5em;
-    width: 100%;
 
-}
 `;

@@ -2,13 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- <link rel="stylesheet" href="./shoelace/dist/themes/light.css" />
-    <link rel="stylesheet" href="./shoelace/dist/themes/dark.css" /> -->
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tauri App</title>
     <script type="module" src="/src/main.ts" defer></script>
+    <link rel="styleSheet" href="./src/styles/light.css" />
+    <link rel="styleSheet" href="./src/styles/dark.css" />
     <style>
+
+    :root {
+        --default-font-family: monospace;
+    }
       *, *::before,*::after {
         box-sizing: border-box;
       }

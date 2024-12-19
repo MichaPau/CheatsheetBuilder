@@ -4,12 +4,12 @@ import {consume, ContextConsumer} from '@lit/context';
 
 import { appContext, AppSettings } from '../utils/app-context.js';
 
-import mainStyles from '../styles/mainStyle.js';
+import sharedStyles from '../styles/shared-styles.js';
 
 @customElement('settings-logger')
 export class SettingsLogger extends LitElement {
   static styles = [
-    mainStyles,
+    sharedStyles,
     css `
       :host {
         display: block;

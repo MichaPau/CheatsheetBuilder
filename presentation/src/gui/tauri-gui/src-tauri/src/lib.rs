@@ -13,11 +13,15 @@ pub fn run(app_state: AppState) {
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            commands::greet,
+            commands::add_default_snippet,
             commands::get_categories,
             commands::get_snippets,
             commands::set_tag_parent_id,
-            commands::get_parent_tags
+            commands::get_parent_tags,
+            commands::search_tags,
+            commands::update_snippet_text,
+            commands::update_snippet_title,
+            commands::append_tag,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

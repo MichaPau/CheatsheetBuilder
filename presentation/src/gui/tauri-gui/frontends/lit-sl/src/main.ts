@@ -18,10 +18,14 @@ import '@shoelace-style/shoelace/dist/components/tree/tree.js';
 import '@shoelace-style/shoelace/dist/components/tree-item/tree-item.js';
 
 
-import '@shoelace-style/shoelace/dist/themes/light.css';
-import '@shoelace-style/shoelace/dist/themes/dark.css';
+// import '@shoelace-style/shoelace/dist/themes/light.css';
+// import '@shoelace-style/shoelace/dist/themes/dark.css';
+
+// import './styles/light.css';
+// import './styles/dark.css'
 
 import mainStyles from './styles/mainStyle.js';
+import sharedStyles from './styles/shared-styles.js';
 
 
 import { appContext, AppSettings } from './utils/app-context.js';
@@ -34,7 +38,9 @@ import { MainController } from './controllers/main-controller.js';
 export class App extends LitElement {
   static styles = [
     mainStyles,
+    sharedStyles,
     css `
+
       :host {
         display: block;
         border: 1px solid red;

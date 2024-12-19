@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "workspaces": ["frontends/*"],
+  "workspaces": [
+    "frontends/*"
+  ],
   "scripts": {
     "start": "vite",
     "dev": "bunx --bun vite",
@@ -15,7 +17,7 @@
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-shell": "^2",
     "@types/markdown-it": "^14.1.2",
-    "lit-solo": "workspace:*"
+    "lit-sl": "workspace:*"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",

@@ -1,7 +1,7 @@
 import { html, css, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-import mainStyles from '../styles/mainStyle.js';
+import sharedStyles from '../styles/shared-styles.js';
 
 import { Snippet } from '../types.js';
 
@@ -10,10 +10,20 @@ import './snippet.js';
 @customElement('snippet-list')
 export class Comp extends LitElement {
   static styles = [
-    mainStyles,
+    sharedStyles,
     css `
       :host {
         display: block;
+      }
+      .snippet-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1em;
+        width: 100%;
+        height: 100%;
+
       }
     `
   ];
@@ -31,17 +41,6 @@ export class Comp extends LitElement {
             ${this.snippets.map((snippet) =>
                 html`
                     <snippet-item .snippet=${snippet}></snippet-item>
-                    <!-- <sl-card class="snippet-item">
-                        <div slot="header">
-                            ${snippet.title}
-                        </div>
-                        <div slot="footer">
-                            ${snippet.tags.map((tag) =>
-                                html`<div>${tag.title}</div>`
-                            )}
-                        </div>
-                        ${snippet.text}
-                    </sl-card> -->
                 `
             )}
         </div>

@@ -12,6 +12,7 @@ export class TagListController implements ReactiveController {
     this.host.addController(this);
   }
 
+
   async getParentTags(tag_id: number) {
     let parent_tags_result = await invoke("get_parent_tags", {tagId: tag_id, }).catch(err => console.log(err));
     return parent_tags_result;

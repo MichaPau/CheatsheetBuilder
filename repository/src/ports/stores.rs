@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use domain::entities::entry::*;
 use domain::utils::types::SearchPattern;
 
@@ -7,13 +9,20 @@ use crate::errors::CheatsheetError;
 
 pub trait StateTrait: SnippetStore + TagStore + Send + Sync + 'static {}
 
+// impl StateTrait for Box<dyn StateTrait> {
+//     fn get_mut(&self) -> &mut dyn StateTrait {
+
+//     }
+// }
+
 pub trait SnippetStore {
     fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError>;
-    fn add_entry(&mut self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError>;
+    fn add_entry(&self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError>;
     fn add_tags(&mut self, snippet_id: SnippetID, tags: Vec<Tag>)
         -> Result<usize, CheatsheetError>;
     fn delete_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError>;
     fn remove_tag_from_all(&self, tag_id: TagID) -> Result<usize, CheatsheetError>;
+    fn append_tag(&self, snippet_id: SnippetID, tag_id: TagID) -> Result<bool, CheatsheetError>;
     fn remove_tag(&self, snippet_id: SnippetID, tag_id: TagID) -> Result<bool, CheatsheetError>;
     fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError>;
     fn update_title(&self, id: SnippetID, new_title: String) -> Result<bool, CheatsheetError>;
@@ -39,6 +48,11 @@ pub trait TagStore {
     fn delete_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
     fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError>;
     fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError>;
+    fn search_tags_by_title(
+        &self,
+        pattern: &str,
+        mode: SearchMode,
+    ) -> Result<TagList, CheatsheetError>;
 }
 
 // pub struct Service<R> where R: SnippetStore + TagStore {

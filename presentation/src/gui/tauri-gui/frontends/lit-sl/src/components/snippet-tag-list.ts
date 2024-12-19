@@ -1,8 +1,8 @@
 import { html, css, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import {ifDefined} from 'lit/directives/if-defined.js';
 
-import mainStyles from '../styles/mainStyle.js';
+
+import sharedStyles from '../styles/shared-styles.js';
 import { Tag } from '../types.js';
 
 import './tag-item.js';
@@ -12,7 +12,7 @@ import { TagItem } from './tag-item.js';
 @customElement('snippet-tag-list')
 export class SnippetTagList extends LitElement {
   static styles = [
-    mainStyles,
+    sharedStyles,
     css `
       :host {
         display: block;
@@ -20,7 +20,7 @@ export class SnippetTagList extends LitElement {
 
       .tag-container {
           display: flex;
-          gap: 0.25em;
+          gap: var(--sl-spacing-2x-small);
       }
 
     `

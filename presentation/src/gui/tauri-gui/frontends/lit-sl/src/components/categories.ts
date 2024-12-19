@@ -1,9 +1,9 @@
 import { html, css, LitElement } from 'lit';
-import { customElement, state, property } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 
 //import './category_node.js';
-import mainStyles from '../styles/mainStyle.js';
+import sharedStyles from '../styles/shared-styles.js';
 import { appContext, AppSettings } from '../utils/app-context.js';
 
 import { Tag, TreeCategory} from '../types.js';
@@ -11,15 +11,17 @@ import { Tag, TreeCategory} from '../types.js';
 @customElement('category-tree')
 export class Categories extends LitElement {
   static styles = [
-    mainStyles,
+    sharedStyles,
     css `
       :host {
         display: block;
       }
 
       #root-item::part(checkbox){
-          visibilty: false;
+          visibility: false;
       }
+
+
     `
   ];
 
@@ -80,7 +82,7 @@ export class Categories extends LitElement {
   renderTemplate(node: TreeCategory): any {
 
     return html`
-    <sl-tree-item tag_id=${node.item.id}
+    <sl-tree-item class="tree-item" tag_id=${node.item.id}
         draggable="true"
         @sl-expand=${(ev: Event) => this.onTreeItemExpand(ev, node.item.id)}
         @sl-collapse=${(ev: Event) => this.onTreeItemCollapse(ev, node.item.id)}

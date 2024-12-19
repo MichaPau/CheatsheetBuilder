@@ -1,19 +1,22 @@
 import { html, css, LitElement } from 'lit';
 import { customElement, property} from 'lit/decorators.js';
 
-import mainStyles from '../styles/mainStyle.js';
+import sharedStyles from '../styles/shared-styles.js';
 import { Tag } from '../types.js';
 import SlDropdown from '@shoelace-style/shoelace/dist/components/dropdown/dropdown.component.js';
 
 @customElement('tag-item')
 export class TagItem extends LitElement {
   static styles = [
-    mainStyles,
+    sharedStyles,
     css `
       :host {
         display: block;
+
       }
     `
+
+
   ];
 
   @property({attribute: false})
@@ -39,18 +42,23 @@ export class TagItem extends LitElement {
     console.log("Tag::onTriggerParents");
     this.dispatchEvent(new CustomEvent("get-parent-tags", { bubbles: false, composed: true, detail: { id: this.tag.id } }));
   }
-  removeParents() {
+  async removeParents() {
+
+    const dropdown = this.shadowRoot?.querySelector("#parents-menu") as SlDropdown;
+    if (dropdown) {
+      await dropdown.hide();
+    }
     this.parent_tags = [];
   }
   render() {
     if (this.tag.tag_type === "Category") {
         return html`
             <sl-dropdown id="parents-menu" placement="top" hoist>
-              <sl-button
+                <div class="tag category" slot="trigger"
+                    @click=${this.onTriggerParents}
+                    @mouseleave=${this.removeParents}
+                >${this.tag.title}</div>
 
-                  @mouseover=${this.onTriggerParents}
-                  @mouseleave=${this.removeParents}
-                  variant="warning" slot="trigger" size="small" caret>${this.tag.title}</sl-button>
               <sl-menu>
                   ${ this.parent_tags.map((parent_tag) => html `
                       <sl-menu-item>${parent_tag.title}</sl-menu-item>
@@ -60,9 +68,15 @@ export class TagItem extends LitElement {
         `;
     } else {
         return html`
-            <sl-button size="small" variant="neutral">${this.tag.title}</sl-button>
+            <div class="tag normal">${this.tag.title}</div>
         `;
     }
 
   }
 }
+
+// <sl-button
+//     @mouseover=${this.onTriggerParents}
+//     @mouseleave=${this.removeParents}
+//     variant="warning" slot="trigger" size="small" caret>${this.tag.title}
+// </sl-button>

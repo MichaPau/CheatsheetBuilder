@@ -1,4 +1,4 @@
-use std::{path::Path, sync::Mutex};
+use std::{path::Path, sync::Mutex, time};
 
 use domain::{
     entities::entry::*,
@@ -61,7 +61,14 @@ impl Rusqlite {
         db.create_dummy_entries();
         Ok(db)
     }
+    pub fn backup<P: AsRef<Path>>(&self, dst: P) -> rusqlite::Result<()> {
+        let c = self.conn.try_lock().unwrap();
+        let mut dst = Connection::open(dst).unwrap();
+        let backup = rusqlite::backup::Backup::new(&c, &mut dst).unwrap();
+        let r = backup.run_to_completion(5, time::Duration::from_millis(250), None);
 
+        r
+    }
     pub fn create_dummy_entries(&mut self) {
         println!("create dummy data");
         let hierarque_tags: Vec<TagListItem> = vec![
@@ -146,7 +153,7 @@ impl Rusqlite {
         }
 
         let tag_list = self.get_tag_list(None).unwrap();
-        println!("tag_list:{:?}", tag_list);
+        //println!("tag_list:{:?}", tag_list);
         let snippets_data = vec![
             CreateSnippet::new(
                 "first".into(),
@@ -303,7 +310,7 @@ impl Rusqlite {
 impl StateTrait for Rusqlite {}
 #[allow(unused)]
 impl SnippetStore for Rusqlite {
-    fn add_entry(&mut self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError> {
+    fn add_entry(&self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError> {
         let mut c = self.conn.try_lock().unwrap();
 
         let ts = u64::from(Timestamp::from_utc_now());
@@ -411,6 +418,17 @@ impl SnippetStore for Rusqlite {
 
         match c.execute(
             "DELETE FROM Snippet_Tags WHERE snippet_id = ?1 AND tag_id = ?2",
+            (snippet_id, tag_id),
+        ) {
+            Ok(count) => Ok(true),
+            Err(e) => Err(CheatsheetError::StoreError(e.to_string())),
+        }
+    }
+    fn append_tag(&self, snippet_id: SnippetID, tag_id: TagID) -> Result<bool, CheatsheetError> {
+        let c = self.conn.try_lock().unwrap();
+
+        match c.execute(
+            "INSERT INTO Snippet_Tags (snippet_id, tag_id) VALUES (?1, ?2)",
             (snippet_id, tag_id),
         ) {
             Ok(count) => Ok(true),
@@ -584,13 +602,6 @@ impl TagStore for Rusqlite {
     }
 
     fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError> {
-        // let mut tag = self.conn.query_row(
-        //     "SELECT * FROM Tag WHERE tag_id = ?1",
-        //     [id], |r| {
-        //         self.create_tag_from_row(r)
-        //     })?;
-
-        // Ok(tag)
         let mut id_check = Some(tag_id);
         let mut list: TagList = TagList::from(Vec::new());
 
@@ -606,7 +617,25 @@ impl TagStore for Rusqlite {
         }
         Ok(list)
     }
+
+    fn search_tags_by_title(
+        &self,
+        pattern: &str,
+        mode: SearchMode,
+    ) -> Result<TagList, CheatsheetError> {
+        let c = self.conn.try_lock().unwrap();
+        let sql = match mode {
+            SearchMode::Start => format!("SELECT * FROM Tag WHERE title LIKE '%{}'", pattern),
+            _ => format!("SELECT * FROM Tag WHERE title LIKE '%{}%'", pattern),
+        };
+        let mut stmt = c.prepare(&sql)?;
+        let tag_iter = stmt.query_map([], |row| self.create_tag_from_row(row))?;
+
+        let result: TagList = tag_iter.flatten().collect();
+        Ok(result)
+    }
 }
+
 impl From<rusqlite::Error> for CheatsheetError {
     fn from(err: rusqlite::Error) -> Self {
         CheatsheetError::StoreError(err.to_string())

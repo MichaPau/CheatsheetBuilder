@@ -1,7 +1,36 @@
-use domain::entities::entry::{Snippet, Tag, TagType};
+use domain::entities::entry::{CreateSnippet, Snippet, SnippetID, Tag, TagType};
 use repository::{errors::CheatsheetError, types::AppState};
 use tauri::{Manager, State};
 
+#[tauri::command]
+pub fn add_default_snippet(app_state: State<'_, AppState>) -> Result<Snippet, CheatsheetError> {
+    app_state.service.add_entry(CreateSnippet::default())
+}
+#[tauri::command]
+pub fn update_snippet_title(
+    id: SnippetID,
+    new_title: String,
+    app_state: State<'_, AppState>,
+) -> Result<bool, CheatsheetError> {
+    app_state.service.update_title(id, new_title)
+}
+#[tauri::command]
+pub fn update_snippet_text(
+    id: SnippetID,
+    new_text: String,
+    app_state: State<'_, AppState>,
+) -> Result<bool, CheatsheetError> {
+    app_state.service.update_text(id, new_text)
+}
+
+#[tauri::command]
+pub fn append_tag(
+    snippet_id: usize,
+    tag_id: usize,
+    app_state: State<'_, AppState>,
+) -> Result<bool, CheatsheetError> {
+    app_state.service.append_tag(snippet_id, tag_id)
+}
 #[tauri::command]
 pub fn get_categories(app_state: State<'_, AppState>) -> Result<Vec<Tag>, CheatsheetError> {
     match app_state.service.get_tag_list(Some(TagType::Category)) {
@@ -29,6 +58,19 @@ pub fn set_tag_parent_id(
     app_state.service.update_tag_parent(tag_id, new_parent_id)
 }
 #[tauri::command]
+pub fn search_tags(
+    pattern: &str,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<Tag>, CheatsheetError> {
+    match app_state
+        .service
+        .search_tags_by_title(pattern, domain::entities::entry::SearchMode::Contains)
+    {
+        Ok(result) => Ok(result.inner),
+        Err(e) => Err(e),
+    }
+}
+#[tauri::command]
 pub fn get_snippets(app_state: State<'_, AppState>) -> Result<Vec<Snippet>, CheatsheetError> {
     let r = app_state.service.get_snippet_list(None, None);
     //println!("{:?}", r);
@@ -37,15 +79,4 @@ pub fn get_snippets(app_state: State<'_, AppState>) -> Result<Vec<Snippet>, Chea
 
     // let snippet_vec: Vec<Snippet> = snippet_result.iter().map(|s| s.clone()).collect();
     // snippet_vec
-}
-
-#[tauri::command]
-pub fn greet(name: &str, app_handle: tauri::AppHandle) -> String {
-    let state: State<'_, AppState> = app_handle.state();
-    let s = state.service.get_snippet_list(None, None).unwrap();
-    println!("Debug store: {:?}", s);
-    format!(
-        "Hello, {}! You've been greeted from Rust! testSnippet: {:?}",
-        name, s[0].title
-    )
 }

@@ -1,3 +1,5 @@
+use std::borrow::BorrowMut;
+
 use domain::entities::entry::{
     CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType,
     Timestamp,
@@ -24,7 +26,10 @@ impl Service {
         self.store.get_entry(id)
     }
     //snippet store
-    pub fn add_entry(&mut self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError> {
+    pub fn add_entry(&self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError> {
+        //self.store.as_mut().
+        //self.store.as_mut().add_entry(entry)
+
         self.store.add_entry(entry)
     }
     pub fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError> {
@@ -35,6 +40,13 @@ impl Service {
     }
     pub fn delete_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
         self.store.delete_entry(id)
+    }
+    pub fn append_tag(
+        &self,
+        snippet_id: SnippetID,
+        tag_id: TagID,
+    ) -> Result<bool, CheatsheetError> {
+        self.store.append_tag(snippet_id, tag_id)
     }
     pub fn add_tags(
         &mut self,
@@ -93,5 +105,13 @@ impl Service {
     }
     pub fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError> {
         self.store.get_tag_hierarchy(tag_id)
+    }
+
+    pub fn search_tags_by_title(
+        &self,
+        pattern: &str,
+        mode: domain::entities::entry::SearchMode,
+    ) -> Result<TagList, CheatsheetError> {
+        self.store.search_tags_by_title(pattern, mode)
     }
 }

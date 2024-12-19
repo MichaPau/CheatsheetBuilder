@@ -103,6 +103,16 @@ pub struct CreateSnippet {
     pub text_type: TextType,
 }
 
+impl Default for CreateSnippet {
+    fn default() -> Self {
+        Self {
+            title: "".into(),
+            text: "".into(),
+            tags: vec![],
+            text_type: TextType::Markdown,
+        }
+    }
+}
 impl CreateSnippet {
     pub fn new(title: String, text: String, text_type: TextType, tags: Vec<Tag>) -> Self {
         Self {
@@ -226,6 +236,13 @@ impl Into<u32> for Color {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[non_exhaustive]
+pub enum SearchMode {
+    Start,
+    Contains,
+}
 #[test]
 fn tag_styles() {
     let style = TagStyle {

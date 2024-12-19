@@ -6,7 +6,6 @@ use crate::ports::services::Service;
 // impl<T> StateTrait for T
 //     where T: SnippetStore + TagStore + Send + Sync + 'static {}
 
-
 // #[derive(Debug)]
 // pub struct AppState<R> where R: StateTrait {
 //     pub service: Service<R>,

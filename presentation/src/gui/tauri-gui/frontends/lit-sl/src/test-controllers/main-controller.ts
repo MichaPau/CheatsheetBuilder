@@ -20,13 +20,13 @@ export class MainController implements ReactiveController {
     //const cats = this.db.query("select * from Tag where tag_type = 1");
 
     const load_categories: Array<Tag> = [
-      { id: 1, title: "Root", tag_type: 1, parent_id: null, tag_style: null },
+      { id: 1, title: "Root", tag_type: "Category", parent_id: null, tag_style: null },
     ];
     this.host.categories = buildTreeArray(load_categories);
 
     //const snippets = this.db.query("select * from Snippet");
     this.host.snippets = [
-      {id: 1, title: "one", text: "snippet_one", created_at: 0, updated_at: 0, tags: [], text_type: 1},
+      {id: 1, title: "one", text: "snippet_one", created_at: 0, updated_at: 0, tags: [load_categories[0]], text_type: 1},
       {id: 2, title: "two", text: "snippet_two", created_at: 0, updated_at: 0, tags: [], text_type: 1},
     ];
   }
