@@ -355,21 +355,24 @@ impl SnippetStore for Rusqlite {
         Ok(to_delete)
     }
     fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
-        println!("1: {:?}", self.conn);
         let mut c = self.conn.try_lock().unwrap();
-        println!("2: {:?}", c);
+
         let mut snippet =
             c.query_row("SELECT * FROM Snippet WHERE snippet_id = ?1", [id], |r| {
                 self.create_snippet_from_row(r, &c)
             })?;
-        println!("3");
+
         Ok(snippet)
     }
-    fn add_tags(
-        &mut self,
-        snippet_id: SnippetID,
-        tags: Vec<Tag>,
-    ) -> Result<usize, CheatsheetError> {
+    fn get_tags(&self, id: SnippetID) -> Result<Vec<Tag>, CheatsheetError> {
+        let mut c = self.conn.try_lock().unwrap();
+        let mut stmt = c.prepare("SELECT * FROM Tag INNER JOIN Snippet_Tags ON Snippet_Tags.snippet_id = ?1 AND Tag.tag_id = Snippet_Tags.tag_id ORDER BY tag_id")?;
+        let tag_iter = stmt.query_map([id], |row| self.create_tag_from_row(row))?;
+
+        let result: Vec<Tag> = tag_iter.flatten().collect();
+        Ok(result)
+    }
+    fn add_tags(&self, snippet_id: SnippetID, tags: Vec<Tag>) -> Result<usize, CheatsheetError> {
         let mut c = self.conn.try_lock().unwrap();
 
         let mut count = 0;

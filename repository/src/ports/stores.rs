@@ -18,8 +18,8 @@ pub trait StateTrait: SnippetStore + TagStore + Send + Sync + 'static {}
 pub trait SnippetStore {
     fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError>;
     fn add_entry(&self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError>;
-    fn add_tags(&mut self, snippet_id: SnippetID, tags: Vec<Tag>)
-        -> Result<usize, CheatsheetError>;
+    fn add_tags(&self, snippet_id: SnippetID, tags: Vec<Tag>) -> Result<usize, CheatsheetError>;
+    fn get_tags(&self, id: SnippetID) -> Result<Vec<Tag>, CheatsheetError>;
     fn delete_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError>;
     fn remove_tag_from_all(&self, tag_id: TagID) -> Result<usize, CheatsheetError>;
     fn append_tag(&self, snippet_id: SnippetID, tag_id: TagID) -> Result<bool, CheatsheetError>;

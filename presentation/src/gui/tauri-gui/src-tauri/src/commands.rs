@@ -1,6 +1,6 @@
 use domain::entities::entry::{CreateSnippet, Snippet, SnippetID, Tag, TagType};
 use repository::{errors::CheatsheetError, types::AppState};
-use tauri::{Manager, State};
+use tauri::State;
 
 #[tauri::command]
 pub fn add_default_snippet(app_state: State<'_, AppState>) -> Result<Snippet, CheatsheetError> {
@@ -28,8 +28,22 @@ pub fn append_tag(
     snippet_id: usize,
     tag_id: usize,
     app_state: State<'_, AppState>,
-) -> Result<bool, CheatsheetError> {
-    app_state.service.append_tag(snippet_id, tag_id)
+) -> Result<Vec<Tag>, CheatsheetError> {
+    match app_state.service.append_tag(snippet_id, tag_id) {
+        Ok(_) => app_state.service.get_tags_for_snippet(snippet_id),
+        Err(e) => Err(e),
+    }
+}
+#[tauri::command]
+pub fn remove_tag_from_snippet(
+    snippet_id: usize,
+    tag_id: usize,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<Tag>, CheatsheetError> {
+    match app_state.service.remove_tag(snippet_id, tag_id) {
+        Ok(_) => app_state.service.get_tags_for_snippet(snippet_id),
+        Err(e) => Err(e),
+    }
 }
 #[tauri::command]
 pub fn get_categories(app_state: State<'_, AppState>) -> Result<Vec<Tag>, CheatsheetError> {

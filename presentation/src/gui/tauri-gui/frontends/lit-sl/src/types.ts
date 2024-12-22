@@ -31,5 +31,6 @@ declare global {
   interface HTMLElementEventMap {
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;
     'get-parent-tags': CustomEvent<{tag_id: number}>;
+    'remove-tag-from-snippet': CustomEvent<{tag_id: number }>;
   }
 }

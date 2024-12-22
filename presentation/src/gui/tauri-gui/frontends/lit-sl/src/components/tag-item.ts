@@ -14,6 +14,16 @@ export class TagItem extends LitElement {
         display: block;
 
       }
+      .icon-button {
+          all: unset;
+          cursor: pointer;
+          margin-left: var(--spacer-small);
+      }
+
+      .tag-container {
+          display: inline-flex;
+
+      }
     `
 
 
@@ -50,6 +60,10 @@ export class TagItem extends LitElement {
     }
     this.parent_tags = [];
   }
+
+  removeTag = (_ev: Event) => {
+    this.dispatchEvent(new CustomEvent("remove-tag-from-snippet", { bubbles: true, composed: true, detail: {tag_id: this.tag.id} }))
+  }
   render() {
     if (this.tag.tag_type === "Category") {
         return html`
@@ -57,7 +71,12 @@ export class TagItem extends LitElement {
                 <div class="tag category" slot="trigger"
                     @click=${this.onTriggerParents}
                     @mouseleave=${this.removeParents}
-                >${this.tag.title}</div>
+                >
+                    ${this.tag.title}
+                    <button class="icon-button" @click=${this.removeTag}>
+                        <img src="./src/assets/icons/x-circle.svg"/>
+                    </button>
+                </div>
 
               <sl-menu>
                   ${ this.parent_tags.map((parent_tag) => html `
@@ -68,7 +87,17 @@ export class TagItem extends LitElement {
         `;
     } else {
         return html`
-            <div class="tag normal">${this.tag.title}</div>
+            <div class="tag-container">
+                <div class="tag normal">
+                    ${this.tag.title}
+                    <button class="icon-button" @click=${this.removeTag}>
+                        <img src="./src/assets/icons/x-circle.svg"/>
+                    </button>
+                </div>
+
+            </div>
+
+
         `;
     }
 

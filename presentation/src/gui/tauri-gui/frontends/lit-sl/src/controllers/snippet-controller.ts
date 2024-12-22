@@ -13,9 +13,9 @@ export class SnippetController implements ReactiveController {
   }
 
   async addTag(tag_id: number) {
-    let result: Tag = await invoke("append_tag", { snippetId: this.host.snippet.id, tagId: tag_id });
+    let result: Array<Tag> = await invoke("append_tag", { snippetId: this.host.snippet.id, tagId: tag_id }) as Array<Tag>;
     if (result) {
-      //todo
+      this.host.tagResult(result, true);
     }
   }
   async searchTags(pattern: string) {
@@ -32,6 +32,14 @@ export class SnippetController implements ReactiveController {
       return false;
     });
     return update_result;
+  }
+
+  async removeTag(snippet_id: number, tag_id: number) {
+    let result: Array<Tag> = await invoke("remove_tag_from_snippet", { snippetId: snippet_id, tagId: tag_id }) as Array<Tag>;
+    if (result) {
+      this.host.tagResult(result, false);
+    }
+
   }
   hostConnected(): void {}
 

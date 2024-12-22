@@ -21,13 +21,14 @@ export class MainController implements ReactiveController {
 
     const load_categories: Array<Tag> = [
       { id: 1, title: "Root", tag_type: "Category", parent_id: null, tag_style: null },
+      { id: 2, title: "Something", tag_type: "Normal", parent_id: null, tag_style: null }
     ];
     this.host.categories = buildTreeArray(load_categories);
 
     //const snippets = this.db.query("select * from Snippet");
     this.host.snippets = [
-      {id: 1, title: "one", text: "snippet_one", created_at: 0, updated_at: 0, tags: [load_categories[0]], text_type: 1},
-      {id: 2, title: "two", text: "snippet_two", created_at: 0, updated_at: 0, tags: [], text_type: 1},
+      {id: 1, title: "one", text: "snippet_one", created_at: 0, updated_at: 0, tags: load_categories, text_type: "markdown"},
+      {id: 2, title: "two", text: "snippet_two", created_at: 0, updated_at: 0, tags: [], text_type: "markdown"},
     ];
   }
 

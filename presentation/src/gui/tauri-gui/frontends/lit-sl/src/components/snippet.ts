@@ -126,6 +126,22 @@ export class SnippetContainer extends LitElement {
       this.snippet_controler.addTag(id);
     }
   }
+
+  removeTag = async (ev:CustomEvent) => {
+
+    this.snippet_controler.removeTag(this.snippet.id, ev.detail.tag_id)
+    console.log("removetag: ", this.snippet.id, ev.detail.tag_id);
+
+  }
+  tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
+
+    if (clear_search) {
+      const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+      search_target?.replaceChildren();
+    }
+    this.snippet.tags = new_tags;
+    this.requestUpdate();
+  }
   onSearchTagChange = async (ev: Event) => {
     const search_target = this.shadowRoot?.querySelector("#tag-search-result");
     search_target?.replaceChildren();
@@ -133,18 +149,24 @@ export class SnippetContainer extends LitElement {
     let pattern = (ev.target as HTMLInputElement).value;
 
     if (pattern.length >= 3) {
-      console.log("search for: ", pattern);
+
       let tags: Array<Tag> = await this.snippet_controler.searchTags(pattern);
-      console.log("tag result: ", tags);
+
       for (const t of tags) {
-          //let tag_node = `<div class="tag normal">${t.title}</div>`;
+
           var tag = document.createElement("div");
           //tag.setAttribute("tabindex", "0");
           tag.classList.add("tag");
-          tag.classList.add("normal");
+          t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
 
           tag.innerHTML = `${t.title}`;
-          tag.addEventListener("click", (e) => this.addTag(t.id, e));
+
+          if (this.snippet.tags.includes(t)) {
+            tag.setAttribute("disabled", "");
+          } else {
+            tag.addEventListener("click", (e) => this.addTag(t.id, e));
+          }
+
           search_target?.appendChild(tag);
 
       }
@@ -162,7 +184,7 @@ export class SnippetContainer extends LitElement {
                         />
             </div>
             <div slot="footer" class="footer">
-                <snippet-tag-list .tag_list=${this.snippet.tags}></snippet-tag-list>
+                <snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list>
                 <div class="tag-search-container">
                     <input class="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
                     <div id="tag-search-result"></div>

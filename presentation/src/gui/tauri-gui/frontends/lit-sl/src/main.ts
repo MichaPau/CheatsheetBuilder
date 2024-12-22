@@ -11,6 +11,8 @@ import './components/settings-logger.js';
 import '@shoelace-style/shoelace/dist/components/button/button.js';
 import '@shoelace-style/shoelace/dist/components/card/card.js';
 import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
+import '@shoelace-style/shoelace/dist/components/icon/icon.js';
+import '@shoelace-style/shoelace/dist/components/icon-button/icon-button.js';
 import '@shoelace-style/shoelace/dist/components/menu/menu.js';
 import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
 import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
@@ -32,7 +34,9 @@ import { appContext, AppSettings } from './utils/app-context.js';
 import { MainController } from './controllers/main-controller.js';
 //import { MainController } from './test-controllers/main-controller.js';
 
-
+import { getBasePath, setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
+setBasePath('./src');
+console.log("path:", getBasePath());
 
 @customElement('main-app')
 export class App extends LitElement {
@@ -103,6 +107,7 @@ export class App extends LitElement {
       <div id="app-container">
         <header class="header">
           <sl-button @click=${this.toggleStyle}>Test</sl-button>
+          <sl-icon-button name="x-circle" label="remove tag"></sl-icon-button>
           </header>
           <aside class="sidebar">
             <category-tree .category_tree=${this.categories}></category-tree>

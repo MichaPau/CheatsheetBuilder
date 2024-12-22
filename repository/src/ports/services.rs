@@ -41,6 +41,9 @@ impl Service {
     pub fn delete_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
         self.store.delete_entry(id)
     }
+    pub fn get_tags_for_snippet(&self, id: SnippetID) -> Result<Vec<Tag>, CheatsheetError> {
+        self.store.get_tags(id)
+    }
     pub fn append_tag(
         &self,
         snippet_id: SnippetID,

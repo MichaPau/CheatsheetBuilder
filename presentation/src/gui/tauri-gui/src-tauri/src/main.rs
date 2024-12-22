@@ -12,7 +12,7 @@ fn main() {
     //     Err(e) => println!("error creatting backup: {:?}", e),
     // }
     //println!("current:{:?}", std::env::current_dir());
-    let store = Rusqlite::open("../../../../../data/dev_db_backup.db").unwrap();
+    let store = Rusqlite::open("../../../../../data/dev_db.db").unwrap();
     let service = Service::new(Box::new(store));
 
     let app_state = AppState { service };
