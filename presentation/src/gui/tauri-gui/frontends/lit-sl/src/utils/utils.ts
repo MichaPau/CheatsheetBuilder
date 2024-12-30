@@ -22,15 +22,17 @@ export function buildTreeArray(flatArray: Array<Tag>) {
         //const node = nodeMap[item.id];
         const node = nodeMap.get(item.id);
         if (item.parent_id !== null) {
-            (nodeMap.get(item.parent_id) as TreeCategory).children.push(node);
+          const p_node = nodeMap.get(item.parent_id) as TreeCategory;
+            p_node.children.push(node);
+          if (!p_node.open) p_node.open = true;
             //nodeMap[item.parentId].children.push(node);
         } else {
             result.push(node);
         }
+
     });
 
-    // const _root = { item: {id: 0, title: "root", parent_id: null, tag_type:"Category", tag_style: null}, children: []}; 
+    // const _root = { item: {id: 0, title: "root", parent_id: null, tag_type:"Category", tag_style: null}, children: []};
     // result.unshift(_root);
     return result;
 }
-

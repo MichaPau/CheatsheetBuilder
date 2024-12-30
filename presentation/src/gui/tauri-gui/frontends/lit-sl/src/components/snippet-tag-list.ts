@@ -20,7 +20,7 @@ export class SnippetTagList extends LitElement {
 
       .tag-container {
           display: flex;
-          gap: var(--sl-spacing-2x-small);
+          gap: var(--spacing-small);
       }
 
     `

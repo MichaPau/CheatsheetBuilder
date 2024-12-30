@@ -21,12 +21,16 @@ export class SnippetEditor extends LitElement {
     css `
       :host {
         display: block;
+        --snippet-body-min-height: 5em;
+        --snippet-body-max-height: 11em;
+
       }
       .editor-container {
           display: flex;
           width: 100%;
           gap: 0.5em;
           max-height: var(--snippet-body-max-height);
+          min-height: var(--snippet-body-min-height);
       }
       .editor-div {
           flex: 1 1 50%;
@@ -42,7 +46,7 @@ export class SnippetEditor extends LitElement {
           height: 100%;
           max-height: 100%;
           min-height: var(--snippet-body-min-height);
-          padding: var(--sl-input-spacing-small) 0 0 var(--sl-input-spacing-small) ;
+          padding: var(--spacing-small) 0 0 var(--spacing-small) ;
 
           /* &:focus {
               //outline: var(--sl-focus-ring-style) var(--sl-focus-ring-width) var(--sl-focus-ring-color);
@@ -53,7 +57,7 @@ export class SnippetEditor extends LitElement {
       .render-container {
           flex: 1 1 50%;
           border: 1px solid black;
-          padding: var(--sl-input-spacing-small) 0 0 var(--sl-input-spacing-small);
+          padding: var(--spacing-small) 0 0 var(--spacing-small);
           transition: all 0.3s;
 
 
@@ -151,15 +155,15 @@ export class SnippetEditor extends LitElement {
     (ev.target as Editor).removeAttribute("readonly");
   }
   onBlurText = (ev: Event) => {
-    // const editor = (ev.target as Editor);
-    // editor.setAttribute("readonly", "");
+    const editor = (ev.target as Editor);
+    editor.setAttribute("readonly", "");
 
-    // if (editor.value !== this.text_data) {
-    //   this.text_data = editor.value;
-    //   this.render_data = this.parseMarkdown(this.text_data);
-    // }
+    if (editor.value !== this.text_data) {
+      this.text_data = editor.value;
+      this.render_data = this.parseMarkdown(this.text_data);
+    }
 
-    // this.edit_mode = false;
+    this.edit_mode = false;
 
 
   }

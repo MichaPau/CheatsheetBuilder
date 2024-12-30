@@ -5,7 +5,6 @@
     "type": "module",
     "dependencies": {
         "@lit-labs/motion": "^1.0.7",
-        "@shoelace-style/shoelace": "^2.18.0",
         "marked": "^15.0.3"
     },
     "devDependencies": {

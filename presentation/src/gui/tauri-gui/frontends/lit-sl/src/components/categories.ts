@@ -8,6 +8,8 @@ import { appContext, AppSettings } from '../utils/app-context.js';
 
 import { Tag, TreeCategory} from '../types.js';
 
+import './tree-view.js';
+
 @customElement('category-tree')
 export class Categories extends LitElement {
   static styles = [
@@ -79,39 +81,12 @@ export class Categories extends LitElement {
     let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: undefined }, bubbles: true, composed: true });
     this.dispatchEvent(ce);
   }
-  renderTemplate(node: TreeCategory): any {
 
-    return html`
-    <sl-tree-item class="tree-item" tag_id=${node.item.id}
-        draggable="true"
-        @sl-expand=${(ev: Event) => this.onTreeItemExpand(ev, node.item.id)}
-        @sl-collapse=${(ev: Event) => this.onTreeItemCollapse(ev, node.item.id)}
-        @drop=${(ev: DragEvent) => this.log_event_drop(node.item, ev)}
-        @dragstart=${(ev: DragEvent) => this.log_event_start(node.item, ev)}
-        @dragover=${(ev: DragEvent) => this.log_event_over(node.item, ev)}>
-        ${node.item.title}
-        ${node.children.map((child) =>
-            this.renderTemplate(child)
-        )}
-
-    </sl-tree-item>`;
-}
 
 
   render() {
     return html`
-
-        <sl-tree-item id="root-item" @drop=${this.on_root_drop} @dragover=${(ev: DragEvent) => { ev.preventDefault()}}>
-            Root
-        </sl-tree-item>
-        <sl-tree selection="multiple" @sl-selection-change=${this.onTreeItemChange}>
-
-            ${this.category_tree.map((node) => {
-                return this.renderTemplate(node);
-            }
-
-            )}
-        </sl-tree>
+        <tree-view .category_tree=${this.category_tree}></tree-view>
     `;
   }
 }

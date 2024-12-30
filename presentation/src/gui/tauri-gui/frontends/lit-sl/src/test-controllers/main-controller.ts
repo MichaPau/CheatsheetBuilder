@@ -20,14 +20,19 @@ export class MainController implements ReactiveController {
     //const cats = this.db.query("select * from Tag where tag_type = 1");
 
     const load_categories: Array<Tag> = [
-      { id: 1, title: "Root", tag_type: "Category", parent_id: null, tag_style: null },
-      { id: 2, title: "Something", tag_type: "Normal", parent_id: null, tag_style: null }
+      { id: 1, title: "First", tag_type: "Category", parent_id: null, tag_style: null },
+      { id: 3, title: "Sub1", tag_type: "Category", parent_id: 1, tag_style: null },
+      { id: 5, title: "Sub1.2", tag_type: "Category", parent_id: 3, tag_style: null },
+      { id: 4, title: "Second", tag_type: "Category", parent_id: null, tag_style: null },
+      { id: 6, title: "Third", tag_type: "Category", parent_id: null, tag_style: null }
+
     ];
+    let normal: Tag = { id: 2, title: "Something", tag_type: "Normal", parent_id: null, tag_style: null };
     this.host.categories = buildTreeArray(load_categories);
 
     //const snippets = this.db.query("select * from Snippet");
     this.host.snippets = [
-      {id: 1, title: "one", text: "snippet_one", created_at: 0, updated_at: 0, tags: load_categories, text_type: "markdown"},
+      {id: 1, title: "one", text: "snippet_one", created_at: 0, updated_at: 0, tags: [load_categories[3], normal], text_type: "markdown"},
       {id: 2, title: "two", text: "snippet_two", created_at: 0, updated_at: 0, tags: [], text_type: "markdown"},
     ];
   }

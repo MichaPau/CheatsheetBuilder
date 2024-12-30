@@ -1,23 +1,24 @@
 import { html, css, LitElement } from 'lit';
+//import { LitElementLightDOM } from './utils/litlightdom.js';
 import { customElement, state } from 'lit/decorators.js';
 import {provide} from '@lit/context';
 
-import { Tag, Snippet, TreeCategory } from './types';
+import { Snippet, TreeCategory } from './types';
 
 import './components/categories.js';
 import './components/snippet-list.js';
 import './components/settings-logger.js';
 
-import '@shoelace-style/shoelace/dist/components/button/button.js';
-import '@shoelace-style/shoelace/dist/components/card/card.js';
-import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
-import '@shoelace-style/shoelace/dist/components/icon/icon.js';
-import '@shoelace-style/shoelace/dist/components/icon-button/icon-button.js';
-import '@shoelace-style/shoelace/dist/components/menu/menu.js';
-import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
-import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
-import '@shoelace-style/shoelace/dist/components/tree/tree.js';
-import '@shoelace-style/shoelace/dist/components/tree-item/tree-item.js';
+// import '@shoelace-style/shoelace/dist/components/button/button.js';
+// import '@shoelace-style/shoelace/dist/components/card/card.js';
+// import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
+// import '@shoelace-style/shoelace/dist/components/icon/icon.js';
+// import '@shoelace-style/shoelace/dist/components/icon-button/icon-button.js';
+// import '@shoelace-style/shoelace/dist/components/menu/menu.js';
+// import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
+// import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
+// import '@shoelace-style/shoelace/dist/components/tree/tree.js';
+// import '@shoelace-style/shoelace/dist/components/tree-item/tree-item.js';
 
 
 // import '@shoelace-style/shoelace/dist/themes/light.css';
@@ -31,8 +32,8 @@ import sharedStyles from './styles/shared-styles.js';
 
 
 import { appContext, AppSettings } from './utils/app-context.js';
-import { MainController } from './controllers/main-controller.js';
-//import { MainController } from './test-controllers/main-controller.js';
+//import { MainController } from './controllers/main-controller.js';
+import { MainController } from './test-controllers/main-controller.js';
 
 import { getBasePath, setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 setBasePath('./src');
@@ -86,10 +87,12 @@ export class App extends LitElement {
   toggleStyle() {
     console.log("toggleStyle");
     const html_root = document.querySelector("html")!;
-    if (html_root.classList.contains("sl-theme-dark")) {
-      html_root.classList.remove("sl-theme-dark");
+    if (html_root.classList.contains("app-theme-light")) {
+      html_root.classList.remove("app-theme-light");
+      html_root.classList.add("app-theme-dark");
     } else {
-      html_root.classList.add("sl-theme-dark");
+      html_root.classList.remove("app-theme-dark");
+      html_root.classList.add("app-theme-light");
     }
   }
   connectedCallback(): void {
@@ -106,7 +109,7 @@ export class App extends LitElement {
     return html`
       <div id="app-container">
         <header class="header">
-          <sl-button @click=${this.toggleStyle}>Test</sl-button>
+          <button @click=${this.toggleStyle}>Test</button>
           <sl-icon-button name="x-circle" label="remove tag"></sl-icon-button>
           </header>
           <aside class="sidebar">

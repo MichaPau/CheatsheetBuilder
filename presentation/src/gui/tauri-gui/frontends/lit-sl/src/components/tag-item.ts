@@ -17,9 +17,22 @@ export class TagItem extends LitElement {
       .icon-button {
           all: unset;
           cursor: pointer;
-          margin-left: var(--spacer-small);
+          /* margin-left: var(--spacer-small); */
+          /* border: 1px solid black; */
+
+          img {
+              vertical-align: middle;
+                display: inline-block;
+          }
+
+          &:hover {
+              scale: 1.2;
+          }
       }
 
+      .tag-text {
+          border: 1px solid black;
+      }
       .tag-container {
           display: inline-flex;
 
@@ -104,6 +117,7 @@ export class TagItem extends LitElement {
   }
 }
 
+//<div class="tag-text">${this.tag.title}</div>
 // <sl-button
 //     @mouseover=${this.onTriggerParents}
 //     @mouseleave=${this.removeParents}

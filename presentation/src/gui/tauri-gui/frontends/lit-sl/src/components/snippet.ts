@@ -17,20 +17,38 @@ export class SnippetContainer extends LitElement {
       :host {
         display: block;
         width: 100%;
-
+        /* --border-color: var(--sl-color-neutral-200); */
+        --border-radius: var(--border-radius-medium);
+        --border-width: 1px;
+        --padding: var(--spacing-large);
 
       }
 
+      .card {
+          display: flex;
+          flex-direction: column;
+          background-color: var(--panel-background-color);
+          box-shadow: var(--shadow-small);
+          border: solid var(--border-width) var(--border-color);
+          border-radius: var(--border-radius);
+      }
+      .card > * {
+          padding: var(--spacing-medium);
+      }
+      #header {
+          border-bottom: solid var(--border-width) var(--border-color);
+      }
       .snippet-item {
         flex: 1;
         width: 80%;
-        --padding: var(--sl-spacing-small);
+        --padding: var(--spacing-small);
       }
-      .snippet-item::part(body) {
+      #editor-component {
         min-height: var(-snippet-body-min-height);
       }
       .snippet-title-label {
           display: block;
+          box-sizing: border-box;
           line-height: 1.5em;
           width: 100%;
           /* border-radius: var(--sl-border-radius-medium); */
@@ -38,38 +56,40 @@ export class SnippetContainer extends LitElement {
           &:read-only {
               border: none;
           }
-      }
-      .footer {
-          display: flex;
-          flex-direction: column;
-          gap: var(--sl-spacing-2x-small);
-          border: 1px solid black;
-      }
-
-    .tag-search-input {
-        flex: 1 1 50%;
-
-
-    }
-    #tag-search-result {
-
-        display: flex;
-        gap: var(--sl-spacing-2x-small);
-
-        &.option {
-            appearance: none;
-            background-color: transparent;
-            border: 0;
-            padding:10px;
-            margin:-5px -20px -5px -5px;
         }
-    }
-    .test {
-        display: inline-block;
-    }
+        .footer {
+            display: flex;
+            flex-direction: column;
+            gap: var(--sl-spacing-2x-small);
+            border: 1px solid black;
+        }
 
+        details > summary {
+            list-style-type: none;
+        }
 
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .tag-search-input {
+            flex: 1 1 50%;
+        }
+        #tag-search-result {
 
+            display: flex;
+            gap: var(--spacing-small);
+
+            &.option {
+                appearance: none;
+                background-color: transparent;
+                border: 0;
+                padding:10px;
+                margin:-5px -20px -5px -5px;
+            }
+        }
+        .test {
+            display: inline-block;
+        }
     `
   ];
 
@@ -133,11 +153,14 @@ export class SnippetContainer extends LitElement {
     console.log("removetag: ", this.snippet.id, ev.detail.tag_id);
 
   }
+
   tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
 
     if (clear_search) {
       const search_target = this.shadowRoot?.querySelector("#tag-search-result");
       search_target?.replaceChildren();
+      const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
+      search_input.value = "";
     }
     this.snippet.tags = new_tags;
     this.requestUpdate();
@@ -161,8 +184,9 @@ export class SnippetContainer extends LitElement {
 
           tag.innerHTML = `${t.title}`;
 
-          if (this.snippet.tags.includes(t)) {
-            tag.setAttribute("disabled", "");
+          if (this.snippet.tags.some(st => st.id === t.id)) {
+            console.log("tag already included");
+            tag.classList.add("disabled");
           } else {
             tag.addEventListener("click", (e) => this.addTag(t.id, e));
           }
@@ -174,8 +198,8 @@ export class SnippetContainer extends LitElement {
   }
   render() {
     return html`
-        <sl-card class="snippet-item">
-            <div slot="header">
+        <div class="snippet-item card">
+            <div id="header">
                     <input readonly class="snippet-title-label"
                         @click=${this.onEditTitle}
                         @blur=${this.onBlurTitle}
@@ -183,18 +207,17 @@ export class SnippetContainer extends LitElement {
                         value=${this.snippet.title}
                         />
             </div>
-            <div slot="footer" class="footer">
-                <snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list>
+            <snippet-editor id="editor-component" .text_data=${this.snippet.text}></snippet-editor>
+            <details id="footer" class="footer">
+                <summary><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <div class="tag-search-container">
                     <input class="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
                     <div id="tag-search-result"></div>
-
                 </div>
+            </details>
 
-            </div>
 
-            <snippet-editor .text_data=${this.snippet.text}></snippet-editor>
-        </sl-card>
+        </div>
 
     `;
   }
