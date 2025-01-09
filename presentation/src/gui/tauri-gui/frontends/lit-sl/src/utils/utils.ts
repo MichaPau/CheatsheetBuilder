@@ -1,4 +1,5 @@
 import { Tag, TreeCategory } from "../types";
+import { TreeNode } from "../components/tree-view";
 
 
 export function buildTreeArray(flatArray: Array<Tag>) {
@@ -6,13 +7,15 @@ export function buildTreeArray(flatArray: Array<Tag>) {
     const nodeMap = new Map();
 
     // Store the root nodes of the tree
-    const result = [] as Array<TreeCategory>;
+    const result = [] as Array<TreeNode>;
 
     // Create a reference object
     flatArray.forEach((item) => {
         nodeMap.set(item.id, {
             item: item,
-            children: [] as Array<TreeCategory>,
+            selected: false,
+            open: false,
+            children: [] as Array<TreeNode>,
         });
         //nodeMap[item.id] = { ...item, children: [] };
     });
@@ -22,9 +25,9 @@ export function buildTreeArray(flatArray: Array<Tag>) {
         //const node = nodeMap[item.id];
         const node = nodeMap.get(item.id);
         if (item.parent_id !== null) {
-          const p_node = nodeMap.get(item.parent_id) as TreeCategory;
+          const p_node = nodeMap.get(item.parent_id) as TreeNode;
             p_node.children.push(node);
-          if (!p_node.open) p_node.open = true;
+          // if (!p_node.open) p_node.open = true;
             //nodeMap[item.parentId].children.push(node);
         } else {
             result.push(node);

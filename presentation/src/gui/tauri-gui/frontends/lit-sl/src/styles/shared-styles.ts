@@ -8,9 +8,6 @@ export default css`
 
     }
 
-    sl-tree-item::part(label) {
-        font-family: var(--default-font-family);
-    }
     textarea, input {
         border-radius: var(--border-radius-medium);
         font-family: var(--default-font-family);

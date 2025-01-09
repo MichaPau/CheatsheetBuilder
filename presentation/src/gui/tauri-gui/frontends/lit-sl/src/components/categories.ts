@@ -1,5 +1,5 @@
 import { html, css, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 
 //import './category_node.js';
@@ -27,7 +27,8 @@ export class Categories extends LitElement {
     `
   ];
 
-  @consume({context: appContext})
+  @consume({ context: appContext, subscribe: true })
+  @state()
   appSettings!: AppSettings;
 
   @property({type: Array})
@@ -35,7 +36,9 @@ export class Categories extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    console.log("connectedCallback");
+    this.addEventListener('change-category-selection', (ev: CustomEvent) => {
+      //console.log("change-category-selection", ev.detail);
+    });
   }
 
   onTreeItemChange(ev: CustomEvent) {

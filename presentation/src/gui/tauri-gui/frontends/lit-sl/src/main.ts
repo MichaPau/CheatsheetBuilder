@@ -34,10 +34,9 @@ import sharedStyles from './styles/shared-styles.js';
 import { appContext, AppSettings } from './utils/app-context.js';
 //import { MainController } from './controllers/main-controller.js';
 import { MainController } from './test-controllers/main-controller.js';
+import { TreeNode } from './components/tree-view.js';
 
-import { getBasePath, setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
-setBasePath('./src');
-console.log("path:", getBasePath());
+
 
 @customElement('main-app')
 export class App extends LitElement {
@@ -58,12 +57,12 @@ export class App extends LitElement {
   @provide({ context: appContext })
   @state()
   appSettings: AppSettings = {
-    open_categories: ["1"],
-    selected_categories: ["2"],
+    open_categories: [],
+    selected_categories: [],
   };
 
   @state()
-  categories: Array<TreeCategory> = [];
+  categories: Array<TreeNode> = [];
 
   @state()
   snippets: Array<Snippet> = [];
@@ -110,6 +109,7 @@ export class App extends LitElement {
       <div id="app-container">
         <header class="header">
           <button @click=${this.toggleStyle}>Test</button>
+          <button @click=${(_ev: Event) => console.log(JSON.stringify(this.categories, null, 2))}>Debug</button>
           <sl-icon-button name="x-circle" label="remove tag"></sl-icon-button>
           </header>
           <aside class="sidebar">

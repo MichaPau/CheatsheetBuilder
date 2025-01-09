@@ -21,8 +21,11 @@ export class MainController implements ReactiveController {
 
     const load_categories: Array<Tag> = [
       { id: 1, title: "First", tag_type: "Category", parent_id: null, tag_style: null },
-      { id: 3, title: "Sub1", tag_type: "Category", parent_id: 1, tag_style: null },
-      { id: 5, title: "Sub1.2", tag_type: "Category", parent_id: 3, tag_style: null },
+      { id: 11, title: "Sub1", tag_type: "Category", parent_id: 1, tag_style: null },
+      { id: 12, title: "Sub2", tag_type: "Category", parent_id: 1, tag_style: null },
+      { id: 13, title: "Sub3", tag_type: "Category", parent_id: 1, tag_style: null },
+      { id: 111, title: "Sub1.1", tag_type: "Category", parent_id: 11, tag_style: null },
+      { id: 112, title: "Sub1.2", tag_type: "Category", parent_id: 11, tag_style: null },
       { id: 4, title: "Second", tag_type: "Category", parent_id: null, tag_style: null },
       { id: 6, title: "Third", tag_type: "Category", parent_id: null, tag_style: null }
 
