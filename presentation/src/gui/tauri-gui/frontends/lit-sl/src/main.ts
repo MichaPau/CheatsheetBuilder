@@ -34,7 +34,7 @@ import sharedStyles from './styles/shared-styles.js';
 import { appContext, AppSettings } from './utils/app-context.js';
 //import { MainController } from './controllers/main-controller.js';
 import { MainController } from './test-controllers/main-controller.js';
-import { TreeNode } from './components/tree-view.js';
+import { TreeNode } from './components/tree.js';
 
 
 

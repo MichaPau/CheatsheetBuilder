@@ -1,5 +1,5 @@
 import { Tag, TreeCategory } from "../types";
-import { TreeNode } from "../components/tree-view";
+import { TreeNode } from "../components/tree";
 
 
 export function buildTreeArray(flatArray: Array<Tag>) {

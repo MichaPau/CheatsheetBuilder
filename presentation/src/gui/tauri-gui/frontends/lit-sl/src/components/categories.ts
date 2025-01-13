@@ -6,9 +6,11 @@ import { consume } from '@lit/context';
 import sharedStyles from '../styles/shared-styles.js';
 import { appContext, AppSettings } from '../utils/app-context.js';
 
-import { Tag, TreeCategory} from '../types.js';
+import { Tag } from '../types.js';
 
-import './tree-view.js';
+import './tree.js';
+import { TreeNode } from './tree.js';
+import { TreeItem } from './tree-item.js';
 
 @customElement('category-tree')
 export class Categories extends LitElement {
@@ -17,6 +19,7 @@ export class Categories extends LitElement {
     css `
       :host {
         display: block;
+        overflow: auto;
       }
 
       #root-item::part(checkbox){
@@ -32,25 +35,23 @@ export class Categories extends LitElement {
   appSettings!: AppSettings;
 
   @property({type: Array})
-  category_tree: Array<TreeCategory> = [];
+  category_tree: Array<TreeNode> = [];
 
   connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener('change-category-selection', (ev: CustomEvent) => {
-      //console.log("change-category-selection", ev.detail);
+    this.addEventListener("tree-sync-finished", (_e: Event) => {
+      console.log("sync finished");
+      const tree = this.shadowRoot?.querySelector("tree-view")!;
+      const all = Array.from(
+        tree.shadowRoot?.querySelectorAll("tree-item")!,
+      ) as Array<TreeItem>;
+      const f = all.filter((node) => node.selected);
+      console.log("all:", all);
+      console.log("f  :", f);
     });
   }
 
-  onTreeItemChange(ev: CustomEvent) {
-    console.log("onTreeItemChange", ev);
-    let ids: Array<string> = [];
-    ev.detail.selection.map((item: HTMLElement) => {
-      ids.push(item.getAttribute("tag_id")!);
-    });
-    console.log(ids);
-    this.dispatchEvent(new CustomEvent("set-selected-categories", { bubbles: true, composed: true, detail: ids }));
-    //this.appSettings.open_categories = ids;
-  }
+
   onTreeItemExpand(ev: Event, id: number) {
     console.log("expand: ", id);
   }
