@@ -2,17 +2,21 @@ import { css, html, LitElement, PropertyValues, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 
 import "./tree-item.js";
-import { TreeItem } from "../components/tree-item.js";
+
+import { Tag } from "../types.js";
 
 export type TreeNode = {
-  item: Item;
+  item: Tag;
   children: Array<TreeNode>;
+  selected?: boolean | null,
+  open?: boolean | null,
+
 };
 
-export type Item = {
-  id: number;
-  title: string;
-};
+// export type Item = {
+//   id: number;
+//   title: string;
+// };
 
 @customElement("tree-view")
 export class Tree extends LitElement {
@@ -32,14 +36,28 @@ export class Tree extends LitElement {
     `,
   ];
 
-  @property()
+  @property({attribute: false})
   tree: TreeNode;
+
+  @property({attribute: false})
+  category_tree: Array<TreeNode> = [];
 
   constructor() {
     super();
-    const root = { item: { id: 0, title: "Root" }, children: dummy_data };
+    const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, children: dummy_data };
     //const root = { item: { id: 0, title: "Root" }, children: [] };
     this.tree = root;
+  }
+
+  protected willUpdate(_changedProperties: PropertyValues): void {
+
+    if(_changedProperties.has("category_tree")) {
+      console.log(_changedProperties);
+     //const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, children: dummy_data };
+      const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, children: this.category_tree };
+      //const root = { item: { id: 0, title: "Root" }, children: [] };
+      this.tree = root;
+    }
   }
   connectedCallback(): void {
     super.connectedCallback();
@@ -88,17 +106,19 @@ export class Tree extends LitElement {
   }
 }
 
-const dummy_data = [
+const dummy_data: Array<TreeNode> = [
   {
     item: {
       id: 1,
       title: "item_1",
+      tag_type: "Category",
     },
     children: [
       {
         item: {
           id: 11,
           title: "item_1.1",
+          tag_type: "Category",
           parent_id: 1,
         },
         children: [
@@ -106,6 +126,7 @@ const dummy_data = [
             item: {
               id: 111,
               title: "item_1.1.1",
+              tag_type: "Category",
               parent_id: 11,
             },
             children: [],
@@ -114,6 +135,7 @@ const dummy_data = [
             item: {
               id: 112,
               title: "item_1.1.2",
+              tag_type: "Category",
               parent_id: 11,
             },
             children: [],
@@ -125,6 +147,7 @@ const dummy_data = [
         item: {
           id: 12,
           title: "item_1.2",
+          tag_type: "Category",
           parent_id: 1,
         },
         children: [],
@@ -136,12 +159,14 @@ const dummy_data = [
     item: {
       id: 2,
       title: "item_2",
+      tag_type: "Category",
     },
     children: [
       {
         item: {
           id: 21,
           title: "item_2.1",
+          tag_type: "Category",
           parent_id: 2,
         },
         children: [],
@@ -150,6 +175,7 @@ const dummy_data = [
         item: {
           id: 22,
           title: "item_2.2",
+          tag_type: "Category",
           parent_id: 2,
         },
         children: [],
@@ -161,6 +187,7 @@ const dummy_data = [
     item: {
       id: 3,
       title: "item_3",
+      tag_type: "Category",
     },
     children: [],
   },

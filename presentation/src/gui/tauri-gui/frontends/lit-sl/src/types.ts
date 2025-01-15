@@ -3,9 +3,9 @@
 export type Tag = {
     id: number,
     title: string,
-    parent_id: number | null,
     tag_type: "Category" | "Normal" | "Untagged",
-    tag_style: object | null
+    parent_id?: number | null,
+    tag_style?: object | null,
 };
 
 export type Snippet = {

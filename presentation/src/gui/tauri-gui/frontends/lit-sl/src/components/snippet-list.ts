@@ -28,7 +28,7 @@ export class Comp extends LitElement {
     `
   ];
 
-  @property({type: Array})
+  @property({attribute: false})
   snippets: Array<Snippet> = [];
 
   connectedCallback(): void {

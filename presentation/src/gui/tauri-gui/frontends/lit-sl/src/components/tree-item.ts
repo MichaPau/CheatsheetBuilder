@@ -12,30 +12,69 @@ export class TreeItem extends LitElement {
         display: block;
       }
 
-      details > summary > .summary-row::before {
-        content: "→";
+      * {
+        box-sizing: border-box;
+      }
+      .icon {
+        display: inline-block;
+        transition: 0.1s ease-in-out;
+
+        img {
+          display: block;
+          width: 1em;
+          height: 1em;
+        }
+      }
+      input[type="checkbox"] {
+        margin: 0;
+        height: 1.5em;
+      }
+      .summary-row {
+        display: flex;
+        gap: 0.25em;
+        align-items: center;
+        align-content: center;
+        font-size: 1em;
+        /* height: 2em; */
+        /* border: 1px solid black; */
+
+        span {
+          display: flex;
+          align-items: center;
+          vertical-align: middle;
+        }
+      }
+
+      details[open] > summary > .summary-row > .icon {
+        transform: rotate(90deg);
+      }
+      /* details > summary > .summary-row::before {
+        content: url(src/assets/icons/east.svg);
+        align-self: center;
         display: inline-block;
         width: var(--bullet-width);
+
       }
 
       details[open] > summary > .summary-row::before {
-        content: "↓";
+        content: url(src/assets/icons/south.svg);
         display: inline-block;
         width: var(--bullet-width);
-      }
+      } */
       summary {
         cursor: pointer;
         list-style: none;
       }
 
-      .non-details > .summary-row {
+      /* .non-details > .summary-row {
+        display: flex;
         &:before {
           content: "-";
           display: inline-block;
           text-align: right;
           width: var(--bullet-width);
         }
-      }
+      } */
       li {
         display: block;
         list-style: none;
@@ -50,13 +89,13 @@ export class TreeItem extends LitElement {
     `,
   ];
 
-  @property()
+  @property({attribute: false})
   data!: TreeNode;
 
   @property({ attribute: false })
   selected: boolean = false;
 
-  @property()
+  @property({attribute: false})
   indeterminate: boolean = false;
 
   @query('input[type="checkbox"]') input!: HTMLInputElement;
@@ -192,7 +231,7 @@ export class TreeItem extends LitElement {
     // this.sync_cildren(state);
   }
 
-  click_handler(ev: Event) {
+  click_handler(_ev: Event) {
     //ev.preventDefault();
     this.selected = !this.selected;
     this.sync_cildren(this.selected);
@@ -207,12 +246,13 @@ export class TreeItem extends LitElement {
         <details open>
           <summary>
             <div class="summary-row">
+                <div class="icon"><img src="/src/assets/icons/east.svg" /></div>
               <input
                 type="checkbox"
                 value=${this.data.item.id}
                 .checked=${this.selected}
                 @click=${(ev: Event) => this.click_handler(ev)}
-              />${this.data.item.title}
+              /><span>${this.data.item.title}</span>
             </div>
           </summary>
           <ul>
@@ -223,11 +263,12 @@ export class TreeItem extends LitElement {
     } else {
       return html`<li class="non-details">
         <div class="summary-row">
+            <div class="icon"><span>-</span></div>
           <input
             type="checkbox"
             ?checked=${this.selected}
             @click=${(ev: Event) => this.click_handler(ev)}
-          />${this.data.item.title}
+          /><span>${this.data.item.title}</span>
         </div>
       </li>`;
     }

@@ -3,7 +3,7 @@ import { html, css, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import {provide} from '@lit/context';
 
-import { Snippet, TreeCategory } from './types';
+import { Snippet} from './types';
 
 import './components/categories.js';
 import './components/snippet-list.js';
@@ -106,20 +106,28 @@ export class App extends LitElement {
   }
   render() {
     return html`
-      <div id="app-container">
+      <div id="layout-container">
         <header class="header">
+        <div class="content-wrapper">
           <button @click=${this.toggleStyle}>Test</button>
           <button @click=${(_ev: Event) => console.log(JSON.stringify(this.categories, null, 2))}>Debug</button>
           <sl-icon-button name="x-circle" label="remove tag"></sl-icon-button>
+        </div>
           </header>
           <aside class="sidebar">
+              <div class="content-wrapper">
             <category-tree .category_tree=${this.categories}></category-tree>
+              </div>
           </aside>
           <main class="main-content">
+              <div class="content-wrapper">
             <snippet-list .snippets=${this.snippets}></snippet-list>
+              </div>
           </main>
           <footer class="footer">
+              <div class="content-wrapper">
               <settings-logger></settings-logger>
+              </div>
           </footer>
       </div>
     `;

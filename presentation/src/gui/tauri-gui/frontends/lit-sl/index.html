@@ -13,11 +13,8 @@
     <link rel="styleSheet" href="./src/styles/style-tokens.css" />
     <style>
 
-    :root {
-        //--default-font-family: monospace;
 
-    }
-      *, *::before,*::after {
+      /* *, *:before,*:after {
         box-sizing: border-box;
       }
 
@@ -30,6 +27,15 @@
       body {
         min-height: 100vh;
         line-height: 1;
+      } */
+      html,
+      body {
+          display: block;
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+          height: 100vh;
+          width: 100%;
       }
       main-app {
         box-sizing: border-box;

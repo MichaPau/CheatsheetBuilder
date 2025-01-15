@@ -1,5 +1,5 @@
 import { html, css, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 
 //import './category_node.js';
@@ -20,6 +20,8 @@ export class Categories extends LitElement {
       :host {
         display: block;
         overflow: auto;
+        height: 100%;
+        box-sizing: border-box;
       }
 
       #root-item::part(checkbox){
@@ -34,7 +36,7 @@ export class Categories extends LitElement {
   @state()
   appSettings!: AppSettings;
 
-  @property({type: Array})
+  @state()
   category_tree: Array<TreeNode> = [];
 
   connectedCallback(): void {
@@ -52,10 +54,10 @@ export class Categories extends LitElement {
   }
 
 
-  onTreeItemExpand(ev: Event, id: number) {
+  onTreeItemExpand(_ev: Event, id: number) {
     console.log("expand: ", id);
   }
-  onTreeItemCollapse(ev: Event, id: number) {
+  onTreeItemCollapse(_ev: Event, id: number) {
      console.log("collpase: ", id);
   }
 
