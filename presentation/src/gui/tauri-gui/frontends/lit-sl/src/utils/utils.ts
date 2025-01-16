@@ -1,4 +1,4 @@
-import { Tag, TreeCategory } from "../types";
+import { Tag } from "../types";
 import { TreeNode } from "../components/tree";
 
 

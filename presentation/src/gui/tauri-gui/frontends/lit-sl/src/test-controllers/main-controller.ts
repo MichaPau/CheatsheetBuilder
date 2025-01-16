@@ -3,7 +3,7 @@ import { ReactiveController, ReactiveControllerHost } from "lit";
 import { App } from "../main.js";
 import { buildTreeArray } from '../utils/utils.js';
 
-import { Snippet, Tag } from "../types";
+import { Tag } from "../types";
 
 
 export class MainController implements ReactiveController {
@@ -44,7 +44,7 @@ export class MainController implements ReactiveController {
     this.host.addEventListener('update-parent-category', this.onUpdateParentCategory);
   }
 
-  onUpdateParentCategory = async (ev: CustomEvent) => {
+  onUpdateParentCategory = async (_ev: CustomEvent) => {
 
     // let update_result = await invoke("set_tag_parent_id", {tagId: ev.detail.tag_id, newParentId: ev.detail.new_parent_id}).catch(err => console.log(err));
     // if (update_result) {

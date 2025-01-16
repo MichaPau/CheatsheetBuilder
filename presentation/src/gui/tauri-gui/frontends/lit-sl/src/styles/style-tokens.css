@@ -23,7 +23,7 @@
     --focus-ring-width: 1px;
     --focus-ring-style: solid;
 
-    --default-font-family: var(--font-mono);
+    --default-font-family: var(--font-sans);
 
     --focus-ring-color: lch(var(--l-80) 45 224);
     --focus-ring-width: 1px;

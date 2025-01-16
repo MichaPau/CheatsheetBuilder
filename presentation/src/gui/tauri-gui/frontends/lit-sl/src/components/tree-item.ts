@@ -10,6 +10,8 @@ export class TreeItem extends LitElement {
     css`
       :host {
         display: block;
+        --spacing: 1.2rem;
+        --icon-size: 1.5rem;
       }
 
       * {
@@ -19,67 +21,55 @@ export class TreeItem extends LitElement {
         display: inline-block;
         transition: 0.1s ease-in-out;
 
+        text-align: center;
+        align-content: center;
+
+        width: var(--spacing);
+        height: var(--spacing);
+
+        min-width: var(--spacing);
+        min-height: var(--spacing);
+
         img {
           display: block;
-          width: 1em;
-          height: 1em;
+          max-width: var(--spacing);
+          max-height: var(--spacing);
+          width: var(--spacing);
+          height: var(--spacing);
         }
       }
       input[type="checkbox"] {
         margin: 0;
-        height: 1.5em;
+        width: var(--spacing);
+        height: var(--spacing);
+        min-width: var(--spacing);
+        min-height: var(--spacing);
+        /* margin-right: 0.25em; */
+
       }
       .summary-row {
         display: flex;
         gap: 0.25em;
         align-items: center;
         align-content: center;
-        font-size: 1em;
-        /* height: 2em; */
-        /* border: 1px solid black; */
-
-        span {
-          display: flex;
-          align-items: center;
-          vertical-align: middle;
-        }
+        font-size: var(--spacing);
       }
 
       details[open] > summary > .summary-row > .icon {
         transform: rotate(90deg);
       }
-      /* details > summary > .summary-row::before {
-        content: url(src/assets/icons/east.svg);
-        align-self: center;
-        display: inline-block;
-        width: var(--bullet-width);
 
-      }
-
-      details[open] > summary > .summary-row::before {
-        content: url(src/assets/icons/south.svg);
-        display: inline-block;
-        width: var(--bullet-width);
-      } */
       summary {
         cursor: pointer;
         list-style: none;
       }
 
-      /* .non-details > .summary-row {
-        display: flex;
-        &:before {
-          content: "-";
-          display: inline-block;
-          text-align: right;
-          width: var(--bullet-width);
-        }
-      } */
       li {
         display: block;
         list-style: none;
         position: relative;
-        padding-left: calc(2 * var(--spacing) - var(--radius) - 2px);
+        //padding-left: calc(2 * var(--spacing) - var(--radius) - 2px);
+        padding-left: var(--spacing);
       }
       ul {
         margin: 0;
@@ -263,7 +253,7 @@ export class TreeItem extends LitElement {
     } else {
       return html`<li class="non-details">
         <div class="summary-row">
-            <div class="icon"><span>-</span></div>
+            <div class="icon"><span class="icon">&minus;</span></div>
           <input
             type="checkbox"
             ?checked=${this.selected}
