@@ -5,4 +5,6 @@ export type AppSettings = {
   open_categories: Array<number>,
   selected_categories: Array<number>,
 }
+
 export const appContext = createContext<AppSettings>(Symbol('app-context'));
+export const saveSettingsContext = createContext<(selected_ids: Array<number>) => void>(Symbol('save-context'));

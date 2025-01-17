@@ -16,7 +16,6 @@ export class MainController implements ReactiveController {
   async load_data() {
     const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
     this.host.categories = buildTreeArray(load_categories);
-
     this.host.snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
   }
 

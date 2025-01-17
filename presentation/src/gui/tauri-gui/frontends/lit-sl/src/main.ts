@@ -9,29 +9,11 @@ import './components/categories.js';
 import './components/snippet-list.js';
 import './components/settings-logger.js';
 
-// import '@shoelace-style/shoelace/dist/components/button/button.js';
-// import '@shoelace-style/shoelace/dist/components/card/card.js';
-// import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
-// import '@shoelace-style/shoelace/dist/components/icon/icon.js';
-// import '@shoelace-style/shoelace/dist/components/icon-button/icon-button.js';
-// import '@shoelace-style/shoelace/dist/components/menu/menu.js';
-// import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
-// import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
-// import '@shoelace-style/shoelace/dist/components/tree/tree.js';
-// import '@shoelace-style/shoelace/dist/components/tree-item/tree-item.js';
-
-
-// import '@shoelace-style/shoelace/dist/themes/light.css';
-// import '@shoelace-style/shoelace/dist/themes/dark.css';
-
-// import './styles/light.css';
-// import './styles/dark.css'
-
 import mainStyles from './styles/mainStyle.js';
 import sharedStyles from './styles/shared-styles.js';
 
 
-import { appContext, AppSettings } from './utils/app-context.js';
+import { appContext, AppSettings, SaveSettings, saveSettingsContext } from './utils/app-context.js';
 //import { MainController } from './controllers/main-controller.js';
 import { MainController } from './test-controllers/main-controller.js';
 import { TreeNode } from './components/tree.js';
@@ -57,9 +39,15 @@ export class App extends LitElement {
   @provide({ context: appContext })
   @state()
   appSettings: AppSettings = {
-    open_categories: [],
+    open_categories: [1, 2],
     selected_categories: [],
   };
+
+  @provide({ context: saveSettingsContext })
+  update_selection = (selected_ids: Array<number>) => {
+    console.log("update_selection");
+    this.appSettings = {open_categories: this.appSettings.open_categories,  selected_categories: selected_ids };
+  }
 
   @state()
   categories: Array<TreeNode> = [];

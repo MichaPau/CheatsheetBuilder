@@ -2,7 +2,7 @@ import { Tag } from "../types";
 import { TreeNode } from "../components/tree";
 
 
-export function buildTreeArray(flatArray: Array<Tag>) {
+export function buildTreeArray(flatArray: Array<Tag>): Array<TreeNode> {
     // Store references to nodes by their IDs
     const nodeMap = new Map();
 

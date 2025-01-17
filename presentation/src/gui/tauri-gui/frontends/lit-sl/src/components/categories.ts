@@ -4,7 +4,7 @@ import { consume } from '@lit/context';
 
 //import './category_node.js';
 import sharedStyles from '../styles/shared-styles.js';
-import { appContext, AppSettings } from '../utils/app-context.js';
+import { appContext, AppSettings, saveSettingsContext } from '../utils/app-context.js';
 
 import { Tag } from '../types.js';
 
@@ -36,6 +36,9 @@ export class Categories extends LitElement {
   @state()
   appSettings!: AppSettings;
 
+  @consume({ context: saveSettingsContext, subscribe: true })
+  update_selection!: (selected_ids: Array<number>) => void;
+
   @state()
   category_tree: Array<TreeNode> = [];
 
@@ -47,9 +50,10 @@ export class Categories extends LitElement {
       const all = Array.from(
         tree.shadowRoot?.querySelectorAll("tree-item")!,
       ) as Array<TreeItem>;
-      const f = all.filter((node) => node.selected);
-      console.log("all:", all);
+      const f = all.filter((node) => node.selected).map((node) => parseInt(node.id));
+
       console.log("f  :", f);
+      this.update_selection(f);
     });
   }
 
@@ -61,24 +65,7 @@ export class Categories extends LitElement {
      console.log("collpase: ", id);
   }
 
-  log_event_start(data: Tag, ev:DragEvent) {
-      ev.stopPropagation();
-      ev.dataTransfer?.setData("text/plain", JSON.stringify(data));
-      console.log("Start:", data.title, ";", data.id);
-  };
-  log_event_over(_data: Tag, ev:DragEvent) {
-      ev.preventDefault();
-  };
-  log_event_drop(data: Tag,ev: DragEvent) {
-      ev.stopPropagation();
-      console.log("Drop on:", data.id, ";", data.title);
-      let tag = JSON.parse(ev.dataTransfer?.getData("text/plain")!);
-      console.log("Drop from:", tag.id,  ";", tag.title);
-      const to_id: number | null = data.id != 0 ? data.id : null;
-      //let ce = new CustomEvent("test_event", { detail: {from: tag.id, to: to_id}, bubbles: true, composed: true});
-      let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: to_id }, bubbles: true, composed: true });
-      this.dispatchEvent(ce);
-  };
+
 
   on_root_drop(ev: DragEvent) {
     console.log("on root drop");

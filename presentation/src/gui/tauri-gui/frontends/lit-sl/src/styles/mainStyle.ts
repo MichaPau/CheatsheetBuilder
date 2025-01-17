@@ -70,6 +70,6 @@ export default css`
       width: 5em;
       max-width: 25em;
       min-width: 1em;
-      text-wrap: nowrap;
+      text-wrap-mode: nowrap;
     }
 `;

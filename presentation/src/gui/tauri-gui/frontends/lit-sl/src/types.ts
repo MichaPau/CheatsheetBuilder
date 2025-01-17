@@ -1,29 +1,29 @@
 
 
 export type Tag = {
-    id: number,
-    title: string,
-    tag_type: "Category" | "Normal" | "Untagged",
-    parent_id?: number | null,
-    tag_style?: object | null,
+  id: number;
+  title: string;
+  tag_type: "Category" | "Normal" | "Untagged";
+  parent_id?: number | null;
+  tag_style?: object | null;
 };
 
 export type Snippet = {
-    id: number,
-    title: string,
-    text: string,
-    text_type: string,
-    tags: Array<Tag>,
-    created_at: number,
-    updated_at: number,
+  id: number;
+  title: string;
+  text: string;
+  text_type: string;
+  tags: Array<Tag>;
+  created_at: number;
+  updated_at: number;
 }
 
-export type TreeCategory = {
-    item: Tag,
-    selected: boolean | undefined,
-    open: boolean | undefined,
-    children: Array<TreeCategory>
-};
+// export type TreeCategory = {
+//     item: Tag,
+//     selected: boolean | undefined,
+//     open: boolean | undefined,
+//     children: Array<TreeCategory>
+// };
 
 //export const md = markdownit();
 

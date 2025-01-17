@@ -1,5 +1,5 @@
 import { css, html, LitElement, PropertyValues, TemplateResult } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 
 import "./tree-item.js";
 
@@ -7,10 +7,9 @@ import { Tag } from "../types.js";
 
 export type TreeNode = {
   item: Tag;
+  selected?: boolean | null;
+  open?: boolean | null;
   children: Array<TreeNode>;
-  selected?: boolean | null,
-  open?: boolean | null,
-
 };
 
 // export type Item = {
@@ -36,15 +35,15 @@ export class Tree extends LitElement {
     `,
   ];
 
-  @property({attribute: false})
+  @state()
   tree: TreeNode;
 
-  @property({attribute: false})
+  @state()
   category_tree: Array<TreeNode> = [];
 
   constructor() {
     super();
-    const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, children: dummy_data };
+    const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, open: true, selected: false, children: dummy_data };
     //const root = { item: { id: 0, title: "Root" }, children: [] };
     this.tree = root;
   }
@@ -52,10 +51,10 @@ export class Tree extends LitElement {
   protected willUpdate(_changedProperties: PropertyValues): void {
 
     if(_changedProperties.has("category_tree")) {
-      console.log(_changedProperties);
+     // console.log(_changedProperties);
      //const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, children: dummy_data };
       const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, children: this.category_tree };
-      //const root = { item: { id: 0, title: "Root" }, children: [] };
+
       this.tree = root;
     }
   }
@@ -64,39 +63,48 @@ export class Tree extends LitElement {
 
   }
 
-  protected firstUpdated(_changedProperties: PropertyValues): void {
-    //this.wait_update();
-  }
-  async wait_update() {
-    let root = this.shadowRoot?.getElementById("root-item");
-    const childs: NodeListOf<LitElement> =
-      root?.shadowRoot?.querySelectorAll("tree-item")!;
-    await Promise.all(
-      Array.from(childs).map((c: LitElement) => c.updateComplete),
-    );
-    console.log("serial update complete on root tree-item");
-  }
+  drag_event_start(data: Tag, ev:DragEvent) {
+      ev.stopPropagation();
+      ev.dataTransfer?.setData("text/plain", JSON.stringify(data));
+      console.log("Start:", data.title, ";", data.id);
+  };
+  drag_event_over(ev:DragEvent) {
+      ev.preventDefault();
+  };
+  drop_event(data: Tag,ev: DragEvent) {
+      ev.stopPropagation();
+      console.log("Drop on:", data.id, ";", data.title);
+      let tag = JSON.parse(ev.dataTransfer?.getData("text/plain")!);
+      console.log("Drop from:", tag.id,  ";", tag.title);
+      const to_id: number | null = data.id != 0 ? data.id : null;
+
+      //let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: to_id }, bubbles: true, composed: true });
+      //this.dispatchEvent(ce);
+  };
+
   renderSlots(treeNodes: Array<TreeNode>): TemplateResult {
     return html`
       ${treeNodes.map((item) => {
-        return html` <tree-item id=${item.item.id} .data=${item}>
-          ${this.renderSlots(item.children)}
-        </tree-item>`;
+        return html`
+            <tree-item
+                id=${item.item.id} .data=${item} draggable="true"
+                @dragstart=${(ev: DragEvent) => this.drag_event_start(item.item, ev)}
+                @dragover=${this.drag_event_over}
+                @drop=${(ev: DragEvent) => this.drop_event(item.item, ev)}>
+                ${this.renderSlots(item.children)}
+            </tree-item>
+        `;
       })}
     `;
   }
 
-  renderExSlot(treeNodes: Array<TreeNode>) {
-    return html`
-      ${treeNodes.map((item) => {
-        return html`<p>${item.item.title}</p>`;
-      })}
-    `;
-  }
   render() {
     const h = html`
       <ul>
-        <tree-item id="root-item" .data=${this.tree}>
+        <tree-item
+            id="0" .data=${this.tree}
+            @dragover=${this.drag_event_over}
+            @drop=${(ev: DragEvent) => this.drop_event(this.tree.item, ev)}>
           ${this.renderSlots(this.tree.children)}
         </tree-item>
       </ul>

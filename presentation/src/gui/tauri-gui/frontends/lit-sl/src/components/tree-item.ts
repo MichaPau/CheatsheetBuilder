@@ -17,6 +17,16 @@ export class TreeItem extends LitElement {
       * {
         box-sizing: border-box;
       }
+      .non-details-icon {
+        //display: inline;
+        width: var(--spacing);
+        //height: var(--spacing);
+
+        min-width: var(--spacing);
+        //min-height: var(--spacing);
+        text-align: center;
+        vertical-align: middle;
+      }
       .icon {
         display: inline-block;
         transition: 0.1s ease-in-out;
@@ -53,6 +63,7 @@ export class TreeItem extends LitElement {
         align-items: center;
         align-content: center;
         font-size: var(--spacing);
+        cursor: pointer;
       }
 
       details[open] > summary > .summary-row > .icon {
@@ -151,7 +162,7 @@ export class TreeItem extends LitElement {
     if (t && t instanceof TreeItem) {
       const c = t.shadowRoot?.host?.closest("tree-item") as TreeItem;
       if (c) {
-        console.log(c);
+        //console.log(c);
         const childs: Array<TreeItem> = Array.from(
           c.shadowRoot?.querySelectorAll("tree-item")!,
         );
@@ -253,7 +264,7 @@ export class TreeItem extends LitElement {
     } else {
       return html`<li class="non-details">
         <div class="summary-row">
-            <div class="icon"><span class="icon">&minus;</span></div>
+            <div class="non-details-icon">&minus;</div>
           <input
             type="checkbox"
             ?checked=${this.selected}
