@@ -112,7 +112,7 @@ export class TreeItem extends LitElement {
     this.input.indeterminate = this.indeterminate; // force a sync update
   }
 
-  sync_parent2() {
+  sync_parent() {
     const t = this.shadowRoot?.host as TreeItem;
     const p = t.parentElement;
     //console.log(p);
@@ -146,7 +146,7 @@ export class TreeItem extends LitElement {
           p.indeterminate = false;
         }
 
-        p.sync_parent2();
+        p.sync_parent();
       }
     } else {
       console.log("outside tree");
@@ -155,62 +155,62 @@ export class TreeItem extends LitElement {
       );
     }
   }
-  sync_parent() {
-    const p = this.shadowRoot?.host as TreeItem;
-    const t = (p?.parentElement?.getRootNode() as ShadowRoot).host;
+  // sync_parent() {
+  //   const p = this.shadowRoot?.host as TreeItem;
+  //   const t = (p?.parentElement?.getRootNode() as ShadowRoot).host;
 
-    if (t && t instanceof TreeItem) {
-      const c = t.shadowRoot?.host?.closest("tree-item") as TreeItem;
-      if (c) {
-        //console.log(c);
-        const childs: Array<TreeItem> = Array.from(
-          c.shadowRoot?.querySelectorAll("tree-item")!,
-        );
-        const all_selected = childs.every((child: TreeItem) => child.selected);
-        const all_deselected = childs.every(
-          (child: TreeItem) => !child.selected && !child.indeterminate,
-        );
-        if (all_selected && !c.selected) {
-          c.selected = true;
-          c.indeterminate = false;
-          //this.input.checked = true;
-        }
+  //   if (t && t instanceof TreeItem) {
+  //     const c = t.shadowRoot?.host?.closest("tree-item") as TreeItem;
+  //     if (c) {
+  //       //console.log(c);
+  //       const childs: Array<TreeItem> = Array.from(
+  //         c.shadowRoot?.querySelectorAll("tree-item")!,
+  //       );
+  //       const all_selected = childs.every((child: TreeItem) => child.selected);
+  //       const all_deselected = childs.every(
+  //         (child: TreeItem) => !child.selected && !child.indeterminate,
+  //       );
+  //       if (all_selected && !c.selected) {
+  //         c.selected = true;
+  //         c.indeterminate = false;
+  //         //this.input.checked = true;
+  //       }
 
-        if (all_deselected && c.selected) {
-          c.selected = false;
-          c.indeterminate = false;
-          //this.input.checked = false;
-        }
+  //       if (all_deselected && c.selected) {
+  //         c.selected = false;
+  //         c.indeterminate = false;
+  //         //this.input.checked = false;
+  //       }
 
-        if (!all_selected && !all_deselected) {
-          c.selected = false;
-          c.indeterminate = true;
-        } else {
-          c.indeterminate = false;
-        }
+  //       if (!all_selected && !all_deselected) {
+  //         c.selected = false;
+  //         c.indeterminate = true;
+  //       } else {
+  //         c.indeterminate = false;
+  //       }
 
-        c.sync_parent();
-      }
-    } else {
-      console.log("outside tree");
-    }
+  //       c.sync_parent();
+  //     }
+  //   } else {
+  //     console.log("outside tree");
+  //   }
 
-    // const r = this.shadowRoot?.host.getRootNode().parentElement;
-    // if (r) {
-    //   const t = r.host;
-    //   console.log(t);
-    //   const c = t.closest("tree-item");
-    //   if (c) {
-    //     const parent = c as TreeItem;
-    //     const childs = parent.querySelectorAll("tree-item");
-    //     console.log(childs);
-    //     for (const c of childs) {
-    //       const i = c as TreeItem;
-    //       console.log(i.data.item.title);
-    //     }
-    //   }
-    // }
-  }
+  //   // const r = this.shadowRoot?.host.getRootNode().parentElement;
+  //   // if (r) {
+  //   //   const t = r.host;
+  //   //   console.log(t);
+  //   //   const c = t.closest("tree-item");
+  //   //   if (c) {
+  //   //     const parent = c as TreeItem;
+  //   //     const childs = parent.querySelectorAll("tree-item");
+  //   //     console.log(childs);
+  //   //     for (const c of childs) {
+  //   //       const i = c as TreeItem;
+  //   //       console.log(i.data.item.title);
+  //   //     }
+  //   //   }
+  //   // }
+  // }
   sync_cildren(state: boolean) {
     const slot = this.shadowRoot?.querySelector("slot");
     if (slot) {
@@ -232,19 +232,23 @@ export class TreeItem extends LitElement {
     // this.sync_cildren(state);
   }
 
+  details_toggle_handler(id: number, ev: ToggleEvent) {
+    const open = ev.newState === 'open' ? true : false;
+    this.dispatchEvent(new CustomEvent('category_toggle', { detail: { tag_id: id, open}, bubbles: true, composed: true }));
+  }
   click_handler(_ev: Event) {
     //ev.preventDefault();
     this.selected = !this.selected;
     this.sync_cildren(this.selected);
-    this.sync_parent2();
+    this.sync_parent();
     //console.log(this.selected);
   }
 
 
   renderTreeItem() {
     if (this.data.children.length > 0) {
-      return html` <li>
-        <details open>
+        return html` <li>
+        <details @toggle=${(ev: ToggleEvent) => this.details_toggle_handler(this.data.item.id, ev)} ?open=${this.data.open}>
           <summary>
             <div class="summary-row">
                 <div class="icon"><img src="/src/assets/icons/east.svg" /></div>

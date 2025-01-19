@@ -33,6 +33,7 @@ declare global {
     'get-parent-tags': CustomEvent<{tag_id: number}>;
     'remove-tag-from-snippet': CustomEvent<{tag_id: number }>;
     'tree-sync-finished': Event;
+    'category_toggle': CustomEvent<{ tag_id: number, open: boolean }>;
     //'change-category-selection': CustomEvent<{id: number, state: boolean}>
   }
 }

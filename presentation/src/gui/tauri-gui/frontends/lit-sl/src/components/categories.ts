@@ -44,6 +44,7 @@ export class Categories extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+
     this.addEventListener("tree-sync-finished", (_e: Event) => {
       console.log("sync finished");
       const tree = this.shadowRoot?.querySelector("tree-view")!;
@@ -53,7 +54,12 @@ export class Categories extends LitElement {
       const f = all.filter((node) => node.selected).map((node) => parseInt(node.id));
 
       console.log("f  :", f);
-      this.update_selection(f);
+      //this.update_selection(f);
+      this.appSettings.save_selected(f);
+    });
+
+    this.addEventListener("category_toggle", (ev: CustomEvent) => {
+      this.appSettings.toggle_open(ev.detail.tag_id, ev.detail.open);
     });
   }
 

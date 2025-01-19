@@ -17,9 +17,16 @@ export class SettingsLogger extends LitElement {
       .logger-container {
           display: flex;
           flex-direction: columns;
+          gap: 0.5em;
+
       }
       .id-container {
           display: flex;
+          gap: 0.25em;
+      }
+      .id-container > div:not(:last-child) {
+          border-right: solid black 1px;
+          padding-right: 0.25em;
       }
     `
   ];
@@ -37,13 +44,14 @@ export class SettingsLogger extends LitElement {
             <div class="id-container">
                 Open categories ids:
                 ${this.appSettings.open_categories.map((id) =>
-                    html`<div>id: ${ id }</div>`
+                    html`<div>${id}</div>`
                 )}
             </div>
+            <div> || </div>
             <div class="id-container">
                 Selected categories ids:
                 ${this.appSettings.selected_categories.map((id) =>
-                    html`<div>id: ${ id }</div>`
+                    html`<div>${id}</div>`
                 )}
             </div>
         </div>

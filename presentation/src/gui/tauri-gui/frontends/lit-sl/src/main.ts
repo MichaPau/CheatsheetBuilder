@@ -13,7 +13,7 @@ import mainStyles from './styles/mainStyle.js';
 import sharedStyles from './styles/shared-styles.js';
 
 
-import { appContext, AppSettings, SaveSettings, saveSettingsContext } from './utils/app-context.js';
+import { appContext, AppSettings, saveSettingsContext } from './utils/app-context.js';
 //import { MainController } from './controllers/main-controller.js';
 import { MainController } from './test-controllers/main-controller.js';
 import { TreeNode } from './components/tree.js';
@@ -39,15 +39,24 @@ export class App extends LitElement {
   @provide({ context: appContext })
   @state()
   appSettings: AppSettings = {
-    open_categories: [1, 2],
+    open_categories: [],
     selected_categories: [],
+    toggle_open: (id: number, state: boolean) => {
+      let open_ids = this.appSettings.open_categories.filter(i => i != id);;
+      if (state) {
+        open_ids.push(id);
+      }
+      this.appSettings = {...this.appSettings,  open_categories: open_ids };
+    },
+    save_selected: (ids: Array<number>) => {
+      this.appSettings = {...this.appSettings,  selected_categories: ids };
+    },
   };
 
-  @provide({ context: saveSettingsContext })
-  update_selection = (selected_ids: Array<number>) => {
-    console.log("update_selection");
-    this.appSettings = {open_categories: this.appSettings.open_categories,  selected_categories: selected_ids };
-  }
+  // @provide({ context: saveSettingsContext })
+  // update_selection = (selected_ids: Array<number>) => {
+  //   this.appSettings = {open_categories: this.appSettings.open_categories,  selected_categories: selected_ids };
+  // }
 
   @state()
   categories: Array<TreeNode> = [];

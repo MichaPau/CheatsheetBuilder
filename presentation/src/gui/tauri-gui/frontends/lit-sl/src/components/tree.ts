@@ -53,7 +53,7 @@ export class Tree extends LitElement {
     if(_changedProperties.has("category_tree")) {
      // console.log(_changedProperties);
      //const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, children: dummy_data };
-      const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, children: this.category_tree };
+      const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, open: true, selected: false, children: this.category_tree };
 
       this.tree = root;
     }
