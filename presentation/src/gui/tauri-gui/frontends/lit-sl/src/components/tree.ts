@@ -78,8 +78,8 @@ export class Tree extends LitElement {
       console.log("Drop from:", tag.id,  ";", tag.title);
       const to_id: number | null = data.id != 0 ? data.id : null;
 
-      //let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: to_id }, bubbles: true, composed: true });
-      //this.dispatchEvent(ce);
+      let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: to_id }, bubbles: true, composed: true });
+      this.dispatchEvent(ce);
   };
 
   renderSlots(treeNodes: Array<TreeNode>): TemplateResult {

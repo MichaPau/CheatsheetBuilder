@@ -46,15 +46,12 @@ export class Categories extends LitElement {
     super.connectedCallback();
 
     this.addEventListener("tree-sync-finished", (_e: Event) => {
-      console.log("sync finished");
+
       const tree = this.shadowRoot?.querySelector("tree-view")!;
       const all = Array.from(
         tree.shadowRoot?.querySelectorAll("tree-item")!,
       ) as Array<TreeItem>;
       const f = all.filter((node) => node.selected).map((node) => parseInt(node.id));
-
-      console.log("f  :", f);
-      //this.update_selection(f);
       this.appSettings.save_selected(f);
     });
 
@@ -63,23 +60,13 @@ export class Categories extends LitElement {
     });
   }
 
-
-  onTreeItemExpand(_ev: Event, id: number) {
-    console.log("expand: ", id);
-  }
-  onTreeItemCollapse(_ev: Event, id: number) {
-     console.log("collpase: ", id);
-  }
-
-
-
-  on_root_drop(ev: DragEvent) {
-    console.log("on root drop");
-    let tag = JSON.parse(ev.dataTransfer?.getData("text/plain")!);
-    console.log("Drop from:", tag.id,  ";", tag.title);
-    let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: undefined }, bubbles: true, composed: true });
-    this.dispatchEvent(ce);
-  }
+  // on_root_drop(ev: DragEvent) {
+  //   console.log("on root drop");
+  //   let tag = JSON.parse(ev.dataTransfer?.getData("text/plain")!);
+  //   console.log("Drop from:", tag.id,  ";", tag.title);
+  //   let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: undefined }, bubbles: true, composed: true });
+  //   this.dispatchEvent(ce);
+  // }
 
 
 

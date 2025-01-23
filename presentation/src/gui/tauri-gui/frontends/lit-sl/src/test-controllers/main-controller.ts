@@ -42,16 +42,22 @@ export class MainController implements ReactiveController {
 
   init_handlers() {
     this.host.addEventListener('update-parent-category', this.onUpdateParentCategory);
+    this.host.addEventListener('update_category_title', this.onUpdateCategoryTitle);
+    this.host.addEventListener('add_category', this.onAddCategory);
+    this.host.addEventListener('delete_category', this.onDeleteCategory);
   }
 
   onUpdateParentCategory = async (_ev: CustomEvent) => {
-
-    // let update_result = await invoke("set_tag_parent_id", {tagId: ev.detail.tag_id, newParentId: ev.detail.new_parent_id}).catch(err => console.log(err));
-    // if (update_result) {
-    //   const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-    //   this.host.categories = buildTreeArray(load_categories);
-    // }
-
+    console.log("onUpdatePaentCategory");
+  }
+  onUpdateCategoryTitle = async (ev: CustomEvent) => {
+    console.log("onUpdateCategoryTitle");
+  }
+  onDeleteCategory = async(ev: CustomEvent) => {
+    console.log("onDeleteCategory");
+  }
+  onAddCategory = async(ev: CustomEvent) => {
+    console.log("onAddCategory");
   }
   hostConnected(): void {}
 

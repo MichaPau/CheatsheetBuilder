@@ -108,7 +108,6 @@ export class App extends LitElement {
         <div class="content-wrapper">
           <button @click=${this.toggleStyle}>Test</button>
           <button @click=${(_ev: Event) => console.log(JSON.stringify(this.categories, null, 2))}>Debug</button>
-          <sl-icon-button name="x-circle" label="remove tag"></sl-icon-button>
         </div>
           </header>
           <aside class="sidebar">

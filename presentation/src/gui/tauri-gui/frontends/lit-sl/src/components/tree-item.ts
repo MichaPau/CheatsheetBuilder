@@ -1,8 +1,10 @@
-import { css, html, LitElement } from "lit";
+import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 
 import { watch } from "../utils/watch";
 import { TreeNode } from "./tree";
+import { CustomMenu } from "./menu";
+import { MenuDialog } from "./menu-dialog";
 
 @customElement("tree-item")
 export class TreeItem extends LitElement {
@@ -74,6 +76,9 @@ export class TreeItem extends LitElement {
         cursor: pointer;
         list-style: none;
       }
+      details summary::-webkit-details-marker {
+        display:none;
+      }
 
       li {
         display: block;
@@ -112,6 +117,20 @@ export class TreeItem extends LitElement {
     this.input.indeterminate = this.indeterminate; // force a sync update
   }
 
+  connectedCallback(): void {
+    super.connectedCallback();
+
+  }
+
+  protected firstUpdated(_changedProperties: PropertyValues): void {
+    const title_elem = this.shadowRoot?.querySelector("#title-element")!;
+    if (this.data.item.id == 0)
+      console.log("title_elem:", title_elem);
+    // title_elem.addEventListener("contextmenu", (ev: Event) => {
+    //   ev.preventDefault();
+    //   console.log("title contextmenu");
+    // });
+  }
   sync_parent() {
     const t = this.shadowRoot?.host as TreeItem;
     const p = t.parentElement;
@@ -155,62 +174,7 @@ export class TreeItem extends LitElement {
       );
     }
   }
-  // sync_parent() {
-  //   const p = this.shadowRoot?.host as TreeItem;
-  //   const t = (p?.parentElement?.getRootNode() as ShadowRoot).host;
 
-  //   if (t && t instanceof TreeItem) {
-  //     const c = t.shadowRoot?.host?.closest("tree-item") as TreeItem;
-  //     if (c) {
-  //       //console.log(c);
-  //       const childs: Array<TreeItem> = Array.from(
-  //         c.shadowRoot?.querySelectorAll("tree-item")!,
-  //       );
-  //       const all_selected = childs.every((child: TreeItem) => child.selected);
-  //       const all_deselected = childs.every(
-  //         (child: TreeItem) => !child.selected && !child.indeterminate,
-  //       );
-  //       if (all_selected && !c.selected) {
-  //         c.selected = true;
-  //         c.indeterminate = false;
-  //         //this.input.checked = true;
-  //       }
-
-  //       if (all_deselected && c.selected) {
-  //         c.selected = false;
-  //         c.indeterminate = false;
-  //         //this.input.checked = false;
-  //       }
-
-  //       if (!all_selected && !all_deselected) {
-  //         c.selected = false;
-  //         c.indeterminate = true;
-  //       } else {
-  //         c.indeterminate = false;
-  //       }
-
-  //       c.sync_parent();
-  //     }
-  //   } else {
-  //     console.log("outside tree");
-  //   }
-
-  //   // const r = this.shadowRoot?.host.getRootNode().parentElement;
-  //   // if (r) {
-  //   //   const t = r.host;
-  //   //   console.log(t);
-  //   //   const c = t.closest("tree-item");
-  //   //   if (c) {
-  //   //     const parent = c as TreeItem;
-  //   //     const childs = parent.querySelectorAll("tree-item");
-  //   //     console.log(childs);
-  //   //     for (const c of childs) {
-  //   //       const i = c as TreeItem;
-  //   //       console.log(i.data.item.title);
-  //   //     }
-  //   //   }
-  //   // }
-  // }
   sync_cildren(state: boolean) {
     const slot = this.shadowRoot?.querySelector("slot");
     if (slot) {
@@ -227,15 +191,40 @@ export class TreeItem extends LitElement {
   }
   selection_changed() {
     this.input.checked = this.selected;
-    // const state = (ev.target as HTMLInputElement).checked;
-    // this.selected = state;
-    // this.sync_cildren(state);
   }
 
   details_toggle_handler(id: number, ev: ToggleEvent) {
+
+    console.log("details toggle in treeitem");
     const open = ev.newState === 'open' ? true : false;
     this.dispatchEvent(new CustomEvent('category_toggle', { detail: { tag_id: id, open}, bubbles: true, composed: true }));
   }
+  onCreateMenu(ev: MouseEvent) {
+    ev.preventDefault();
+    let container = this.shadowRoot?.host.parentElement;
+    while ( container instanceof TreeItem && container) {
+      container = container.shadowRoot?.host.parentElement;
+    }
+    console.log("add menu container: ",container);
+    const pos = { x: ev.pageX - 15, y: ev.pageY - 15 };
+
+    const menu_item = new CustomMenu();
+    menu_item.item = this.data.item;
+
+
+    if (this.data.item.id === 0) {
+      menu_item.isRoot = true;
+    }
+    menu_item.style.top = pos.y + "px";
+    menu_item.style.left = pos.x + "px";
+    //const container = this.shadowRoot!.querySelector(".summary-row")!;
+    if(container)
+      container.appendChild(menu_item);
+
+    //document.body.appendChild(menu_item);
+
+  }
+
   click_handler(_ev: Event) {
     //ev.preventDefault();
     this.selected = !this.selected;
@@ -244,20 +233,24 @@ export class TreeItem extends LitElement {
     //console.log(this.selected);
   }
 
-
+  // onEditTitle(ev: MouseEvent) {
+  //   console.log("onEditTitle");
+  //   const target = ev.target as HTMLElement;
+  //   target.contentEditable = "plaintext-only";
+  // }
   renderTreeItem() {
     if (this.data.children.length > 0) {
         return html` <li>
         <details @toggle=${(ev: ToggleEvent) => this.details_toggle_handler(this.data.item.id, ev)} ?open=${this.data.open}>
           <summary>
-            <div class="summary-row">
+            <div class="summary-row" @contextmenu=${this.onCreateMenu}>
                 <div class="icon"><img src="/src/assets/icons/east.svg" /></div>
               <input
                 type="checkbox"
                 value=${this.data.item.id}
                 .checked=${this.selected}
                 @click=${(ev: Event) => this.click_handler(ev)}
-              /><span>${this.data.item.title}</span>
+              /><span id="title-element">${this.data.item.title}</span>
             </div>
           </summary>
           <ul>
@@ -273,7 +266,7 @@ export class TreeItem extends LitElement {
             type="checkbox"
             ?checked=${this.selected}
             @click=${(ev: Event) => this.click_handler(ev)}
-          /><span>${this.data.item.title}</span>
+          /><span id="title-element">${this.data.item.title}</span>
         </div>
       </li>`;
     }
