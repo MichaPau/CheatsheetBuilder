@@ -30,12 +30,26 @@ export class MainController implements ReactiveController {
 
   onUpdateCategoryTitle = async (ev: CustomEvent) => {
     console.log("onUpdateCategoryTitle");
+    let update_result = await invoke("update_tag_title", { tagId: ev.detail.tag_id, newTitle: ev.detail.new_title }).catch(err => console.log(err));
+    if(update_result) {
+      const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+      this.host.categories = this.buildTreeArray(load_categories);
+    }
   }
   onDeleteCategory = async(ev: CustomEvent) => {
     console.log("onDeleteCategory");
+    let count_result = await invoke("get_snippet_count_for_tag", { tagId: ev.detail.tag_id }).catch(err => console.log(err));
+    if(count_result) {
+      //Show confirm
+    }
   }
   onAddCategory = async(ev: CustomEvent) => {
     console.log("onAddCategory");
+    let create_tag_result = await invoke("create_category", { parentId: ev.detail.parent_id, title: ev.detail.title }).catch(err => console.log(err));
+    if(create_tag_result) {
+      const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+      this.host.categories = this.buildTreeArray(load_categories);
+    }
   }
   onUpdateParentCategory = async (ev: CustomEvent) => {
     console.log("updateParntCategory:",ev.detail);

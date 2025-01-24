@@ -3,6 +3,7 @@ import { customElement, state, query } from "lit/decorators.js";
 import {classMap} from 'lit/directives/class-map.js';
 
 import { Tag } from "../types";
+import sharedStyles from "../styles/shared-styles";
 
 enum MenuAction {
   ADD = "add",
@@ -12,11 +13,12 @@ enum MenuAction {
 @customElement("custom-menu")
 export class CustomMenu extends LitElement {
   static styles = [
+    sharedStyles,
     css`
       :host {
         display: block;
         border: 1px solid black;
-        background: white;
+        background-color: var(--panel-background-color);
         padding: 0.5em;
         z-index: 999;
         position: fixed;

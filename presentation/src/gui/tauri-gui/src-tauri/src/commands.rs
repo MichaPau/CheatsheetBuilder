@@ -1,4 +1,4 @@
-use domain::entities::entry::{CreateSnippet, Snippet, SnippetID, Tag, TagType};
+use domain::entities::entry::{CreateSnippet, CreateTag, Snippet, SnippetID, Tag, TagType};
 use repository::{errors::CheatsheetError, types::AppState};
 use tauri::State;
 
@@ -70,6 +70,39 @@ pub fn set_tag_parent_id(
     app_state: State<'_, AppState>,
 ) -> Result<bool, CheatsheetError> {
     app_state.service.update_tag_parent(tag_id, new_parent_id)
+}
+
+#[tauri::command]
+pub fn update_tag_title(
+    tag_id: usize,
+    new_title: String,
+    app_state: State<'_, AppState>,
+) -> Result<bool, CheatsheetError> {
+    app_state.service.update_tag_title(tag_id, new_title)
+}
+
+#[tauri::command]
+pub fn create_category(
+    parent_id: usize,
+    title: String,
+    app_state: State<'_, AppState>,
+) -> Result<Tag, CheatsheetError> {
+    let tag: CreateTag = CreateTag {
+        parent_id: Some(parent_id),
+        title,
+        tag_type: TagType::Category,
+        tag_style: None,
+    };
+    let tag = app_state.service.add_tag(tag);
+    tag
+}
+
+#[tauri::command]
+pub fn get_snippet_count_for_tag(
+    tag_id: usize,
+    app_state: State<'_, AppState>,
+) -> Result<usize, CheatsheetError> {
+    app_state.service.get_snippet_count_for_tag(tag_id)
 }
 #[tauri::command]
 pub fn search_tags(

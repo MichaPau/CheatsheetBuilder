@@ -4,6 +4,7 @@ import { App } from "../main.js";
 import { buildTreeArray } from '../utils/utils.js';
 
 import { Tag } from "../types";
+import { ConfirmDialog } from "../components/confirm-dialog.js";
 
 
 export class MainController implements ReactiveController {
@@ -54,7 +55,12 @@ export class MainController implements ReactiveController {
     console.log("onUpdateCategoryTitle");
   }
   onDeleteCategory = async(ev: CustomEvent) => {
-    console.log("onDeleteCategory");
+    console.log("onDeleteCategory in test-controller");
+    const dlg = new ConfirmDialog();
+    dlg.message = "confirm this message";
+    this.host.shadowRoot?.appendChild(dlg);
+    let answer = await dlg.confirm();
+    console.log("the answer was: ", answer);
   }
   onAddCategory = async(ev: CustomEvent) => {
     console.log("onAddCategory");

@@ -23,6 +23,9 @@ pub fn run(app_state: AppState) {
             commands::update_snippet_title,
             commands::append_tag,
             commands::remove_tag_from_snippet,
+            commands::get_snippet_count_for_tag,
+            commands::update_tag_title,
+            commands::create_category,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

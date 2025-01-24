@@ -1,5 +1,5 @@
 import { css, html, LitElement, PropertyValues, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 
 import "./tree-item.js";
 

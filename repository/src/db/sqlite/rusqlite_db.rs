@@ -620,7 +620,17 @@ impl TagStore for Rusqlite {
         }
         Ok(list)
     }
+    fn get_snippet_count_for_tag(&self, tag_id: TagID) -> Result<usize, CheatsheetError> {
+        let c = self.conn.try_lock().unwrap();
 
+        let result = c.query_row(
+            "SELECT count(*) FROM Snippet_Tag WHERE snippet_id = ?1",
+            [tag_id],
+            |row| row.get(0),
+        )?;
+
+        Ok(result)
+    }
     fn search_tags_by_title(
         &self,
         pattern: &str,

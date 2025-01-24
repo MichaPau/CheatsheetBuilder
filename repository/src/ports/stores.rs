@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use domain::entities::entry::*;
 use domain::utils::types::SearchPattern;
 
@@ -48,6 +46,7 @@ pub trait TagStore {
     fn delete_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
     fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError>;
     fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError>;
+    fn get_snippet_count_for_tag(&self, tag_id: TagID) -> Result<usize, CheatsheetError>;
     fn search_tags_by_title(
         &self,
         pattern: &str,

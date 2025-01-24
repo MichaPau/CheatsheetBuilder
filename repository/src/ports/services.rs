@@ -1,5 +1,3 @@
-use std::borrow::BorrowMut;
-
 use domain::entities::entry::{
     CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType,
     Timestamp,
@@ -110,6 +108,9 @@ impl Service {
         self.store.get_tag_hierarchy(tag_id)
     }
 
+    pub fn get_snippet_count_for_tag(&self, tag_id: TagID) -> Result<usize, CheatsheetError> {
+        self.store.get_snippet_count_for_tag(tag_id)
+    }
     pub fn search_tags_by_title(
         &self,
         pattern: &str,

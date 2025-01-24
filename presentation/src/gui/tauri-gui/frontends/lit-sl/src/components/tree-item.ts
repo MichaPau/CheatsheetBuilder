@@ -4,7 +4,6 @@ import { customElement, property, query } from "lit/decorators.js";
 import { watch } from "../utils/watch";
 import { TreeNode } from "./tree";
 import { CustomMenu } from "./menu";
-import { MenuDialog } from "./menu-dialog";
 
 @customElement("tree-item")
 export class TreeItem extends LitElement {
