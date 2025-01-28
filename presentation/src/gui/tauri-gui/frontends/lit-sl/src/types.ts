@@ -35,7 +35,7 @@ declare global {
     'tree-sync-finished': Event;
     'category_toggle': CustomEvent<{ tag_id: number, open: boolean }>;
     'update_category_title': CustomEvent<{ tag_id: number, new_title: string}>;
-    'delete_category': CustomEvent<{ tag_id: number }>;
+    'delete_category': CustomEvent<{ tag_id: number, title: string }>;
     'add_category': CustomEvent<{ parent_id: number, title: string }>;
     //'change-category-selection': CustomEvent<{id: number, state: boolean}>
   }

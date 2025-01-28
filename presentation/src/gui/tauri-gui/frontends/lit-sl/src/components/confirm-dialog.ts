@@ -1,5 +1,5 @@
 import { html, css, LitElement } from 'lit';
-import { customElement, state, property } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 
 import sharedStyles from '../styles/shared-styles.js';
 
@@ -11,6 +11,13 @@ export class ConfirmDialog extends LitElement {
     css `
       :host {
         display: block;
+      }
+
+      dialog {
+        background-color: var(--panel-background-color);
+        box-shadow: var(--shadow-small);
+        border: solid var(--border-width) var(--border-color);
+        border-radius: var(--border-radius-medium);
       }
     `
   ];

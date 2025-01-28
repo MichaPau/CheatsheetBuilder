@@ -1,6 +1,6 @@
 import { html, css, LitElement, PropertyValues } from "lit";
 import { customElement, state, query } from "lit/decorators.js";
-import {classMap} from 'lit/directives/class-map.js';
+
 
 import { Tag } from "../types";
 import sharedStyles from "../styles/shared-styles";
@@ -29,7 +29,7 @@ export class CustomMenu extends LitElement {
         margin: 0;
         padding: 0;
         margin-bottom: 0.25em;
-        border-bottom: 1px solid black;
+        border-bottom: 1px solid var(--border-color);
       }
       .menu-item:hover {
         background-color: grey;
@@ -108,7 +108,7 @@ export class CustomMenu extends LitElement {
         if (title !== "") {
           console.log("Add new to: ", this.input_elem?.value);
           this.dispatchEvent(new CustomEvent('add_category', { bubbles: true, composed: true, detail: { parent_id: this.item.id, title: title } }));
-          //this.remove();
+          this.remove();
         }
       }
     }
@@ -135,7 +135,7 @@ export class CustomMenu extends LitElement {
             this.action_state = action;
             break;
           case MenuAction.DELETE:
-            this.dispatchEvent(new CustomEvent('delete_category', { bubbles: true, composed: true, detail: { id: this.item.id} }))
+            this.dispatchEvent(new CustomEvent('delete_category', { bubbles: true, composed: true, detail: { tag_id: this.item.id, title: this.item.title} }))
             break;
         }
         // this.dispatchEvent(

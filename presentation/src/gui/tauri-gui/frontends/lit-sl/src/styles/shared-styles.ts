@@ -4,11 +4,9 @@ export default css`
 
     :host {
         font-family: var(--default-font-family);
-
-
     }
 
-    textarea, input {
+    textarea, input, .focusable {
         border-radius: var(--border-radius-medium);
         font-family: var(--default-font-family);
 

@@ -35,7 +35,19 @@ export class TagItem extends LitElement {
       }
       .tag-container {
           display: inline-flex;
+          position: relative;
+      }
+      .menu-container {
+          display: none;
+          border: 1px solid black;
 
+          &.show {
+              display: block;
+          }
+      }
+
+      .parent-item:not(:last-child){
+          border-bottom: 1px solid black;
       }
     `
 
@@ -56,9 +68,9 @@ export class TagItem extends LitElement {
 
   showParents(tag_list: Array<Tag>) {
     this.parent_tags = tag_list;
-    const dropdown = this.shadowRoot?.querySelector("#parents-menu") as SlDropdown;
+    const dropdown = this.shadowRoot?.querySelector(".menu-container");
     if (dropdown) {
-      dropdown.show();
+      dropdown.classList.add("show");
     }
   }
   onTriggerParents(_ev:Event) {
@@ -67,9 +79,9 @@ export class TagItem extends LitElement {
   }
   async removeParents() {
 
-    const dropdown = this.shadowRoot?.querySelector("#parents-menu") as SlDropdown;
+    const dropdown = this.shadowRoot?.querySelector(".menu-container");
     if (dropdown) {
-      await dropdown.hide();
+      dropdown.classList.remove("show");
     }
     this.parent_tags = [];
   }
@@ -80,26 +92,23 @@ export class TagItem extends LitElement {
   render() {
     if (this.tag.tag_type === "Category") {
         return html`
-            <sl-dropdown id="parents-menu" placement="top" hoist>
-                <div class="tag category" slot="trigger"
-                    @click=${this.onTriggerParents}
-                    @mouseleave=${this.removeParents}
-                >
+            <div class="tag-container">
+                <div class="tag category">
                     ${this.tag.title}
                     <button class="icon-button" @click=${this.removeTag}>
                         <img src="./src/assets/icons/x-circle.svg"/>
                     </button>
                 </div>
+                <div class="menu-container">
+                    ${this.parent_tags.map((tag: Tag) => {
+                      html `<div class="parent-tag">${tag.title}</div>`
+                    })};
+                </div>
 
-              <sl-menu>
-                  ${ this.parent_tags.map((parent_tag) => html `
-                      <sl-menu-item>${parent_tag.title}</sl-menu-item>
-                    `)}
-              </sl-menu>
-            </sl-dropdown>
+            </div>
         `;
     } else {
-        return html`
+      return html`
             <div class="tag-container">
                 <div class="tag normal">
                     ${this.tag.title}
@@ -107,7 +116,6 @@ export class TagItem extends LitElement {
                         <img src="./src/assets/icons/x-circle.svg"/>
                     </button>
                 </div>
-
             </div>
 
 

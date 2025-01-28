@@ -93,8 +93,8 @@ pub fn create_category(
         tag_type: TagType::Category,
         tag_style: None,
     };
-    let tag = app_state.service.add_tag(tag);
-    tag
+    let new_tag = app_state.service.add_tag(tag);
+    new_tag
 }
 
 #[tauri::command]
@@ -103,6 +103,10 @@ pub fn get_snippet_count_for_tag(
     app_state: State<'_, AppState>,
 ) -> Result<usize, CheatsheetError> {
     app_state.service.get_snippet_count_for_tag(tag_id)
+}
+#[tauri::command]
+pub fn delete_category(tag_id: usize, app_state: State<'_, AppState>) -> Result<Tag, CheatsheetError> {
+    app_state.service.delete_tag(tag_id)
 }
 #[tauri::command]
 pub fn search_tags(

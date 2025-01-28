@@ -5,13 +5,15 @@
     --font-sans: Roboto, sans-serif;
     --font-serif: Georgia, "Times New Roman", serif;
 
-    --spacing-small: 0.25em;
-    --spacing-medium : 0.5em;
-    --spacing-large: 0.75em;
+    --spacing-small: 0.25rem;
+    --spacing-medium : 0.5rem;
+    --spacing-large: 0.75rem;
+    --spacing-tree: 1.25rem;
 
     --border-radius-small: 0.1875rem;
     --border-radius-medium: 0.25rem;
     --border-radius-large: 0.5rem;
+    --border-width: 1px;
 
     --font-size-small: 0.875rem;
     --font-size-medium: 1rem;
@@ -19,9 +21,6 @@
 
     --shadow-x-small: 0 1px 2px hsl(240 3.8% 46.1% / 6%);
     --shadow-small: 0 1px 2px hsl(240 3.8% 46.1% / 12%);
-
-    --focus-ring-width: 1px;
-    --focus-ring-style: solid;
 
     --default-font-family: var(--font-sans);
 

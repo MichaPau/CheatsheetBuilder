@@ -160,7 +160,7 @@ impl Default for CreateTag {
 }
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
-#[serde(tag = "type")]
+//#[serde(tag = "type")]
 pub struct Tag {
     pub id: TagID,
     pub title: String,
@@ -175,22 +175,21 @@ impl fmt::Display for Tag {
     }
 }
 
-// #[cfg(feature = "serde")]
-// impl serde::Serialize for Tag {
-//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-//         where
-//             S: serde::Serializer {
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+pub struct Cheatsheet {
+    pub id: usize,
+    pub title: String,
+    pub snippets: Vec<CheatsheetItem>,
+}
 
-//         use serde::ser::SerializeStruct;
-//         let mut state = serializer.serialize_struct("Tag", 5)?;
-//         state.serialize_field("id", &self.id)?;
-//         state.serialize_field("title", &self.title)?;
-//         state.serialize_field("parent_id", &self.parent_id)?;
-//         state.serialize_field("tag_type", &self.tag_type)?;
-//         state.serialize_field("tag_style", &self.tag_style)?;
-//         state.end()
-//     }
-//}
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+pub struct CheatsheetItem {
+    pub id: usize,
+    pub order: usize,
+    pub snippet: Snippet,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize))]

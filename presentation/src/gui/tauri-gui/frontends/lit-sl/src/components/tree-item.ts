@@ -4,27 +4,24 @@ import { customElement, property, query } from "lit/decorators.js";
 import { watch } from "../utils/watch";
 import { TreeNode } from "./tree";
 import { CustomMenu } from "./menu";
+import sharedStyles from "../styles/shared-styles";
 
 @customElement("tree-item")
 export class TreeItem extends LitElement {
   static styles = [
+    sharedStyles,
     css`
       :host {
         display: block;
-        --spacing: 1.2rem;
-        --icon-size: 1.5rem;
+        --spacing: var(--spacing-tree);
       }
 
       * {
         box-sizing: border-box;
       }
       .non-details-icon {
-        //display: inline;
         width: var(--spacing);
-        //height: var(--spacing);
-
         min-width: var(--spacing);
-        //min-height: var(--spacing);
         text-align: center;
         vertical-align: middle;
       }
@@ -63,7 +60,7 @@ export class TreeItem extends LitElement {
         gap: 0.25em;
         align-items: center;
         align-content: center;
-        font-size: var(--spacing);
+        font-size: var(--font-size-medium);
         cursor: pointer;
       }
 
@@ -83,7 +80,6 @@ export class TreeItem extends LitElement {
         display: block;
         list-style: none;
         position: relative;
-        //padding-left: calc(2 * var(--spacing) - var(--radius) - 2px);
         padding-left: var(--spacing);
       }
       ul {
@@ -91,7 +87,7 @@ export class TreeItem extends LitElement {
         padding-left: 0;
         list-style: none;
       }
-    `,
+    `
   ];
 
   @property({attribute: false})
@@ -216,6 +212,7 @@ export class TreeItem extends LitElement {
     }
     menu_item.style.top = pos.y + "px";
     menu_item.style.left = pos.x + "px";
+    menu_item.classList.add("focusable");
     //const container = this.shadowRoot!.querySelector(".summary-row")!;
     if(container)
       container.appendChild(menu_item);
@@ -259,7 +256,7 @@ export class TreeItem extends LitElement {
       </li>`;
     } else {
       return html`<li class="non-details">
-        <div class="summary-row">
+        <div class="summary-row" @contextmenu=${this.onCreateMenu}>
             <div class="non-details-icon">&minus;</div>
           <input
             type="checkbox"

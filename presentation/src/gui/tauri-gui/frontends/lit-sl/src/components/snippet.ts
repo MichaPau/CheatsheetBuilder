@@ -19,7 +19,7 @@ export class SnippetContainer extends LitElement {
         width: 100%;
         /* --border-color: var(--sl-color-neutral-200); */
         --border-radius: var(--border-radius-medium);
-        --border-width: 1px;
+        --border-width: var(--border-width);
         --padding: var(--spacing-large);
 
       }

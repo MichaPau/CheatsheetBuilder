@@ -16,8 +16,8 @@ use repository::{
 };
 
 static STATIC_DB: LazyLock<Mutex<Rusqlite>> = LazyLock::new(|| {
-    //let db = rusqlite_db::Rusqlite::new_in_memory().unwrap();
-    let db = rusqlite_db::Rusqlite::new("../data/dev_db.db").unwrap();
+    let db = rusqlite_db::Rusqlite::new_in_memory().unwrap();
+    //let db = rusqlite_db::Rusqlite::new("../data/dev_db.db").unwrap();
 
     Mutex::new(db)
 });
@@ -25,8 +25,15 @@ static STATIC_DB: LazyLock<Mutex<Rusqlite>> = LazyLock::new(|| {
 type TestResult<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T, E>;
 
 #[test]
+fn test_sql_batch_creation() -> TestResult {
+    let db = STATIC_DB.lock().unwrap();
+    let result = db.get_tag_list(None).unwrap();
+    println!("taglist: {:?}", result);
+    Ok(())
+}
+#[test]
 fn test_01_inserts() -> TestResult {
-    let mut db = STATIC_DB.lock().unwrap();
+    let db = STATIC_DB.lock().unwrap();
 
     let hierarque_tags: Vec<TagListItem> = vec![
         TagListItem {
@@ -191,7 +198,7 @@ fn test_03_delete_entry() -> TestResult {
 
 #[test]
 fn test_04_add_tags() -> TestResult {
-    let mut db = STATIC_DB.lock().unwrap();
+    let db = STATIC_DB.lock().unwrap();
 
     let tags = db.get_tag_list(None).unwrap();
     //snippet 2 tags -> 1, 6 (index)

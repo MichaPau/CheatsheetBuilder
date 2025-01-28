@@ -13,9 +13,9 @@ import mainStyles from './styles/mainStyle.js';
 import sharedStyles from './styles/shared-styles.js';
 
 
-import { appContext, AppSettings, saveSettingsContext } from './utils/app-context.js';
-//import { MainController } from './controllers/main-controller.js';
-import { MainController } from './test-controllers/main-controller.js';
+import { appContext, AppSettings } from './utils/app-context.js';
+import { MainController } from './controllers/main-controller.js';
+//import { MainController } from './test-controllers/main-controller.js';
 import { TreeNode } from './components/tree.js';
 
 
@@ -58,8 +58,8 @@ export class App extends LitElement {
   //   this.appSettings = {open_categories: this.appSettings.open_categories,  selected_categories: selected_ids };
   // }
 
-  @state()
-  categories: Array<TreeNode> = [];
+  // @state()
+  // categories: Array<TreeNode> = [];
 
   @state()
   snippets: Array<Snippet> = [];
@@ -69,7 +69,7 @@ export class App extends LitElement {
   constructor() {
     super();
     this.main_controler.load_data();
-    this.main_controler.init_handlers();
+    //this.main_controler.init_handlers();
 
   }
 
@@ -107,12 +107,11 @@ export class App extends LitElement {
         <header class="header">
         <div class="content-wrapper">
           <button @click=${this.toggleStyle}>Test</button>
-          <button @click=${(_ev: Event) => console.log(JSON.stringify(this.categories, null, 2))}>Debug</button>
         </div>
           </header>
           <aside class="sidebar">
               <div class="content-wrapper">
-            <category-tree .category_tree=${this.categories}></category-tree>
+            <category-tree></category-tree>
               </div>
           </aside>
           <main class="main-content">

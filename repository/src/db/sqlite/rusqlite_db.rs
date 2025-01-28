@@ -8,8 +8,7 @@ use rusqlite::{Connection, OpenFlags, Row};
 
 use crate::{
     errors::CheatsheetError,
-    ports::stores::{SnippetStore, StateTrait, TagStore},
-    types::TagListItem,
+    ports::stores::{SnippetStore, StateTrait, TagStore}
 };
 
 #[derive(Debug)]
@@ -20,11 +19,12 @@ pub struct Rusqlite {
 impl Rusqlite {
     pub fn new<P: AsRef<Path>>(path: P) -> rusqlite::Result<Self> {
         let conn = Connection::open(path)?;
-        let db = Self {
+        let mut db = Self {
             conn: Mutex::new(conn),
         };
 
         db.create_default_tables()?;
+        db.create_dummy_entries()?;
 
         Ok(db)
     }
@@ -58,7 +58,7 @@ impl Rusqlite {
         };
 
         db.create_default_tables()?;
-        db.create_dummy_entries();
+        db.create_dummy_entries()?;
         Ok(db)
     }
     pub fn backup<P: AsRef<Path>>(&self, dst: P) -> rusqlite::Result<()> {
@@ -69,178 +69,23 @@ impl Rusqlite {
 
         r
     }
-    pub fn create_dummy_entries(&mut self) {
-        println!("create dummy data");
-        let hierarque_tags: Vec<TagListItem> = vec![
-            TagListItem {
-                tag: CreateTag {
-                    title: "one".into(),
-                    tag_type: TagType::Category,
-                    tag_style: Some(TagStyle {
-                        color: Color::RGB((255, 255, 255)),
-                    }),
-                    ..Default::default()
-                },
-                childs: vec![
-                    CreateTag {
-                        title: "one_sub_1".into(),
-                        tag_type: TagType::Category,
-                        ..Default::default()
-                    },
-                    CreateTag {
-                        title: "one_sub_2".into(),
-                        tag_type: TagType::Category,
-                        ..Default::default()
-                    },
-                ],
-            },
-            TagListItem {
-                tag: CreateTag {
-                    title: "two".into(),
-                    tag_type: TagType::Category,
-                    ..Default::default()
-                },
-                childs: vec![CreateTag {
-                    title: "two_sub_1".into(),
-                    tag_type: TagType::Category,
-                    ..Default::default()
-                }],
-            },
-            TagListItem {
-                tag: CreateTag {
-                    title: "three".into(),
-                    tag_type: TagType::Category,
-                    ..Default::default()
-                },
-                childs: vec![CreateTag {
-                    title: "three_sub_1".into(),
-                    tag_type: TagType::Category,
-                    ..Default::default()
-                }],
-            },
-            TagListItem {
-                tag: CreateTag {
-                    title: "all".into(),
-                    tag_type: TagType::Category,
-                    ..Default::default()
-                },
-                childs: vec![],
-            },
-            TagListItem {
-                tag: CreateTag {
-                    title: "some".into(),
-                    tag_type: TagType::Category,
-                    ..Default::default()
-                },
-                childs: vec![],
-            },
-            TagListItem {
-                tag: CreateTag {
-                    title: "normal".into(),
-                    tag_type: TagType::Normal,
-                    ..Default::default()
-                },
-                childs: vec![],
-            },
-        ];
+    pub fn create_dummy_entries(&mut self) -> rusqlite::Result<bool> {
+        self.conn
+            .lock()
+            .unwrap()
+            .execute_batch(include_str!("./sql/insert_test_data.sql"))?;
+        Ok(true)
 
-        for item in hierarque_tags {
-            let tag_added = self.add_tag(item.tag).unwrap();
-            for mut sub_item in item.childs {
-                sub_item.parent_id = Some(tag_added.id);
-                let _ = self.add_tag(sub_item).unwrap();
-            }
-        }
-
-        let tag_list = self.get_tag_list(None).unwrap();
-        //println!("tag_list:{:?}", tag_list);
-        let snippets_data = vec![
-            CreateSnippet::new(
-                "first".into(),
-                "first content".into(),
-                TextType::Text,
-                vec![
-                    tag_list[0].clone(),
-                    tag_list[6].clone(),
-                    tag_list[9].clone(),
-                ],
-            ),
-            CreateSnippet::new(
-                "first again".into(),
-                "first again content".into(),
-                TextType::Text,
-                vec![tag_list[1].clone(), tag_list[6].clone()],
-            ),
-            CreateSnippet::new(
-                "second".into(),
-                "second content".into(),
-                TextType::Text,
-                vec![
-                    tag_list[3].clone(),
-                    tag_list[6].clone(),
-                    tag_list[7].clone(),
-                ],
-            ),
-            CreateSnippet::new(
-                "third".into(),
-                "third content".into(),
-                TextType::Text,
-                vec![tag_list[5].clone(), tag_list[6].clone()],
-            ),
-            CreateSnippet::new(
-                "third again".into(),
-                "third again content".into(),
-                TextType::Text,
-                vec![tag_list[7].clone(), tag_list[6].clone()],
-            ),
-        ];
-
-        for item in snippets_data.iter() {
-            let _added = self.add_entry(item.clone()).unwrap();
-            //println!("added: {:?}", added);
-        }
     }
     fn create_default_tables(&self) -> rusqlite::Result<bool> {
-        println!("createdefault tables");
-        self.conn.lock().unwrap().execute(
-            "CREATE TABLE IF NOT EXISTS Snippet (
-                snippet_id INTEGER PRIMARY KEY,
-                title TEXT NOT NULL,
-                text TEXT NOT NULL,
-                text_type INTEGER NOT NULL,
-                created_at INTEGER NOT NULL,
-                updated_at INTEGER NOT NULL
-            )",
-            (),
-        )?;
-
-        self.conn.lock().unwrap().execute(
-            "CREATE TABLE IF NOT EXISTS Tag (
-                tag_id INTEGER PRIMARY KEY,
-                title TEXT NOT NULL,
-                parent_id INTEGER,
-                tag_type INTEGER,
-                tag_color INTEGER
-            )",
-            (),
-        )?;
-
-        self.conn.lock().unwrap().execute(
-            "CREATE TABLE IF NOT EXISTS Snippet_Tags (
-                id INTEGER PRIMARY KEY,
-                snippet_id INTEGER NOT NULL,
-                tag_id INTEGER,
-
-                FOREIGN KEY (snippet_id) REFERENCES Snippet (snippet_id),
-                FOREIGN KEY (tag_id) REFERENCES Tag (tag_id),
-
-                UNIQUE(snippet_id, tag_id) ON CONFLICT IGNORE
-            )",
-            (),
-        )?;
-
+        self.conn
+            .lock()
+            .unwrap()
+            .execute_batch(include_str!("./sql/create_db.sql"))?;
         Ok(true)
     }
+
+
 
     #[allow(dead_code)]
     fn get_tag_ids_for_snippet(
@@ -624,7 +469,7 @@ impl TagStore for Rusqlite {
         let c = self.conn.try_lock().unwrap();
 
         let result = c.query_row(
-            "SELECT count(*) FROM Snippet_Tag WHERE snippet_id = ?1",
+            "SELECT count(*) FROM Snippet_Tags WHERE tag_id = ?1",
             [tag_id],
             |row| row.get(0),
         )?;
