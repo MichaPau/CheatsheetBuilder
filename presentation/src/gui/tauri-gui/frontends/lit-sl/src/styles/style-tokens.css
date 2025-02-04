@@ -15,6 +15,9 @@
     --border-radius-large: 0.5rem;
     --border-width: 1px;
 
+    --border-color: lch(var(--l-90) 1.52 285.35);
+    --border-style: solid;
+
     --font-size-small: 0.875rem;
     --font-size-medium: 1rem;
     --font-size-large: 1.25rem;
@@ -27,11 +30,14 @@
     --focus-ring-color: lch(var(--l-80) 45 224);
     --focus-ring-width: 1px;
     --focus-ring-style: solid;
-
+    --checkbox-color: lch(var(--l-60) 37 214);
     --panel-background-color: lch(var(--l-100) 0 297);
-    --border-color: lch(var(--l-90) 1.52 285.35);
+
+    --placeholder-color: lch(var(--l-90) 1.52 285.35);
 
     --tag-color-normal: 38 221;
     --tag-color-category: 56 82;
+
+    --z-index-menu: 900;
 
 }

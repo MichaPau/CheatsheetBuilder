@@ -17,7 +17,7 @@ export class CustomMenu extends LitElement {
     css`
       :host {
         display: block;
-        border: 1px solid black;
+        border: var(--border-width) var(--border-style) var(--border-color);
         background-color: var(--panel-background-color);
         padding: 0.5em;
         z-index: 999;
@@ -28,8 +28,8 @@ export class CustomMenu extends LitElement {
       h3 {
         margin: 0;
         padding: 0;
-        margin-bottom: 0.25em;
-        border-bottom: 1px solid var(--border-color);
+        margin-bottom: var(--spacing-small);
+        border-bottom: var(--border-width) var(--border-style) var(--border-color);
       }
       .menu-item:hover {
         background-color: grey;

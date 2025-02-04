@@ -8,7 +8,7 @@ import { Snippet } from '../types.js';
 import './snippet.js';
 
 @customElement('snippet-list')
-export class Comp extends LitElement {
+export class SnippetList extends LitElement {
   static styles = [
     sharedStyles,
     css `

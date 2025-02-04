@@ -3,7 +3,6 @@ import { customElement, property} from 'lit/decorators.js';
 
 import sharedStyles from '../styles/shared-styles.js';
 import { Tag } from '../types.js';
-import SlDropdown from '@shoelace-style/shoelace/dist/components/dropdown/dropdown.component.js';
 
 @customElement('tag-item')
 export class TagItem extends LitElement {
@@ -31,7 +30,7 @@ export class TagItem extends LitElement {
       }
 
       .tag-text {
-          border: 1px solid black;
+          border: var(--border-width) var(--border-style) var(--border-color);
       }
       .tag-container {
           display: inline-flex;
@@ -39,10 +38,19 @@ export class TagItem extends LitElement {
       }
       .menu-container {
           display: none;
-          border: 1px solid black;
+          box-sizing: border-box;
+          border: var(--border-width) var(--border-style) var(--border-color);
+          min-width: 200px;
+          background-color: var(--panel-background-color);
 
           &.show {
               display: block;
+              position: absolute;
+              z-index: var(--z-index-menu);
+              bottom: 100%;
+              left: 0;
+              /* width: 300px;
+              height: 300px; */
           }
       }
 
@@ -67,15 +75,17 @@ export class TagItem extends LitElement {
 
 
   showParents(tag_list: Array<Tag>) {
+    console.log("show parents");
     this.parent_tags = tag_list;
     const dropdown = this.shadowRoot?.querySelector(".menu-container");
     if (dropdown) {
       dropdown.classList.add("show");
     }
   }
-  onTriggerParents(_ev:Event) {
-    console.log("Tag::onTriggerParents");
-    this.dispatchEvent(new CustomEvent("get-parent-tags", { bubbles: false, composed: true, detail: { id: this.tag.id } }));
+  onTriggerParents = (_ev:Event) => {
+    console.log("Tag::onTriggerParents:", this);
+
+    this.dispatchEvent(new CustomEvent("get-parent-tags", { bubbles: false, composed: false, detail: { id: this.tag.id } }));
   }
   async removeParents() {
 
@@ -92,7 +102,7 @@ export class TagItem extends LitElement {
   render() {
     if (this.tag.tag_type === "Category") {
         return html`
-            <div class="tag-container">
+            <div class="tag-container" @mouseover=${this.onTriggerParents} @mouseleave=${this.removeParents}>
                 <div class="tag category">
                     ${this.tag.title}
                     <button class="icon-button" @click=${this.removeTag}>
@@ -101,8 +111,8 @@ export class TagItem extends LitElement {
                 </div>
                 <div class="menu-container">
                     ${this.parent_tags.map((tag: Tag) => {
-                      html `<div class="parent-tag">${tag.title}</div>`
-                    })};
+                        return html`<div class="parent-tag">${tag.title}</div>`;
+                    })}
                 </div>
 
             </div>

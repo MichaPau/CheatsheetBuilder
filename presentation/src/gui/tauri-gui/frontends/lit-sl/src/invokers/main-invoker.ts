@@ -6,14 +6,12 @@ import { invoke } from "@tauri-apps/api/core";
 import { CategoriesInvoker, Snippet} from "../types";
 
 
-export default class MainController implements ReactiveController {
+export default class MainInvoker implements ReactiveController {
   private host: App;
   private categories_invoker;
-
   constructor(host: ReactiveControllerHost & App) {
     this.host = host;
     this.host.addController(this);
-
     this.categories_invoker = new CategoriesInvoker(this.host);
   }
 

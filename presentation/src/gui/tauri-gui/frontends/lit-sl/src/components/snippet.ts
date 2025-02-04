@@ -4,7 +4,7 @@ import { customElement, state, property } from 'lit/decorators.js';
 import sharedStyles from '../styles/shared-styles.js';
 import { Snippet, Tag } from '../types.js';
 
-import { SnippetController } from '../controllers/snippet-controller.js';
+import { SnippetInvoker } from '../types.js';
 
 import './snippet-editor.js';
 import './snippet-tag-list.js';
@@ -18,8 +18,8 @@ export class SnippetContainer extends LitElement {
         display: block;
         width: 100%;
         /* --border-color: var(--sl-color-neutral-200); */
-        --border-radius: var(--border-radius-medium);
-        --border-width: var(--border-width);
+        /* --border-radius: var(--border-radius-medium); */
+        /* --border-width: var(--border-width); */
         --padding: var(--spacing-large);
 
       }
@@ -30,7 +30,7 @@ export class SnippetContainer extends LitElement {
           background-color: var(--panel-background-color);
           box-shadow: var(--shadow-small);
           border: solid var(--border-width) var(--border-color);
-          border-radius: var(--border-radius);
+          border-radius: var(--border-radius-medium);
       }
       .card > * {
           padding: var(--spacing-medium);
@@ -99,7 +99,7 @@ export class SnippetContainer extends LitElement {
   @state()
   state_var = false;
 
-  private snippet_controler: SnippetController = new SnippetController(this);
+  private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
 
   connectedCallback(): void {
     super.connectedCallback();

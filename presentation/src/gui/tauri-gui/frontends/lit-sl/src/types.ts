@@ -27,6 +27,17 @@ export type Snippet = {
 
 //export const md = markdownit();
 
+// export { default as MainInvoker } from './invokers/main-invoker.js';
+// export { default as SnippetInvoker} from './invokers/snippet-invoker.js';
+// export { default as CategoriesInvoker } from './invokers/categories-invoker.js';
+// export { default as TagListController } from './invokers/tag-list-invoker.js';
+
+export { default as MainInvoker } from './invokers/mock-invokers/main-invoker.js';
+export { default as SnippetInvoker} from './invokers/mock-invokers/snippet-invoker.js';
+export { default as CategoriesInvoker } from './invokers/mock-invokers/categories-invoker.js';
+export { default as TagListInvoker} from './invokers/mock-invokers/tag-list-invoker.js';
+
+
 declare global {
   interface GlobalEventHandlersEventMap {
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;

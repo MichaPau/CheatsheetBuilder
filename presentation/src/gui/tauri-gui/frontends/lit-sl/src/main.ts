@@ -1,6 +1,7 @@
-import { html, css, LitElement } from 'lit';
+import { html, css, LitElement, PropertyValues } from 'lit';
 //import { LitElementLightDOM } from './utils/litlightdom.js';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, state, query } from 'lit/decorators.js';
+
 import {provide} from '@lit/context';
 
 import { Snippet} from './types';
@@ -8,15 +9,27 @@ import { Snippet} from './types';
 import './components/categories.js';
 import './components/snippet-list.js';
 import './components/settings-logger.js';
+// import './test/test-vanilla-comp.js';
+// import './test/test-wrapper.js';
+
 
 import mainStyles from './styles/mainStyle.js';
 import sharedStyles from './styles/shared-styles.js';
 
 
 import { appContext, AppSettings } from './utils/app-context.js';
-import { MainController } from './controllers/main-controller.js';
-//import { MainController } from './test-controllers/main-controller.js';
+
+// const controllerModule = import.meta.env.VITE_USE_MOCK_DATA ? await import('./test-controllers/main-controller.js') : await import('./controllers/main-controller.js');
+// const MainController: typeof controllerModule = controllerModule;
+//import MainController from './controllers/main-controller.js';
+import { MainInvoker } from './types.js';
+import { Categories } from './components/categories.js';
+import { SnippetList } from './components/snippet-list.js';
 import { TreeNode } from './components/tree.js';
+//import { MainController } from './test-controllers/main-controller.js';
+
+//
+//import { TreeNode } from './components/tree.js';
 
 
 
@@ -42,7 +55,7 @@ export class App extends LitElement {
     open_categories: [],
     selected_categories: [],
     toggle_open: (id: number, state: boolean) => {
-      let open_ids = this.appSettings.open_categories.filter(i => i != id);;
+      let open_ids = this.appSettings.open_categories.filter(i => i !== id);;
       if (state) {
         open_ids.push(id);
       }
@@ -58,17 +71,24 @@ export class App extends LitElement {
   //   this.appSettings = {open_categories: this.appSettings.open_categories,  selected_categories: selected_ids };
   // }
 
-  // @state()
-  // categories: Array<TreeNode> = [];
+  @state()
+  categories: Array<TreeNode> = [];
+
+  @query("category-tree")
+  category_comp!: Categories;
+
+  @query("snippet-list")
+  snippet_list_comp!: SnippetList;
 
   @state()
   snippets: Array<Snippet> = [];
 
-  private main_controler: MainController = new MainController(this);
+  private main_controler = new MainInvoker(this);
 
   constructor() {
     super();
-    this.main_controler.load_data();
+    //this.main_controler.load_data();
+    //console.log("USE_MOCK_DATA:", import.meta.env.VITE_USE_MOCK_DATA);
     //this.main_controler.init_handlers();
 
   }
@@ -96,27 +116,32 @@ export class App extends LitElement {
     console.log("connectedCallback main");
     this.addEventListener("set-selected-categories", (ev: Event) => {
       let ids = (ev as CustomEvent).detail;
-      console.log("setting ids: ",ids);
-      //this.appSettings.selected_categories = ids;
+      console.log("main::setting ids: ",ids);
       this.appSettings = {...this.appSettings, selected_categories: ids};
     });
   }
+
+  protected firstUpdated(_changedProperties: PropertyValues): void {
+    this.main_controler.load_data();
+  }
+
+
   render() {
     return html`
       <div id="layout-container">
         <header class="header">
         <div class="content-wrapper">
-          <button @click=${this.toggleStyle}>Test</button>
+            <button @click=${this.toggleStyle}>Test</button>
         </div>
           </header>
           <aside class="sidebar">
               <div class="content-wrapper">
-            <category-tree></category-tree>
+            <category-tree .category_tree=${this.categories} id="category-tree" ></category-tree>
               </div>
           </aside>
           <main class="main-content">
               <div class="content-wrapper">
-            <snippet-list .snippets=${this.snippets}></snippet-list>
+            <snippet-list id="snippet-list" .snippets=${this.snippets}></snippet-list>
               </div>
           </main>
           <footer class="footer">

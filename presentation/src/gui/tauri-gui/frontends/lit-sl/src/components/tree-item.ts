@@ -118,13 +118,10 @@ export class TreeItem extends LitElement {
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
-    const title_elem = this.shadowRoot?.querySelector("#title-element")!;
-    if (this.data.item.id == 0)
-      console.log("title_elem:", title_elem);
-    // title_elem.addEventListener("contextmenu", (ev: Event) => {
-    //   ev.preventDefault();
-    //   console.log("title contextmenu");
-    // });
+    // const title_elem = this.shadowRoot?.querySelector("#title-element")!;
+    // if (this.data.item.id == 0)
+    //   console.log("title_elem:", title_elem);
+
   }
   sync_parent() {
     const t = this.shadowRoot?.host as TreeItem;
@@ -190,7 +187,7 @@ export class TreeItem extends LitElement {
 
   details_toggle_handler(id: number, ev: ToggleEvent) {
 
-    console.log("details toggle in treeitem");
+    //console.log("details toggle in treeitem");
     const open = ev.newState === 'open' ? true : false;
     this.dispatchEvent(new CustomEvent('category_toggle', { detail: { tag_id: id, open}, bubbles: true, composed: true }));
   }

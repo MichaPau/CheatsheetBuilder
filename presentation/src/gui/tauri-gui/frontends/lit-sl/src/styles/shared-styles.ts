@@ -9,7 +9,7 @@ export default css`
     textarea, input, .focusable {
         border-radius: var(--border-radius-medium);
         font-family: var(--default-font-family);
-
+        accent-color: var(--checkbox-color);
         &:focus {
             outline: none;
             border: var(--focus-ring-style) var(--focus-ring-width) var(--focus-ring-color);

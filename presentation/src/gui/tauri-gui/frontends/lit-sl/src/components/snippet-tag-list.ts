@@ -6,7 +6,8 @@ import sharedStyles from '../styles/shared-styles.js';
 import { Tag } from '../types.js';
 
 import './tag-item.js';
-import { TagListController } from '../controllers/tag-list-controller.js';
+import { TagListInvoker } from '../types.js';
+//import TagListController from '../invokers/mock-invokers/tag-list-invoker.js';
 import { TagItem } from './tag-item.js';
 
 @customElement('snippet-tag-list')
@@ -21,7 +22,14 @@ export class SnippetTagList extends LitElement {
       .tag-container {
           display: flex;
           gap: var(--spacing-small);
+
       }
+      .placeholder {
+          color: var(--placeholder-color);
+          cursor: pointer;
+      }
+
+
 
     `
   ];
@@ -32,22 +40,24 @@ export class SnippetTagList extends LitElement {
   @property({ attribute: false })
   tag_list!: Array<Tag>;
 
-  private controller: TagListController = new TagListController(this);
+  private controller: TagListInvoker = new TagListInvoker(this);
 
   connectedCallback(): void {
     super.connectedCallback();
   }
 
   getParentTags = async (ev: CustomEvent) => {
-    ev.stopImmediatePropagation();
 
-    let result: Array<Tag> = await this.controller.getParentTags(ev.detail.id) as Array<Tag>;
-    console.log(result);
+    ev.stopPropagation();
 
-    if (result.length > 0) {
-      const t = ev.target as TagItem;
-      t.showParents(result);
-    }
+    const tag_target = ev.composedPath()[0] as TagItem;
+
+    const id = ev.detail.id;
+    this.controller.getParentTags(id).then(result => {
+      //console.log(t);
+      tag_target.showParents(result);
+    });
+
   }
   render() {
     return html`
@@ -57,6 +67,7 @@ export class SnippetTagList extends LitElement {
                <tag-item .tag=${tag} @get-parent-tags=${this.getParentTags}></tag-item>
                 `
         )}
+        ${this.tag_list.length === 0 ? html`<span class="placeholder">No tags</span>`: ``}
         </div>
     `;
   }

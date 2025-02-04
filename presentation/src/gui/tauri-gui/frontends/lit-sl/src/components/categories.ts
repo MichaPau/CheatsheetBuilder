@@ -6,12 +6,14 @@ import { consume } from '@lit/context';
 import sharedStyles from '../styles/shared-styles.js';
 import { appContext, AppSettings, saveSettingsContext } from '../utils/app-context.js';
 
-import { Tag } from '../types.js';
+
 
 import './tree.js';
 import { TreeNode } from './tree.js';
 import { TreeItem } from './tree-item.js';
-import { CategoriesInvoker } from '../invokers/categories-invoker.js';
+
+import { CategoriesInvoker } from '../types.js';
+
 
 @customElement('category-tree')
 export class Categories extends LitElement {
@@ -43,7 +45,7 @@ export class Categories extends LitElement {
   @state()
   category_tree: Array<TreeNode> = [];
 
-  private _invoker: CategoriesInvoker = new CategoriesInvoker(this);
+  //private _invoker: CategoriesInvoker = new CategoriesInvoker(this);
 
   connectedCallback(): void {
     super.connectedCallback();

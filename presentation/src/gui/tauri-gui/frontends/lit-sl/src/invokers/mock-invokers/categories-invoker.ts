@@ -1,23 +1,26 @@
 import { ReactiveController, ReactiveControllerHost } from "lit";
 
-import { invoke } from "@tauri-apps/api/core";
+import { Categories } from "../../components/categories";
+import { TreeNode } from "../../components/tree";
+import { Tag } from "../../types";
+import { ConfirmDialog } from "../../components/confirm-dialog";
 
-import { TreeNode } from "../components/tree";
-import { Tag } from "../types";
-import { ConfirmDialog } from "../components/confirm-dialog";
-import { App } from "../main";
+import { snippets, tags, get_categories } from "./mockData";
+import { App } from "../../main";
 
 export default class CategoriesInvoker implements ReactiveController {
   private host: App;
 
+  private categories: Array<Tag>;
   constructor(host: ReactiveControllerHost & App) {
     this.host = host;
     this.host.addController(this);
+    this.categories = get_categories();
   }
 
   async load_data() {
-    const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-    this.host.categories = this.buildTreeArray(load_categories);
+
+    this.host.categories = this.buildTreeArray(this.categories) as Array<TreeNode>;
   }
   hostConnected(): void {
     this.load_data();
@@ -35,49 +38,58 @@ export default class CategoriesInvoker implements ReactiveController {
   }
 
   onUpdateCategoryTitle = async (ev: CustomEvent) => {
-    console.log("onUpdateCategoryTitle");
-    let update_result = await invoke("update_tag_title", { tagId: ev.detail.tag_id, newTitle: ev.detail.new_title }).catch(err => console.log(err));
-    if(update_result) {
-      const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-      this.host.categories = this.buildTreeArray(load_categories);
+
+    let found = tags.find(item => item.id === ev.detail.tag_id);
+    if (found) {
+      found.title = ev.detail.new_title;
     }
+    this.categories = get_categories();
+    this.host.categories = this.buildTreeArray(this.categories);
+
   }
   onDeleteCategory = async(ev: CustomEvent) => {
     console.log("onDeleteCategory");
-    let count_result = await invoke("get_snippet_count_for_tag", { tagId: ev.detail.tag_id }).catch(err => console.log(err));
-    console.log("count_result:", count_result);
+    let f = snippets.filter((snippet) => snippet.tags.findIndex((tag) => tag.id === ev.detail.tag_id) !== -1);
+
+    console.log("count_result:", f.length);
 
     const dlg = new ConfirmDialog();
-    dlg.message = "Delete category " + ev.detail.title + " " + count_result + " snippets are using it.";
+    dlg.message = "Delete category " + ev.detail.title + " " + f.length + " snippets are using it.";
     this.host.shadowRoot?.appendChild(dlg);
     let answer = await dlg.confirm();
 
     if(answer) {
       console.log("delete for real");
-      let delete_result = await invoke("delete_category", { tagId: ev.detail.tag_id }).catch(err => console.log(err));
-      console.log("count_result:", delete_result);
-      if(delete_result) {
-        const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-        this.host.categories = this.buildTreeArray(load_categories);
-      }
+      f.forEach((snippet) => {
+        let index = snippet.tags.findIndex(tag => tag.id === ev.detail.tag_id);
+        snippet.tags.splice(index, 1);
+      });
+
+      let index = tags.findIndex(tag => tag.id === ev.detail.tag_id);
+      tags.splice(index, 1);
+
+      this.categories = get_categories();
+      this.host.categories = this.buildTreeArray(this.categories);
+
     }
 
   }
   onAddCategory = async(ev: CustomEvent) => {
     console.log("onAddCategory: ", ev.detail);
-    let create_tag_result = await invoke("create_category", { parentId: ev.detail.parent_id, title: ev.detail.title }).catch(err => console.log(err));
-    if(create_tag_result) {
-      const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-      this.host.categories = this.buildTreeArray(load_categories);
-    }
+    let new_id = Math.max(...this.categories.map(tag => tag.id)) + 1;
+    tags.push({ id: new_id, title: ev.detail.title, tag_type: "Category", parent_id: ev.detail.parent_id, tag_style: null });
+    this.categories = get_categories();
+    this.host.categories = this.buildTreeArray(this.categories);
+
   }
   onUpdateParentCategory = async (ev: CustomEvent) => {
     console.log("updateParntCategory:",ev.detail);
-    let update_result = await invoke("set_tag_parent_id", {tagId: ev.detail.tag_id, newParentId: ev.detail.new_parent_id}).catch(err => console.log(err));
-    if (update_result) {
-      const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-      this.host.categories = this.buildTreeArray(load_categories);
+    let tag = tags.find((tag) => tag.id === ev.detail.tag_id);
+    if (tag) {
+      tag.parent_id = ev.detail.new_parent_id;
     }
+    this.categories = get_categories();
+    this.host.categories = this.buildTreeArray(this.categories);
 
   }
 
