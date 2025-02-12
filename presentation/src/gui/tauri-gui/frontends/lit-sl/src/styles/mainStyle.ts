@@ -6,6 +6,7 @@ export default css`
     }
     #layout-container {
       display: grid;
+      position: relative;
       border: 2px dotted black;
       padding: 1em;
 

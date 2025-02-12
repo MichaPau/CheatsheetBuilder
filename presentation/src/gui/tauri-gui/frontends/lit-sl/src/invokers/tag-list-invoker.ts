@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 import { SnippetTagList } from "../components/snippet-tag-list";
 
-export class TagListInvoker implements ReactiveController {
+export default class TagListInvoker implements ReactiveController {
   private host: SnippetTagList;
 
   constructor(host: ReactiveControllerHost & SnippetTagList) {

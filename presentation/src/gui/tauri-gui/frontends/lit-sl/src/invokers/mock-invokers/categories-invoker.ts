@@ -1,11 +1,10 @@
 import { ReactiveController, ReactiveControllerHost } from "lit";
 
-import { Categories } from "../../components/categories";
 import { TreeNode } from "../../components/tree";
 import { Tag } from "../../types";
 import { ConfirmDialog } from "../../components/confirm-dialog";
 
-import { snippets, tags, get_categories } from "./mockData";
+import { snippets, tags, get_categories, get_snippets } from "./mockData";
 import { App } from "../../main";
 
 export default class CategoriesInvoker implements ReactiveController {
@@ -20,7 +19,8 @@ export default class CategoriesInvoker implements ReactiveController {
 
   async load_data() {
 
-    this.host.categories = this.buildTreeArray(this.categories) as Array<TreeNode>;
+    //this.host.categories = this.buildTreeArray(this.categories) as Array<TreeNode>;
+    this.host.appData.categories = this.buildTreeArray(this.categories);
   }
   hostConnected(): void {
     this.load_data();
@@ -37,21 +37,30 @@ export default class CategoriesInvoker implements ReactiveController {
 
   }
 
+  set_categories() {
+    this.categories = get_categories();
+    // console.log("set_categories:");
+    // console.log(this.categories);
+    //this.host.categories = this.buildTreeArray(this.categories);
+    this.host.appData.categories = this.buildTreeArray(this.categories);
+  }
   onUpdateCategoryTitle = async (ev: CustomEvent) => {
 
     let found = tags.find(item => item.id === ev.detail.tag_id);
     if (found) {
       found.title = ev.detail.new_title;
     }
+    //this.set_categories();
     this.categories = get_categories();
-    this.host.categories = this.buildTreeArray(this.categories);
+    //const snippets = get_snippets();
+    this.host.appData = { categories: this.buildTreeArray(this.categories), snippets: get_snippets() };
+    //this.host.appData.snippets = get_snippets();
 
   }
   onDeleteCategory = async(ev: CustomEvent) => {
     console.log("onDeleteCategory");
     let f = snippets.filter((snippet) => snippet.tags.findIndex((tag) => tag.id === ev.detail.tag_id) !== -1);
 
-    console.log("count_result:", f.length);
 
     const dlg = new ConfirmDialog();
     dlg.message = "Delete category " + ev.detail.title + " " + f.length + " snippets are using it.";
@@ -68,8 +77,7 @@ export default class CategoriesInvoker implements ReactiveController {
       let index = tags.findIndex(tag => tag.id === ev.detail.tag_id);
       tags.splice(index, 1);
 
-      this.categories = get_categories();
-      this.host.categories = this.buildTreeArray(this.categories);
+      this.set_categories();
 
     }
 
@@ -88,8 +96,7 @@ export default class CategoriesInvoker implements ReactiveController {
     if (tag) {
       tag.parent_id = ev.detail.new_parent_id;
     }
-    this.categories = get_categories();
-    this.host.categories = this.buildTreeArray(this.categories);
+    this.set_categories();
 
   }
 

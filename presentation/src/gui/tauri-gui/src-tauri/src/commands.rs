@@ -124,7 +124,7 @@ pub fn search_tags(
 #[tauri::command]
 pub fn get_snippets(app_state: State<'_, AppState>) -> Result<Vec<Snippet>, CheatsheetError> {
     let r = app_state.service.get_snippet_list(None, None);
-    //println!("{:?}", r);
+    //println!("Snippets: {:?}", r);
     r
     // let snippet_result = app_state.service.get_snippet_list(None, None).unwrap();
 

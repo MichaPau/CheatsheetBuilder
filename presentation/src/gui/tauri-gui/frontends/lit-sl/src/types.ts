@@ -3,20 +3,22 @@
 export type Tag = {
   id: number;
   title: string;
-  tag_type: "Category" | "Normal" | "Untagged";
-  parent_id?: number | null;
-  tag_style?: object | null;
+  tag_type: string;
+  parent_id: number | null;
+  tag_style: object | null;
 };
-
+//"Category" | "Normal" | "Untagged";
 export type Snippet = {
   id: number;
   title: string;
   text: string;
-  text_type: string;
+  text_type: TextType;
   tags: Array<Tag>;
   created_at: number;
   updated_at: number;
-}
+};
+
+export type TextType = "Text" | "Markdown";
 
 // export type TreeCategory = {
 //     item: Tag,
@@ -30,7 +32,7 @@ export type Snippet = {
 // export { default as MainInvoker } from './invokers/main-invoker.js';
 // export { default as SnippetInvoker} from './invokers/snippet-invoker.js';
 // export { default as CategoriesInvoker } from './invokers/categories-invoker.js';
-// export { default as TagListController } from './invokers/tag-list-invoker.js';
+// export { default as TagListInvoker } from './invokers/tag-list-invoker.js';
 
 export { default as MainInvoker } from './invokers/mock-invokers/main-invoker.js';
 export { default as SnippetInvoker} from './invokers/mock-invokers/snippet-invoker.js';
@@ -40,6 +42,7 @@ export { default as TagListInvoker} from './invokers/mock-invokers/tag-list-invo
 
 declare global {
   interface GlobalEventHandlersEventMap {
+    'get_data': Event;
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;
     'get-parent-tags': CustomEvent<{tag_id: number}>;
     'remove-tag-from-snippet': CustomEvent<{tag_id: number }>;
@@ -48,6 +51,7 @@ declare global {
     'update_category_title': CustomEvent<{ tag_id: number, new_title: string}>;
     'delete_category': CustomEvent<{ tag_id: number, title: string }>;
     'add_category': CustomEvent<{ parent_id: number, title: string }>;
+    'create_snippet': CustomEvent<{ snippet: Snippet}>;
     //'change-category-selection': CustomEvent<{id: number, state: boolean}>
   }
 }

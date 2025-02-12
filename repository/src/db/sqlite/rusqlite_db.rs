@@ -58,7 +58,7 @@ impl Rusqlite {
         };
 
         db.create_default_tables()?;
-        db.create_dummy_entries()?;
+        //db.create_dummy_entries()?;
         Ok(db)
     }
     pub fn backup<P: AsRef<Path>>(&self, dst: P) -> rusqlite::Result<()> {

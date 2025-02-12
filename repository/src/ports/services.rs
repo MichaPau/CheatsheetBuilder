@@ -98,6 +98,22 @@ impl Service {
     pub fn delete_tag(&self, tag_id: TagID) -> Result<Tag, CheatsheetError> {
         self.store.remove_tag_from_all(tag_id)?;
         let deleted_tag = self.store.delete_tag(tag_id)?;
+        //reparent
+        if deleted_tag.tag_type == TagType::Category {
+            if let Ok(cats) = self.get_tag_list(Some(TagType::Category)) {
+                let childs: Vec<&Tag> = cats.iter().filter(|&item| {
+                    if let Some(p_id) = item.parent_id {
+                        p_id == deleted_tag.id
+                    } else {
+                        false
+                    }
+                }).collect();
+                for c in childs {
+                    self.update_tag_parent(c.id, deleted_tag.parent_id)?;
+                }
+            };
+
+        }
         Ok(deleted_tag)
     }
 

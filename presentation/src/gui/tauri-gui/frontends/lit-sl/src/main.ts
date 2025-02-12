@@ -9,6 +9,8 @@ import { Snippet} from './types';
 import './components/categories.js';
 import './components/snippet-list.js';
 import './components/settings-logger.js';
+import './components/drawer.js';
+import './components/snippet/create-snippet.js';
 // import './test/test-vanilla-comp.js';
 // import './test/test-wrapper.js';
 
@@ -17,7 +19,7 @@ import mainStyles from './styles/mainStyle.js';
 import sharedStyles from './styles/shared-styles.js';
 
 
-import { appContext, AppSettings } from './utils/app-context.js';
+import { AppData, appDataContext, appSettingContext, AppSettings } from './utils/app-context.js';
 
 // const controllerModule = import.meta.env.VITE_USE_MOCK_DATA ? await import('./test-controllers/main-controller.js') : await import('./controllers/main-controller.js');
 // const MainController: typeof controllerModule = controllerModule;
@@ -46,10 +48,33 @@ export class App extends LitElement {
         width: 100%;
         height: 100vh;
       }
+
+      drawer-comp {
+        position: fixed;
+        display: inline-block;
+        width: 3rem;
+        margin: 0 auto;
+        bottom: 5px;
+        transform: translateY(50%);
+        transition: all 0.2s;
+        right: 0;
+        left: 0;
+
+        &:hover {
+            transform: translateY(25%);
+        }
+      }
     `
   ];
 
-  @provide({ context: appContext })
+  @provide({ context: appDataContext })
+  @state()
+  appData: AppData = {
+    snippets: [],
+    categories: [],
+  };
+
+  @provide({ context: appSettingContext })
   @state()
   appSettings: AppSettings = {
     open_categories: [],
@@ -87,7 +112,7 @@ export class App extends LitElement {
 
   constructor() {
     super();
-    //this.main_controler.load_data();
+    this.main_controler.load_data();
     //console.log("USE_MOCK_DATA:", import.meta.env.VITE_USE_MOCK_DATA);
     //this.main_controler.init_handlers();
 
@@ -121,8 +146,9 @@ export class App extends LitElement {
     });
   }
 
-  protected firstUpdated(_changedProperties: PropertyValues): void {
-    this.main_controler.load_data();
+  protected async firstUpdated(_changedProperties: PropertyValues) {
+    //await new Promise(requestAnimationFrame);
+    //this.main_controler.load_data();
   }
 
 
@@ -147,9 +173,14 @@ export class App extends LitElement {
           <footer class="footer">
               <div class="content-wrapper">
               <settings-logger></settings-logger>
+
               </div>
           </footer>
+
       </div>
+      <drawer-comp>
+          <create-snippet></create-snippet>
+      </drawer-comp>
     `;
   }
 }

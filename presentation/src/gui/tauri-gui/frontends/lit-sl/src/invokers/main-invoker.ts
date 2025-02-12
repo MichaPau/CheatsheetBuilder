@@ -16,13 +16,19 @@ export default class MainInvoker implements ReactiveController {
   }
 
   async load_data() {
-
-    this.host.snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
+    //console.log("load data");
+    const snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
+    this.host.appData = { ... this.host.appData, snippets };
+    //console.log(this.host.appData.snippets);
   }
 
 
 
-  hostConnected(): void {}
+  hostConnected(): void {
+    this.host.addEventListener('create_snippet', (_ev: CustomEvent) => {
+      //todo
+    });
+  }
 
   hostDisconnected(): void {}
 }

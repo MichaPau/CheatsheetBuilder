@@ -17,7 +17,8 @@ export default class CategoriesInvoker implements ReactiveController {
 
   async load_data() {
     const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-    this.host.categories = this.buildTreeArray(load_categories);
+    this.host.appData = { ... this.host.appData, categories:  this.buildTreeArray(load_categories)};
+    //this.host.appData.categories = this.buildTreeArray(load_categories);
   }
   hostConnected(): void {
     this.load_data();
@@ -39,7 +40,8 @@ export default class CategoriesInvoker implements ReactiveController {
     let update_result = await invoke("update_tag_title", { tagId: ev.detail.tag_id, newTitle: ev.detail.new_title }).catch(err => console.log(err));
     if(update_result) {
       const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-      this.host.categories = this.buildTreeArray(load_categories);
+      //this.host.categories = this.buildTreeArray(load_categories);
+      this.load_data();
     }
   }
   onDeleteCategory = async(ev: CustomEvent) => {
@@ -57,8 +59,9 @@ export default class CategoriesInvoker implements ReactiveController {
       let delete_result = await invoke("delete_category", { tagId: ev.detail.tag_id }).catch(err => console.log(err));
       console.log("count_result:", delete_result);
       if(delete_result) {
-        const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-        this.host.categories = this.buildTreeArray(load_categories);
+        //const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+        //this.host.categories = this.buildTreeArray(load_categories);
+        this.load_data();
       }
     }
 
@@ -67,16 +70,18 @@ export default class CategoriesInvoker implements ReactiveController {
     console.log("onAddCategory: ", ev.detail);
     let create_tag_result = await invoke("create_category", { parentId: ev.detail.parent_id, title: ev.detail.title }).catch(err => console.log(err));
     if(create_tag_result) {
-      const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-      this.host.categories = this.buildTreeArray(load_categories);
+      // const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+      // this.host.categories = this.buildTreeArray(load_categories);
+      this.load_data();
     }
   }
   onUpdateParentCategory = async (ev: CustomEvent) => {
     console.log("updateParntCategory:",ev.detail);
     let update_result = await invoke("set_tag_parent_id", {tagId: ev.detail.tag_id, newParentId: ev.detail.new_parent_id}).catch(err => console.log(err));
     if (update_result) {
-      const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-      this.host.categories = this.buildTreeArray(load_categories);
+      // const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+      // this.host.categories = this.buildTreeArray(load_categories);
+      this.load_data();
     }
 
   }
