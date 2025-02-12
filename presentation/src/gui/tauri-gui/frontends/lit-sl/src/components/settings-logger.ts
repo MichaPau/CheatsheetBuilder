@@ -2,7 +2,7 @@ import { html, css, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import {consume, ContextConsumer} from '@lit/context';
 
-import { appContext, AppSettings } from '../utils/app-context.js';
+import { appSettingContext, AppSettings } from '../utils/app-context.js';
 
 import sharedStyles from '../styles/shared-styles.js';
 
@@ -31,7 +31,7 @@ export class SettingsLogger extends LitElement {
     `
   ];
 
-  @consume({ context: appContext, subscribe: true })
+  @consume({ context: appSettingContext, subscribe: true })
   @state()
   appSettings!: AppSettings;
 

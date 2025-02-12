@@ -1,5 +1,5 @@
-import { html, css, LitElement } from 'lit';
-import { customElement, property} from 'lit/decorators.js';
+import { html, css, LitElement, PropertyValues } from 'lit';
+import { customElement, property, state} from 'lit/decorators.js';
 
 import sharedStyles from '../styles/shared-styles.js';
 import { Tag } from '../types.js';
@@ -62,10 +62,10 @@ export class TagItem extends LitElement {
 
   ];
 
-  @property({attribute: false})
+  @property({type: Object})
   tag!:Tag;
 
-  @property({attribute: false})
+  @state()
   parent_tags:Array<Tag> = [];
 
 
@@ -73,7 +73,10 @@ export class TagItem extends LitElement {
     super.connectedCallback();
   }
 
-
+  protected shouldUpdate(_changedProperties: PropertyValues): boolean {
+    //console.log("TagItem::shouldUpdate", _changedProperties);
+    return super.shouldUpdate(_changedProperties);
+  }
   showParents(tag_list: Array<Tag>) {
     console.log("show parents");
     this.parent_tags = tag_list;
@@ -97,7 +100,7 @@ export class TagItem extends LitElement {
   }
 
   removeTag = (_ev: Event) => {
-    this.dispatchEvent(new CustomEvent("remove-tag-from-snippet", { bubbles: true, composed: true, detail: {tag_id: this.tag.id} }))
+    this.dispatchEvent(new CustomEvent("remove-tag-from-snippet", { bubbles: true, composed: true, detail: { tag_id: this.tag.id } }));
   }
   render() {
     if (this.tag.tag_type === "Category") {
@@ -127,8 +130,6 @@ export class TagItem extends LitElement {
                     </button>
                 </div>
             </div>
-
-
         `;
     }
 

@@ -1,18 +1,16 @@
-import { html, css, LitElement } from 'lit';
+import { html, css, LitElement, PropertyValues } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { consume } from '@lit/context';
+import { consume, ContextConsumer, ContextType } from '@lit/context';
 
 //import './category_node.js';
 import sharedStyles from '../styles/shared-styles.js';
-import { appContext, AppSettings, saveSettingsContext } from '../utils/app-context.js';
+import { appSettingContext, AppSettings, saveSettingsContext, appDataContext, AppData } from '../utils/app-context.js';
 
 
 
 import './tree.js';
 import { TreeNode } from './tree.js';
 import { TreeItem } from './tree-item.js';
-
-import { CategoriesInvoker } from '../types.js';
 
 
 @customElement('category-tree')
@@ -35,18 +33,28 @@ export class Categories extends LitElement {
     `
   ];
 
-  @consume({ context: appContext, subscribe: true })
+
+
+  @consume({ context: appSettingContext, subscribe: true })
   @state()
   appSettings!: AppSettings;
 
   @consume({ context: saveSettingsContext, subscribe: true })
   update_selection!: (selected_ids: Array<number>) => void;
 
+  @consume({ context: appDataContext, subscribe: true })
+  @state()
+  appData!: AppData;
+
   @state()
   category_tree: Array<TreeNode> = [];
 
   //private _invoker: CategoriesInvoker = new CategoriesInvoker(this);
 
+  protected shouldUpdate(_changedProperties: PropertyValues): boolean {
+    //console.log("Categories::shouldUpdate", _changedProperties);
+    return super.shouldUpdate(_changedProperties);
+  }
   connectedCallback(): void {
     super.connectedCallback();
 
@@ -77,7 +85,7 @@ export class Categories extends LitElement {
 
   render() {
     return html`
-        <tree-view .category_tree=${this.category_tree}></tree-view>
+        <tree-view .category_tree=${this.appData.categories}></tree-view>
     `;
   }
 }
