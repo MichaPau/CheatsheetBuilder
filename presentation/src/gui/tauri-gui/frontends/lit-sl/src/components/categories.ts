@@ -68,7 +68,7 @@ export class Categories extends LitElement {
       this.appSettings.save_selected(f);
     });
 
-    this.addEventListener("category_toggle", (ev: CustomEvent) => {
+    this.addEventListener("category-toggle", (ev: CustomEvent) => {
       this.appSettings.toggle_open(ev.detail.tag_id, ev.detail.open);
     });
   }

@@ -1,9 +1,10 @@
-import { html, css, LitElement, PropertyValues } from 'lit';
-import { customElement, state, property } from 'lit/decorators.js';
+import { html, LitElement, PropertyValues } from 'lit';
+import { customElement, query, property } from 'lit/decorators.js';
 
 import sharedStyles from '../../styles/shared-styles.js';
 import snippetStyles from './snippet-styles.js';
 import { Snippet, Tag, SnippetInvoker } from '../../types.js';
+//import SnippetInvoker from '../../invokers/mock-invokers/snippet-invoker.js';
 
 import './snippet-editor.js';
 import './snippet-tag-list.js';
@@ -18,10 +19,13 @@ export class SnippetContainer extends LitElement {
   @property({attribute: false})
   snippet!: Snippet;
 
-  @state()
-  state_var = false;
+  @query("#tag-search-input")
+  tagSearchInput!: HTMLInputElement;
 
-  private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
+  @query("#tag-search-result")
+  tagSearchResult!: HTMLElement;
+
+  // private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -46,11 +50,17 @@ export class SnippetContainer extends LitElement {
     title_elem.readOnly = true;
 
     if (this.snippet.title !== title_elem.value) {
-      console.log("title changed!");
-      let r = await this.snippet_controler.updateTitle(this.snippet.id, title_elem.value);
-      if(r === false) {
-        title_elem.value = this.snippet.title;
-      }
+      // console.log("title changed!");
+      await SnippetInvoker.updateTitle(this.snippet.id, title_elem.value)
+        .then((_result_flag) => {})
+        .catch((err) => {
+          console.log(err);
+          title_elem.value = this.snippet.title;
+        })
+      // let r = await this.snippet_controler.updateTitle(this.snippet.id, title_elem.value);
+      // if(r === false) {
+      //   title_elem.value = this.snippet.title;
+      // }
     }
   }
   onTitleKeyDown = (ev: KeyboardEvent) => {
@@ -68,14 +78,28 @@ export class SnippetContainer extends LitElement {
 
     const index = this.snippet.tags.findIndex(e => e.id === id);
     if (index === -1) {
-      this.snippet_controler.addTag(id);
+      //this.snippet_controler.addTag(id);
+      await SnippetInvoker.addTag(id, this.snippet.id)
+        .then((tag_result) => {
+          this.snippet = { ...this.snippet, tags: tag_result };
+        })
+        .catch((err) => {
+          console.log(err);
+        })
     }
   }
 
   removeTag = async (ev:CustomEvent) => {
 
-    this.snippet_controler.removeTag(this.snippet.id, ev.detail.tag_id)
-    console.log("removetag: ", this.snippet.id, ev.detail.tag_id);
+    await SnippetInvoker.removeTag(this.snippet.id, ev.detail.tag_id)
+      .then((tag_result) => {
+        this.snippet = { ...this.snippet, tags: tag_result };
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    //this.snippet_controler.removeTag(this.snippet.id, ev.detail.tag_id)
+    //console.log("removetag: ", this.snippet.id, ev.detail.tag_id);
 
   }
 
@@ -97,8 +121,8 @@ export class SnippetContainer extends LitElement {
     let pattern = (ev.target as HTMLInputElement).value;
 
     if (pattern.length >= 3) {
-
-      let tags: Array<Tag> = await this.snippet_controler.searchTags(pattern);
+      console.log(SnippetInvoker.searchTags);
+      let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
 
       for (const t of tags) {
 
@@ -136,7 +160,7 @@ export class SnippetContainer extends LitElement {
             <details id="footer" class="footer">
                 <summary><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <div class="tag-search-container">
-                    <input class="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
+                    <input class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
                     <div id="tag-search-result"></div>
                 </div>
             </details>

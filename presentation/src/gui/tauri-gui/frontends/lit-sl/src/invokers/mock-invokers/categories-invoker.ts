@@ -31,8 +31,8 @@ export default class CategoriesInvoker implements ReactiveController {
 
   init_handlers() {
     this.host.addEventListener('update-parent-category', this.onUpdateParentCategory);
-    this.host.addEventListener('update_category_title', this.onUpdateCategoryTitle);
-    this.host.addEventListener('add_category', this.onAddCategory);
+    this.host.addEventListener('update-category-title', this.onUpdateCategoryTitle);
+    this.host.addEventListener('add-category', this.onAddCategory);
     this.host.addEventListener('delete_category', this.onDeleteCategory);
 
   }

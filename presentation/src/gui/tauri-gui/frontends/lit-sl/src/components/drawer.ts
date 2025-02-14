@@ -4,7 +4,7 @@ import { customElement, state } from 'lit/decorators.js';
 import sharedStyles from '../styles/shared-styles.js';
 
 @customElement('drawer-comp')
-export class drawer extends LitElement {
+export class Drawer extends LitElement {
   static styles = [
     sharedStyles,
     css `
@@ -48,11 +48,13 @@ export class drawer extends LitElement {
           bottom: 15px;
           transform: translateY(100%);
           opacity: 0;
-          transition:
-            all .5s;
+          transition: all .5s;
+          box-shadow: var(--shadow-medium);
+          border: var(--border-style) var(--border-width) var(--border-color);
+          border-radius: var(--border-radius-medium);
       }
       ::backdrop {
-          backdrop-filter: blur(3px);
+          backdrop-filter: blur(2px);
       }
       @starting-style {
           [popover]:popover-open {
@@ -77,6 +79,10 @@ export class drawer extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
 
+  }
+  close() {
+    const popover = this.shadowRoot?.getElementById("thepopover")!;
+    popover.hidePopover();
   }
   protected firstUpdated(_changedProperties: PropertyValues): void {
     const popover = this.shadowRoot?.getElementById("thepopover")!;

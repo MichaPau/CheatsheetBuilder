@@ -14,7 +14,7 @@ export default css`
     flex-direction: column;
     background-color: var(--panel-background-color);
     box-shadow: var(--shadow-small);
-    border: solid var(--border-width) var(--border-color);
+    border: var(--border-style) var(--border-width) var(--border-color);
     border-radius: var(--border-radius-medium);
 }
 .card > * {

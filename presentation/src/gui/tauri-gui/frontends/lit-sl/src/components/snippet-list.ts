@@ -4,8 +4,6 @@ import { consume, ContextConsumer } from '@lit/context';
 
 import sharedStyles from '../styles/shared-styles.js';
 
-import { Snippet } from '../types.js';
-
 import './snippet/snippet.js';
 import { AppData, appDataContext } from '../utils/app-context.js';
 
@@ -57,7 +55,7 @@ export class SnippetList extends LitElement {
     console.log("connectedCallback");
   }
   protected firstUpdated(_changedProperties: PropertyValues): void {
-    this.dispatchEvent(new Event('get_data', { bubbles: true, composed: true }));
+    //this.dispatchEvent(new Event('get_data', { bubbles: true, composed: true }));
   }
   render() {
     return html`

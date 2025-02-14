@@ -100,14 +100,14 @@ export class CustomMenu extends LitElement {
         const new_title = this.input_elem?.value;
         if ( new_title !== this.item.title) {
           console.log("Update title to: ", new_title);
-          this.dispatchEvent(new CustomEvent('update_category_title', { bubbles: true, composed: true, detail: { tag_id: this.item.id, new_title: new_title } }));
+          this.dispatchEvent(new CustomEvent('update-category-title', { bubbles: true, composed: true, detail: { tag_id: this.item.id, new_title: new_title } }));
           this.remove();
         }
       } else if (this.action_state === MenuAction.ADD) {
         const title = this.input_elem?.value;
         if (title !== "") {
           console.log("Add new to: ", this.input_elem?.value);
-          this.dispatchEvent(new CustomEvent('add_category', { bubbles: true, composed: true, detail: { parent_id: this.item.id, title: title } }));
+          this.dispatchEvent(new CustomEvent('add-category', { bubbles: true, composed: true, detail: { parent_id: this.item.id, title: title } }));
           this.remove();
         }
       }

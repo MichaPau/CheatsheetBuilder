@@ -42,16 +42,17 @@ export { default as TagListInvoker} from './invokers/mock-invokers/tag-list-invo
 
 declare global {
   interface GlobalEventHandlersEventMap {
-    'get_data': Event;
+    'reload-snippets': Event;
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;
     'get-parent-tags': CustomEvent<{tag_id: number}>;
     'remove-tag-from-snippet': CustomEvent<{tag_id: number }>;
     'tree-sync-finished': Event;
-    'category_toggle': CustomEvent<{ tag_id: number, open: boolean }>;
-    'update_category_title': CustomEvent<{ tag_id: number, new_title: string}>;
+    'category-toggle': CustomEvent<{ tag_id: number, open: boolean }>;
+    'set-selected-categories': CustomEvent<{ids: number[]}>;
+    'update-category-title': CustomEvent<{ tag_id: number, new_title: string}>;
     'delete_category': CustomEvent<{ tag_id: number, title: string }>;
-    'add_category': CustomEvent<{ parent_id: number, title: string }>;
-    'create_snippet': CustomEvent<{ snippet: Snippet}>;
+    'add-category': CustomEvent<{ parent_id: number, title: string }>;
+    'create-snippet': CustomEvent<{ snippet: Snippet}>;
     //'change-category-selection': CustomEvent<{id: number, state: boolean}>
   }
 }

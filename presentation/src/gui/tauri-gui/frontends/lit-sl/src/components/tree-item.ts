@@ -189,7 +189,7 @@ export class TreeItem extends LitElement {
 
     //console.log("details toggle in treeitem");
     const open = ev.newState === 'open' ? true : false;
-    this.dispatchEvent(new CustomEvent('category_toggle', { detail: { tag_id: id, open}, bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent('category-toggle', { detail: { tag_id: id, open}, bubbles: true, composed: true }));
   }
   onCreateMenu(ev: MouseEvent) {
     ev.preventDefault();

@@ -64,6 +64,11 @@ export class App extends LitElement {
             transform: translateY(25%);
         }
       }
+
+      create-snippet {
+        width: 500px;
+        height: 300px;
+      }
     `
   ];
 
@@ -139,11 +144,7 @@ export class App extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     console.log("connectedCallback main");
-    this.addEventListener("set-selected-categories", (ev: Event) => {
-      let ids = (ev as CustomEvent).detail;
-      console.log("main::setting ids: ",ids);
-      this.appSettings = {...this.appSettings, selected_categories: ids};
-    });
+
   }
 
   protected async firstUpdated(_changedProperties: PropertyValues) {

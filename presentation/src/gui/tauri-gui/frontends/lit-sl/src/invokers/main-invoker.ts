@@ -25,10 +25,16 @@ export default class MainInvoker implements ReactiveController {
 
 
   hostConnected(): void {
-    this.host.addEventListener('create_snippet', (_ev: CustomEvent) => {
-      //todo
-    });
+    this.host.addEventListener('create-snippet', this.createSnippet);
+    this.host.addEventListener('set-selected-categories', this.setSelectedCategories);
   }
-
+  setSelectedCategories(ev: CustomEvent) {
+    let ids = (ev as CustomEvent).detail;
+    console.log("main::setting ids: ",ids);
+    this.host.appSettings = {...this.host.appSettings, selected_categories: ids};
+  }
+  createSnippet(ev: CustomEvent) {
+    //todo
+  }
   hostDisconnected(): void {}
 }

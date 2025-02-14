@@ -1,24 +1,21 @@
-import { ReactiveController, ReactiveControllerHost } from "lit";
-import { SnippetContainer } from "../components/snippet";
 
 import { invoke } from "@tauri-apps/api/core";
 import { Tag } from "../types";
 
-export default class SnippetInvoker implements ReactiveController {
-  private host: SnippetContainer;
+export default class SnippetInvoker {
 
-  constructor(host: ReactiveControllerHost & SnippetContainer) {
-    this.host = host;
-    this.host.addController(this);
-  }
+  static async addTag(tag_id: number, snippet_id: number): Promise<Array<Tag>> {
+    return new Promise(async (resolve, reject) => {
+      let result: Array<Tag> = await invoke("append_tag", { snippetId: snippet_id, tagId: tag_id }) as Array<Tag>;
+      if (result) {
+        resolve(result);
+      } else {
+        reject("SnippetInvoker::addTag no result");
+      }
+    });
 
-  async addTag(tag_id: number) {
-    let result: Array<Tag> = await invoke("append_tag", { snippetId: this.host.snippet.id, tagId: tag_id }) as Array<Tag>;
-    if (result) {
-      this.host.tagResult(result, true);
-    }
   }
-  async searchTags(pattern: string) {
+  static async searchTags(pattern: string): Promise<Array<Tag>> {
     let search_tags_result: Array<Tag> = await invoke("search_tags", { pattern: pattern, }).catch(err => {
       console.log(err);
       return [];
@@ -26,23 +23,31 @@ export default class SnippetInvoker implements ReactiveController {
     return search_tags_result;
   }
 
-  async updateTitle(id: number, new_title: string) {
-    let update_result = await invoke("update_snippet_title", { id: id, newTitle: new_title }).catch(err => {
-      console.log(err);
-      return false;
+  static async updateTitle(id: number, new_title: string): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      await invoke("update_snippet_title", { id: id, newTitle: new_title }).then((_result)=> {
+        resolve(true);
+      }).catch(err => {
+        console.log(err);
+        reject(false);
+      });
+
     });
-    return update_result;
-  }
-
-  async removeTag(snippet_id: number, tag_id: number) {
-    let result: Array<Tag> = await invoke("remove_tag_from_snippet", { snippetId: snippet_id, tagId: tag_id }) as Array<Tag>;
-    if (result) {
-      this.host.tagResult(result, false);
-    }
 
   }
-  hostConnected(): void {}
 
-  hostDisconnected(): void {}
+  static async removeTag(snippet_id: number, tag_id: number): Promise<Array<Tag>> {
+    return new Promise(async (resolve, reject) => {
+      let result: Array<Tag> = await invoke("remove_tag_from_snippet", { snippetId: snippet_id, tagId: tag_id }) as Array<Tag>;
+      if (result) {
+        resolve(result);
+      } else {
+        reject("SnippetInvoker::removeTag error");
+      }
+    });
+
+
+  }
+
 
 }

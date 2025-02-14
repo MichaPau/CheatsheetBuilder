@@ -1,6 +1,6 @@
-import { html, css, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import {live} from 'lit/directives/live.js';
+import { html, LitElement } from 'lit';
+import { customElement, state, query } from 'lit/decorators.js';
+
 
 import sharedStyles from '../../styles/shared-styles.js';
 import snippetStyles from './snippet-styles.js';
@@ -8,6 +8,9 @@ import { Snippet, SnippetInvoker, Tag } from '../../types.js';
 
 import './snippet-editor.js';
 import './snippet-tag-list.js';
+import { SnippetEditor } from './snippet-editor.js';
+import { Drawer } from '../drawer.js';
+
 
 @customElement('create-snippet')
 export class CreateSnippet extends LitElement {
@@ -22,13 +25,19 @@ export class CreateSnippet extends LitElement {
   @state()
   tags: Array<Tag> = [];
 
-  private default_snippet: Snippet = { id: 0, tags: [], text: "", title: "", created_at: 0, updated_at: 0, text_type: "Markdown" };
+  @query("#title-input")
+  titleInput!: HTMLInputElement;
 
-  @state()
-  snippet: Snippet = this.default_snippet;
+  @query("#editor-component")
+  editorComponent!: SnippetEditor;
 
+  @query("#tag-search-input")
+  tagSearchInput!: HTMLInputElement;
 
-  private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
+  @query("#tag-search-result")
+  tagSearchResult!: HTMLElement;
+
+  //private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -55,9 +64,9 @@ export class CreateSnippet extends LitElement {
   }
   addTag = async (tag: Tag, _ev: Event) => {
     //console.log("create-snippet::addTag", tag);
-    if (this.snippet.tags.findIndex((_t => _t.id === tag.id)) == -1) {
-      const tags = this.snippet.tags.concat(tag);
-      this.snippet = { ...this.snippet, tags };
+    if (this.tags.findIndex((_t => _t.id === tag.id)) == -1) {
+      const tags = this.tags.concat(tag);
+      this.tags = [...tags];
       const search_target = this.shadowRoot?.querySelector("#tag-search-result");
       search_target?.replaceChildren();
     }
@@ -65,30 +74,31 @@ export class CreateSnippet extends LitElement {
 
   removeTag = async (ev:CustomEvent) => {
     //console.log("create-snippet::removeTag", ev.detail.tag_id);
-    let tags = this.snippet.tags.filter((_t => _t.id !== ev.detail.tag_id));
-    this.snippet = { ...this.snippet, tags };
+    let tags = this.tags.filter((_t => _t.id !== ev.detail.tag_id));
+    this.tags = [...tags];
 
   }
-  tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
+  // tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
 
-    if (clear_search) {
-      const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-      search_target?.replaceChildren();
-      const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
-      search_input.value = "";
-    }
-    this.snippet.tags = new_tags;
-    this.requestUpdate();
-  }
+  //   if (clear_search) {
+  //     const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+  //     search_target?.replaceChildren();
+  //     const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
+  //     search_input.value = "";
+  //   }
+  //   this.snippet.tags = new_tags;
+  //   this.requestUpdate();
+  // }
   onSearchTagChange = async (ev: Event) => {
-    const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-    search_target?.replaceChildren();
+
+    this.tagSearchResult.replaceChildren();
 
     let pattern = (ev.target as HTMLInputElement).value;
 
     if (pattern.length >= 3) {
 
-      let tags: Array<Tag> = await this.snippet_controler.searchTags(pattern);
+      //let tags: Array<Tag> = await this.snippet_controler.searchTags(pattern);
+      let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
 
       for (const t of tags) {
 
@@ -99,49 +109,70 @@ export class CreateSnippet extends LitElement {
 
           tag.innerHTML = `${t.title}`;
 
-          if (this.snippet.tags.some(st => st.id === t.id)) {
+          if (this.tags.some(st => st.id === t.id)) {
             console.log("tag already included");
             tag.classList.add("disabled");
           } else {
             tag.addEventListener("click", (e) => this.addTag(t, e));
           }
 
-          search_target?.appendChild(tag);
+          this.tagSearchResult.appendChild(tag);
 
       }
     }
   }
 
   clearAndClose() {
+    this.titleInput.value = "";
+    this.tagSearchInput.value = "";
+
+    this.editorComponent.text_data = "";
+    this.tags = [];
+
+    this.tagSearchResult.replaceChildren();
+
+    const t = this.shadowRoot?.host!;
+    const p = t.parentElement as Drawer;
+    if(p) {
+      p.close();
+    }
 
   }
   onCancel= (_ev:Event) => {
+    this.clearAndClose();
 
-    //this.snippet = { ...this.default_snippet };
-    this.snippet = { id: 10000, tags: [], text: "", title: "", created_at: 0, updated_at: 0, text_type: "Markdown" };
-    console.log("create-snippet::onCancel", this.snippet);
-    //his.requestUpdate();
   }
 
-  onSave(_ev: Event) {
-    this.dispatchEvent(new CustomEvent('create_snippet', { detail: { snippet: this.snippet }, bubbles: true, composed: true }));
+  async onSave(_ev: Event) {
+    const snippet: Snippet = { id: 0, title: this.titleInput.value, text: this.editorComponent.text_data, tags: this.tags, text_type: "Markdown", created_at: 0, updated_at: 0 };;
+    //this.dispatchEvent(new CustomEvent('create-snippet', { detail: { snippet: snippet }, bubbles: true, composed: true }));
+    await SnippetInvoker.createSnippet(snippet)
+      .then((_) => {
+        this.dispatchEvent(new Event('reload-snippets', { bubbles: true, composed: true}));
+        this.clearAndClose();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
   }
   render() {
     return html`
         <div class="snippet-item card">
             <div id="header">
                 <input readonly class="snippet-title-label"
+                    id="title-input"
                     @click=${this.onEditTitle}
                     @blur=${this.onBlurTitle}
                     @keydown=${this.onTitleKeyDown}
-                    .value=${live(this.snippet.title)}
+                    value=""
                     />
             </div>
-            <snippet-editor id="editor-component" .text_data=${live(this.snippet.text)}></snippet-editor>
+            <snippet-editor id="editor-component"></snippet-editor>
             <details id="footer" class="footer">
-                <summary><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
+                <summary><snippet-tag-list .tag_list=${this.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <div class="tag-search-container">
-                    <input class="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
+                    <input id="tag-search-input" class="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
                     <div id="tag-search-result"></div>
                 </div>
             </details>
