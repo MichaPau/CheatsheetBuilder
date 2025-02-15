@@ -16,16 +16,22 @@ export default class MainInvoker implements ReactiveController {
   }
 
   async load_data() {
-    //console.log("load data");
+    console.log("load data", this);
     const snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
     this.host.appData = { ... this.host.appData, snippets };
     //console.log(this.host.appData.snippets);
   }
 
+  reload_data = async (_ev: Event) => {
+    console.log("reload data", this);
+    const snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
+    this.host.appData = { ... this.host.appData, snippets };
+  }
+
 
 
   hostConnected(): void {
-    this.host.addEventListener('create-snippet', this.createSnippet);
+    this.host.addEventListener('reload-snippets', this.reload_data);
     this.host.addEventListener('set-selected-categories', this.setSelectedCategories);
   }
   setSelectedCategories(ev: CustomEvent) {
@@ -33,8 +39,6 @@ export default class MainInvoker implements ReactiveController {
     console.log("main::setting ids: ",ids);
     this.host.appSettings = {...this.host.appSettings, selected_categories: ids};
   }
-  createSnippet(ev: CustomEvent) {
-    //todo
-  }
+
   hostDisconnected(): void {}
 }

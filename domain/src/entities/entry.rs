@@ -140,6 +140,15 @@ impl From<usize> for TextType {
         }
     }
 }
+impl From<&str> for TextType {
+    fn from(value: &str) -> Self {
+        match value {
+            "Text" => TextType::Text,
+            "Markdown" => TextType::Markdown,
+            _ => TextType::Text,
+        }
+    }
+}
 #[derive(Debug, Clone)]
 pub struct CreateTag {
     pub title: String,

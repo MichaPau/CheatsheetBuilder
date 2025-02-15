@@ -1,6 +1,6 @@
 
 import { invoke } from "@tauri-apps/api/core";
-import { Tag } from "../types";
+import { Snippet, Tag } from "../types";
 
 export default class SnippetInvoker {
 
@@ -46,8 +46,21 @@ export default class SnippetInvoker {
       }
     });
 
+  }
+  static async createSnippet(snippet: Snippet): Promise<boolean> {
+
+    console.log("SnippetInvoker::createSnippet");
+    const tagIds = snippet.tags.map((tag) => tag.id);
+
+    return new Promise(async (resolve, reject) => {
+      await invoke("create_snippet", { title: snippet.title, text: snippet.text, textType: snippet.text_type, tagIds: tagIds })
+        .then((_result) => {
+          console.log("result: ", _result);
+          resolve(true);
+        })
+        .catch((err) => reject("Error createSnippet: " + err));
+    });
 
   }
-
 
 }

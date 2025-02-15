@@ -53,7 +53,7 @@ impl Rusqlite {
                 | OpenFlags::SQLITE_OPEN_NO_MUTEX,
         )?;
 
-        let mut db = Self {
+        let db = Self {
             conn: Mutex::new(conn),
         };
 
@@ -357,6 +357,19 @@ impl TagStore for Rusqlite {
     fn add_tag(&self, tag: CreateTag) -> Result<Tag, CheatsheetError> {
         let c = self.conn.try_lock().unwrap();
 
+        println!("add_tag: {:?}", tag.parent_id);
+        if let Some(parent_id) = tag.parent_id {
+            //check if parent exists
+            let mut parent_tag: rusqlite::Result<Tag> =
+                c.query_row("SELECT * FROM Tag WHERE tag_id = ?1", [parent_id], |r| {
+                    self.create_tag_from_row(r)
+                    //self.create_snippet_from_row(r, &c)
+                });
+            println!("{:?}", parent_tag);
+            if parent_tag.is_err() {
+                return Err(CheatsheetError::CreateTagError("parent_id does not exists".into()));
+            }
+        }
         let color_option: Option<u32> = tag.tag_style.clone().map(|o| o.color.into());
         c.execute(
             "INSERT INTO Tag (title, parent_id, tag_type, tag_color) VALUES (?1, ?2, ?3, ?4)",

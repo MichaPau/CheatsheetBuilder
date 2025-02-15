@@ -8,9 +8,9 @@ pub enum CheatsheetError {
     SnippetError,
     StoreError(String),
     CreateSnippetError,
+    CreateTagError(String),
     TagError,
     SnippetListError,
     UnknownError,
     NotImplemented(String),
 }
-
