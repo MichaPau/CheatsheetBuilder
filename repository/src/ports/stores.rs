@@ -22,7 +22,7 @@ pub trait SnippetStore {
     fn remove_tag_from_all(&self, tag_id: TagID) -> Result<usize, CheatsheetError>;
     fn append_tag(&self, snippet_id: SnippetID, tag_id: TagID) -> Result<bool, CheatsheetError>;
     fn remove_tag(&self, snippet_id: SnippetID, tag_id: TagID) -> Result<bool, CheatsheetError>;
-    fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError>;
+    fn update_text(&self, id: SnippetID, new_text: String, text_type: TextType) -> Result<bool, CheatsheetError>;
     fn update_title(&self, id: SnippetID, new_title: String) -> Result<bool, CheatsheetError>;
     fn get_snippet_list(
         &self,

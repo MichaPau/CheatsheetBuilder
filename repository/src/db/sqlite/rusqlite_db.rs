@@ -236,14 +236,14 @@ impl SnippetStore for Rusqlite {
 
         Ok(count)
     }
-    fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError> {
+    fn update_text(&self, id: SnippetID, new_text: String, text_type: TextType) -> Result<bool, CheatsheetError> {
         let ts = u64::from(Timestamp::from_utc_now());
 
         let c = self.conn.try_lock().unwrap();
 
         c.execute(
-            "UPDATE Snippet SET text = ?1, updated_at = ?2 WHERE snippet_id = ?3",
-            (new_text, ts, id),
+            "UPDATE Snippet SET text = ?1, text_type = ?2, updated_at = ?3 WHERE snippet_id = ?4",
+            (new_text, text_type as usize, ts, id),
         )?;
 
         Ok(true)

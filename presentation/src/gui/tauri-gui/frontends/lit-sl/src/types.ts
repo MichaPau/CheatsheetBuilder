@@ -53,6 +53,7 @@ declare global {
     'delete_category': CustomEvent<{ tag_id: number, title: string }>;
     'add-category': CustomEvent<{ parent_id: number, title: string }>;
     'create-snippet': CustomEvent<{ snippet: Snippet}>;
+    'editor-content-update': CustomEvent<{ content_text: string, text_type: TextType }>,
     //'change-category-selection': CustomEvent<{id: number, state: boolean}>
   }
 }

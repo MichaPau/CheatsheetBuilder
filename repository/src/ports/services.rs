@@ -1,6 +1,5 @@
 use domain::entities::entry::{
-    CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType,
-    Timestamp,
+    CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType, TextType, Timestamp
 };
 
 use crate::errors::CheatsheetError;
@@ -30,8 +29,8 @@ impl Service {
 
         self.store.add_entry(entry)
     }
-    pub fn update_text(&self, id: SnippetID, new_text: String) -> Result<bool, CheatsheetError> {
-        self.store.update_text(id, new_text)
+    pub fn update_text(&self, id: SnippetID, new_text: String, text_type: TextType) -> Result<bool, CheatsheetError> {
+        self.store.update_text(id, new_text, text_type)
     }
     pub fn update_title(&self, id: SnippetID, new_title: String) -> Result<bool, CheatsheetError> {
         self.store.update_title(id, new_title)

@@ -21,6 +21,7 @@ export default css`
     padding: var(--spacing-medium);
 }
 #header {
+    display: flex;
     border-bottom: solid var(--border-width) var(--border-color);
 }
 .snippet-item {

@@ -1,6 +1,7 @@
 
 import { invoke } from "@tauri-apps/api/core";
-import { Snippet, Tag } from "../types";
+import { Snippet, Tag, TextType } from "../types";
+import { ConfirmDialog } from "../components/confirm-dialog";
 
 export default class SnippetInvoker {
 
@@ -35,7 +36,47 @@ export default class SnippetInvoker {
     });
 
   }
+  static async deleteSnippet(id: number): Promise<boolean> {
 
+      return new Promise(async (resolve, reject) => {
+        const dlg = new ConfirmDialog();
+        dlg.message = "Delete snippet " + id + "?";
+        document.body.appendChild(dlg);
+        let answer = await dlg.confirm();
+
+        if (answer) {
+          await invoke("delete_snippet", { id: id }).then((_result) => {
+            resolve(true);
+          }).catch((err) => {
+            reject(err);
+          });
+        } else {
+          reject("delete canceled");
+        }
+
+      });
+
+  }
+
+  static async updateTextContent(id: number, new_content: string, text_type: TextType): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      await invoke("update_snippet_text", { id: id, newText: new_content, textType: text_type }).then((_result) => {
+        resolve(true);
+      }).catch((err) => {
+        console.log(err);
+        reject(err);
+      })
+    });
+  }
+
+  static async createTag(snippet_id: number, title: string): Promise<Array<Tag>> {
+    return new Promise(async (resolve, reject) => {
+      await invoke("create_tag", { title })
+        .then((result) => SnippetInvoker.addTag((result as Tag).id, snippet_id))
+        .then((result) => resolve(result))
+        .catch((err) => reject(err));
+    });
+  }
   static async removeTag(snippet_id: number, tag_id: number): Promise<Array<Tag>> {
     return new Promise(async (resolve, reject) => {
       let result: Array<Tag> = await invoke("remove_tag_from_snippet", { snippetId: snippet_id, tagId: tag_id }) as Array<Tag>;

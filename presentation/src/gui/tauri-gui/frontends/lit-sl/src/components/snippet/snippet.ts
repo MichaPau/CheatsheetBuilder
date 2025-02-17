@@ -6,12 +6,14 @@ import snippetStyles from './snippet-styles.js';
 import { Snippet, Tag, SnippetInvoker } from '../../types.js';
 //import SnippetInvoker from '../../invokers/mock-invokers/snippet-invoker.js';
 
+import {BaseElement } from '../../utils/base-element.js';
 import './snippet-editor.js';
 import './snippet-tag-list.js';
 
 @customElement('snippet-item')
-export class SnippetContainer extends LitElement {
+export class SnippetContainer extends BaseElement {
   static styles = [
+    super.styles,
     sharedStyles,
     snippetStyles,
   ];
@@ -52,9 +54,11 @@ export class SnippetContainer extends LitElement {
     if (this.snippet.title !== title_elem.value) {
       // console.log("title changed!");
       await SnippetInvoker.updateTitle(this.snippet.id, title_elem.value)
-        .then((_result_flag) => {})
-        .catch((err) => {
-          console.log(err);
+        .then((_result_flag) => {
+          super.showSuccess();
+        })
+        .catch((_err) => {
+          super.showError();
           title_elem.value = this.snippet.title;
         })
       // let r = await this.snippet_controler.updateTitle(this.snippet.id, title_elem.value);
@@ -89,6 +93,16 @@ export class SnippetContainer extends LitElement {
     }
   }
 
+  createTag = async (title: string) => {
+    await SnippetInvoker.createTag(this.snippet.id, title).then((tag_result) => {
+      this.snippet = { ...this.snippet, tags: tag_result };
+      super.showSuccess();
+      this.clearTagSearchResult();
+    }).catch((err) => {
+      console.log("create-tag:", err);
+      super.showError();
+    });
+  }
   removeTag = async (ev:CustomEvent) => {
 
     await SnippetInvoker.removeTag(this.snippet.id, ev.detail.tag_id)
@@ -103,17 +117,23 @@ export class SnippetContainer extends LitElement {
 
   }
 
-  tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
-
-    if (clear_search) {
-      const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-      search_target?.replaceChildren();
-      const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
-      search_input.value = "";
-    }
-    this.snippet.tags = new_tags;
-    this.requestUpdate();
+  clearTagSearchResult() {
+        const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+        search_target?.replaceChildren();
+        const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
+        search_input.value = "";
   }
+  // tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
+
+  //   if (clear_search) {
+  //     const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+  //     search_target?.replaceChildren();
+  //     const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
+  //     search_input.value = "";
+  //   }
+  //   this.snippet.tags = new_tags;
+  //   this.requestUpdate();
+  // }
   onSearchTagChange = async (ev: Event) => {
     const search_target = this.shadowRoot?.querySelector("#tag-search-result");
     search_target?.replaceChildren();
@@ -127,23 +147,46 @@ export class SnippetContainer extends LitElement {
       for (const t of tags) {
 
           var tag = document.createElement("div");
-          //tag.setAttribute("tabindex", "0");
           tag.classList.add("tag");
           t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
 
           tag.innerHTML = `${t.title}`;
 
           if (this.snippet.tags.some(st => st.id === t.id)) {
-            console.log("tag already included");
             tag.classList.add("disabled");
           } else {
             tag.addEventListener("click", (e) => this.addTag(t.id, e));
           }
-
           search_target?.appendChild(tag);
+      }
 
+      if(tags.findIndex((tag) => tag.title === pattern) === -1) {
+        var tag = document.createElement("div");
+        tag.classList.add("tag");
+        tag.classList.add("create");
+
+        tag.innerHTML = `${pattern}`;
+        tag.addEventListener("click", (_e) => this.createTag(pattern));
+
+        search_target?.appendChild(tag);
       }
     }
+  }
+
+  async removeSnippet(_ev:Event) {
+    await SnippetInvoker.deleteSnippet(this.snippet.id)
+      .then((_result) => {
+        this.dispatchEvent(new Event('reload-snippets', { bubbles: true, composed: true }));
+      }).catch(_err => super.showError());
+  }
+  async editorContentUpdate(ev: CustomEvent) {
+    await SnippetInvoker.updateTextContent(this.snippet.id, ev.detail.content_text, ev.detail.text_type)
+      .then((_result) => {
+        super.showSuccess();
+      })
+      .catch((_err) => {
+        super.showError();
+      });
   }
   render() {
     return html`
@@ -155,8 +198,10 @@ export class SnippetContainer extends LitElement {
                         @keydown=${this.onTitleKeyDown}
                         value=${this.snippet.title}
                         />
+                    <button @click=${this.removeSnippet}>X</button>
             </div>
-            <snippet-editor id="editor-component" .text_data=${this.snippet.text}></snippet-editor>
+
+            <snippet-editor id="editor-component" .text_data=${this.snippet.text} @editor-content-update=${this.editorContentUpdate}></snippet-editor>
             <details id="footer" class="footer">
                 <summary><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <div class="tag-search-container">

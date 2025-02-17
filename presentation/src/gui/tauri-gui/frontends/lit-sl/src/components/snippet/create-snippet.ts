@@ -157,6 +157,7 @@ export class CreateSnippet extends LitElement {
 
   }
   render() {
+
     return html`
         <div class="snippet-item card">
             <div id="header">
@@ -177,8 +178,8 @@ export class CreateSnippet extends LitElement {
                 </div>
             </details>
             <div>
-                <input type="button" value="Cancel" @click=${this.onCancel}>
-                <input type="button" value="Save" @click=${this.onSave}>
+                <button type="button" @click=${this.onCancel}>Cancel</button>
+                <button type="button" @click=${this.onSave}>Save</button>
             </div>
 
         </div>

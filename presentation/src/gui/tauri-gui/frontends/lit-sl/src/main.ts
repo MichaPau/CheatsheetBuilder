@@ -113,11 +113,11 @@ export class App extends LitElement {
   @state()
   snippets: Array<Snippet> = [];
 
-  private main_controler = new MainInvoker(this);
+  public main_controller = new MainInvoker(this);
 
   constructor() {
     super();
-    this.main_controler.load_data();
+    this.main_controller.load_data();
     //console.log("USE_MOCK_DATA:", import.meta.env.VITE_USE_MOCK_DATA);
     //this.main_controler.init_handlers();
 
@@ -159,6 +159,7 @@ export class App extends LitElement {
         <header class="header">
         <div class="content-wrapper">
             <button @click=${this.toggleStyle}>Test</button>
+            <input type="button" value="type button"/>
         </div>
           </header>
           <aside class="sidebar">

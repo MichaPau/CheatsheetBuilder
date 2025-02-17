@@ -1,6 +1,6 @@
 use domain::{
     //entities::entry::{CreateSnippet, CreateTag, TagType, TextType},
-    utils::types::Timestamp,
+    entities::entry::TextType, utils::types::Timestamp
 };
 
 use core::time;
@@ -67,7 +67,7 @@ fn test_02_list_filter() -> TestResult {
     thread::sleep(time::Duration::from_secs(2));
     let ts_before = Timestamp::from_utc_now();
     let _flag = db
-        .update_text(1, "first content with new content".into())
+        .update_text(1, "first content with new content".into(), TextType::Text)
         .unwrap();
     let ts_after = Timestamp::from_utc_now();
 

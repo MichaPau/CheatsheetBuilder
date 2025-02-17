@@ -13,6 +13,7 @@ export class TreeItem extends LitElement {
     css`
       :host {
         display: block;
+        margin: var(--spacing-small);
         --spacing: var(--spacing-tree);
       }
 

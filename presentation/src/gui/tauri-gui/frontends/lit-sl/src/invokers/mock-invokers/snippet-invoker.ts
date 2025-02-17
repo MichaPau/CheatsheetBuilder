@@ -1,6 +1,7 @@
 
 
-import { Snippet, Tag } from "../../types";
+import { ConfirmDialog } from "../../components/confirm-dialog";
+import { Snippet, Tag, TextType } from "../../types";
 import { snippet_tags, snippets, tags } from "./mockData";
 
 
@@ -39,8 +40,45 @@ export default class SnippetInvoker  {
       }
 
     });
+  }
+
+  static async updateTextContent(id: number, new_content: string, text_type: TextType): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let snippet = snippets.find(item => item.id === id);
+      if(snippet) {
+        snippet.text = new_content;
+        snippet.text_type = text_type;
+
+        resolve(true);
+      } else {
+        reject("updateTextContent::Snippet not found");
+      }
+
+    });
+  }
+
+  static async deleteSnippet(id: number): Promise<boolean> {
 
 
+    return new Promise( async (resolve, reject) => {
+      let index = snippets.findIndex(item => item.id === id);
+
+        const dlg = new ConfirmDialog();
+        dlg.message = "Delete snippet " + id + "?";
+        document.body.appendChild(dlg);
+        let answer = await dlg.confirm();
+
+          if (answer) {
+            const removed = snippets.splice(index, 1);
+            if(removed.length === 1) {
+              resolve(true);
+            } else {
+              reject("Snippet to remove not found");
+            }
+          } else {
+            reject("delete snippet canceled");
+          }
+    });
   }
 
   static async removeTag(snippet_id: number, tag_id: number): Promise<Array<Tag>> {

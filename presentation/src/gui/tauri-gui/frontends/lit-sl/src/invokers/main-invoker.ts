@@ -16,16 +16,18 @@ export default class MainInvoker implements ReactiveController {
   }
 
   async load_data() {
-    console.log("load data", this);
+    //console.log("load data", this);
     const snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
-    this.host.appData = { ... this.host.appData, snippets };
+    const categories = await this.categories_invoker.load_categories();
+    this.host.appData = { categories, snippets };
     //console.log(this.host.appData.snippets);
   }
 
   reload_data = async (_ev: Event) => {
-    console.log("reload data", this);
+    //console.log("reload data", this);
     const snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
-    this.host.appData = { ... this.host.appData, snippets };
+    const categories = await this.categories_invoker.load_categories();
+    this.host.appData = { categories, snippets };
   }
 
 

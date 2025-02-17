@@ -161,6 +161,7 @@ export class SnippetEditor extends LitElement {
     if (editor.value !== this.text_data) {
       this.text_data = editor.value;
       this.render_data = this.parseMarkdown(this.text_data);
+      this.dispatchEvent(new CustomEvent("editor-content-update", { detail: { content_text: this.text_data, text_type: "Markdown" } }));
     }
 
     this.edit_mode = false;

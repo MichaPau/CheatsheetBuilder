@@ -49,6 +49,14 @@ export default css`
               background-color: lch(var(--l-60) var(--tag-color-normal));
           }
       }
+      &.create {
+          background-color: lch(var(--l-80) var(--tag-color-create));
+          border: 1px solid lch(var(--l-40) var(--tag-color-create));
+
+          &:hover {
+              background-color: lch(var(--l-60) var(--tag-color-create));
+          }
+      }
 
     }
 `;

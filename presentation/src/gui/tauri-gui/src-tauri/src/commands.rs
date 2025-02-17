@@ -17,6 +17,10 @@ pub fn create_snippet(title: String, text: String, text_type: String, tag_ids: V
     app_state.service.add_entry(entry)
 }
 #[tauri::command]
+pub fn delete_snippet(id: usize, app_state: State<'_, AppState>) -> Result<Snippet, CheatsheetError> {
+    app_state.service.delete_entry(id)
+}
+#[tauri::command]
 pub fn update_snippet_title(
     id: SnippetID,
     new_title: String,
@@ -28,9 +32,10 @@ pub fn update_snippet_title(
 pub fn update_snippet_text(
     id: SnippetID,
     new_text: String,
+    text_type: String,
     app_state: State<'_, AppState>,
 ) -> Result<bool, CheatsheetError> {
-    app_state.service.update_text(id, new_text)
+    app_state.service.update_text(id, new_text, text_type.as_str().into())
 }
 
 #[tauri::command]
@@ -106,7 +111,20 @@ pub fn create_category(
     let new_tag = app_state.service.add_tag(tag);
     new_tag
 }
-
+#[tauri::command]
+pub fn create_tag(
+    title: String,
+    app_state: State<'_, AppState>,
+) -> Result<Tag, CheatsheetError> {
+    let tag: CreateTag = CreateTag {
+        parent_id : None,
+        title,
+        tag_type: TagType::Normal,
+        tag_style: None,
+    };
+    let new_tag = app_state.service.add_tag(tag);
+    new_tag
+}
 #[tauri::command]
 pub fn get_snippet_count_for_tag(
     tag_id: usize,

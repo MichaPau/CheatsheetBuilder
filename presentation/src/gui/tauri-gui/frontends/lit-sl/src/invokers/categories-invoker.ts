@@ -15,13 +15,18 @@ export default class CategoriesInvoker implements ReactiveController {
     this.host.addController(this);
   }
 
-  async load_data() {
+  async load_categories() {
     const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-    this.host.appData = { ... this.host.appData, categories:  this.buildTreeArray(load_categories)};
+    return this.buildTreeArray(load_categories);
+    //this.host.appData = { ... this.host.appData, categories:  this.buildTreeArray(load_categories)};
     //this.host.appData.categories = this.buildTreeArray(load_categories);
   }
+  async reload_categories() {
+    const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+    this.host.appData = { ... this.host.appData, categories:  this.buildTreeArray(load_categories)};
+  }
   hostConnected(): void {
-    this.load_data();
+    //this.load_data();
     this.init_handlers();
   }
 
@@ -39,9 +44,9 @@ export default class CategoriesInvoker implements ReactiveController {
     console.log("onUpdateCategoryTitle");
     let update_result = await invoke("update_tag_title", { tagId: ev.detail.tag_id, newTitle: ev.detail.new_title }).catch(err => console.log(err));
     if(update_result) {
-      const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
+      //const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
       //this.host.categories = this.buildTreeArray(load_categories);
-      this.load_data();
+      this.host.main_controller.load_data();
     }
   }
   onDeleteCategory = async(ev: CustomEvent) => {
@@ -61,7 +66,7 @@ export default class CategoriesInvoker implements ReactiveController {
       if(delete_result) {
         //const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
         //this.host.categories = this.buildTreeArray(load_categories);
-        this.load_data();
+        this.reload_categories();
       }
     }
 
@@ -73,7 +78,7 @@ export default class CategoriesInvoker implements ReactiveController {
     //console.log(parent_id);
     let create_tag_result = await invoke("create_category", { parentId: parent_id, title: ev.detail.title }).catch(err => console.log(err));
     if(create_tag_result) {
-      this.load_data();
+      this.reload_categories();
     }
   }
   onUpdateParentCategory = async (ev: CustomEvent) => {
@@ -82,7 +87,7 @@ export default class CategoriesInvoker implements ReactiveController {
     if (update_result) {
       // const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
       // this.host.categories = this.buildTreeArray(load_categories);
-      this.load_data();
+      this.reload_categories();
     }
 
   }
@@ -105,7 +110,7 @@ export default class CategoriesInvoker implements ReactiveController {
           //nodeMap[item.id] = { ...item, children: [] };
       });
 
-    console.log(JSON.stringify(flatArray, null, 2));
+    //console.log(JSON.stringify(flatArray, null, 2));
       // Build the tree array
     flatArray.forEach((item) => {
       //const node = nodeMap[item.id];
