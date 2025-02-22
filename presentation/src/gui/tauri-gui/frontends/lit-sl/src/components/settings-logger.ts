@@ -54,6 +54,13 @@ export class SettingsLogger extends LitElement {
                     html`<div>${id}</div>`
                 )}
             </div>
+            <div> || </div>
+            <div class="id-container">
+                Search order:
+                ${this.appSettings.search_order.map((order) =>
+                    html`<div>${order.value} ${order.order}</div>`
+                )}
+            </div>
         </div>
     `;
   }

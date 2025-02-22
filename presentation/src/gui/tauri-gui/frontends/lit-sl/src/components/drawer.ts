@@ -85,8 +85,8 @@ export class Drawer extends LitElement {
     popover.hidePopover();
   }
   protected firstUpdated(_changedProperties: PropertyValues): void {
-    const popover = this.shadowRoot?.getElementById("thepopover")!;
-    popover.showPopover();
+    // const popover = this.shadowRoot?.getElementById("thepopover")!;
+    // popover.showPopover();
   }
   render() {
     return html`

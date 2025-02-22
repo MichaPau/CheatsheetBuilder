@@ -59,7 +59,7 @@ export class SnippetEditor extends LitElement {
           border: 1px solid black;
           padding: var(--spacing-small) 0 0 var(--spacing-small);
           transition: all 0.3s;
-
+          overflow-y: auto;
 
       }
       .full {

@@ -4,9 +4,10 @@ import { customElement, state, query } from 'lit/decorators.js';
 
 import {provide} from '@lit/context';
 
-import { Snippet} from './types';
+import { Order, SearchOrder, Snippet} from './types';
 
 import './components/categories.js';
+import './components/header-comp.js';
 import './components/snippet-list.js';
 import './components/settings-logger.js';
 import './components/drawer.js';
@@ -84,6 +85,12 @@ export class App extends LitElement {
   appSettings: AppSettings = {
     open_categories: [],
     selected_categories: [],
+    search_order: [
+      { title: "title", value: "title", order: Order.NONE },
+      { title: "created", value: "createdat", order: Order.NONE },
+      { title: "updated", value: "updatedat", order: Order.NONE },
+      { title: "nonvalid", value: "nonvalidcomumn", order: Order.NONE },
+    ],
     toggle_open: (id: number, state: boolean) => {
       let open_ids = this.appSettings.open_categories.filter(i => i !== id);;
       if (state) {
@@ -93,6 +100,9 @@ export class App extends LitElement {
     },
     save_selected: (ids: Array<number>) => {
       this.appSettings = {...this.appSettings,  selected_categories: ids };
+    },
+    save_search_order: (order: Array<SearchOrder>) => {
+      this.appSettings = {...this.appSettings, search_order: order};
     },
   };
 
@@ -159,7 +169,7 @@ export class App extends LitElement {
         <header class="header">
         <div class="content-wrapper">
             <button @click=${this.toggleStyle}>Test</button>
-            <input type="button" value="type button"/>
+            <header-comp></header-comp>
         </div>
           </header>
           <aside class="sidebar">

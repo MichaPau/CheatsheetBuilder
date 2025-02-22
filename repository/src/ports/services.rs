@@ -2,7 +2,7 @@ use domain::entities::entry::{
     CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType, TextType, Timestamp
 };
 
-use crate::errors::CheatsheetError;
+use crate::{db::sqlite::rusqlite_db::Rusqlite, errors::CheatsheetError};
 
 use super::stores::StateTrait;
 
@@ -19,6 +19,13 @@ impl Service {
         Self { store }
     }
 
+    pub fn test_filter_result(&self) {
+        let db = match self.store.as_any().downcast_ref::<Rusqlite>() {
+            Some(db) => db,
+            None => panic!("downcast to Rusqlite error"),
+        };
+        db.test_filter_result();
+    }
     pub fn get_entry(&self, id: SnippetID) -> Result<Snippet, CheatsheetError> {
         self.store.get_entry(id)
     }

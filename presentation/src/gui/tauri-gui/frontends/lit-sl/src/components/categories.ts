@@ -39,8 +39,8 @@ export class Categories extends LitElement {
   @state()
   appSettings!: AppSettings;
 
-  @consume({ context: saveSettingsContext, subscribe: true })
-  update_selection!: (selected_ids: Array<number>) => void;
+  // @consume({ context: saveSettingsContext, subscribe: true })
+  // update_selection!: (selected_ids: Array<number>) => void;
 
   @consume({ context: appDataContext, subscribe: true })
   @state()

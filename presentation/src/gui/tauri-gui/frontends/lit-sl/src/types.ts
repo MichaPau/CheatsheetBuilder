@@ -20,6 +20,18 @@ export type Snippet = {
 
 export type TextType = "Text" | "Markdown";
 
+export enum Order {
+  NONE,
+  ASC,
+  DESC,
+}
+
+export type SearchOrder = {
+  title: string,
+  value: string,
+  order: Order,
+}
+
 // export type TreeCategory = {
 //     item: Tag,
 //     selected: boolean | undefined,

@@ -1,4 +1,4 @@
-use std::{path::Path, sync::Mutex, time};
+use std::{any::Any, path::Path, sync::Mutex, time};
 
 use domain::{
     entities::entry::*,
@@ -16,6 +16,11 @@ pub struct Rusqlite {
     pub conn: Mutex<Connection>,
 }
 
+impl StateTrait for Rusqlite {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
 impl Rusqlite {
     pub fn new<P: AsRef<Path>>(path: P) -> rusqlite::Result<Self> {
         let conn = Connection::open(path)?;
@@ -68,6 +73,9 @@ impl Rusqlite {
         let r = backup.run_to_completion(5, time::Duration::from_millis(250), None);
 
         r
+    }
+    pub fn test_filter_result(&self) {
+        println!("rusqlite_db::test_call");
     }
     pub fn create_dummy_entries(&mut self) -> rusqlite::Result<bool> {
         self.conn
@@ -152,7 +160,7 @@ impl Rusqlite {
     }
 }
 
-impl StateTrait for Rusqlite {}
+//impl StateTrait for Rusqlite {}
 #[allow(unused)]
 impl SnippetStore for Rusqlite {
     fn add_entry(&self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError> {

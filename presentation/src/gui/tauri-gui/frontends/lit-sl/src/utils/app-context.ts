@@ -1,5 +1,5 @@
 import {createContext} from '@lit/context';
-import { Snippet, Tag } from '../types';
+import { SearchOrder, Snippet, Tag } from '../types';
 import { TreeNode } from '../components/tree';
 
 // export type AppSettings = {
@@ -16,8 +16,10 @@ export interface AppData {
 export interface AppSettings {
   open_categories: Array<number>,
   selected_categories: Array<number>,
+  search_order: Array<SearchOrder>,
   toggle_open: (id: number, state: boolean) => void;
   save_selected: (ids: Array<number>) => void;
+  save_search_order: (order: Array<SearchOrder>) => void;
 }
 
 export const appSettingContext = createContext<AppSettings>(Symbol('app-setting-context'));

@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use domain::entities::entry::*;
 use domain::utils::types::SearchPattern;
 
@@ -5,7 +7,9 @@ use crate::errors::CheatsheetError;
 
 //use super::services::Service;
 
-pub trait StateTrait: SnippetStore + TagStore + Send + Sync + 'static {}
+pub trait StateTrait: SnippetStore + TagStore + Send + Sync + 'static {
+    fn as_any(&self) -> &dyn Any;
+}
 
 // impl StateTrait for Box<dyn StateTrait> {
 //     fn get_mut(&self) -> &mut dyn StateTrait {

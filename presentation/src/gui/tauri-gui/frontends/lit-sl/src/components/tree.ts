@@ -36,16 +36,15 @@ export class Tree extends LitElement {
   ];
 
   @state()
-  tree: TreeNode;
+  tree!: TreeNode;
 
   @state()
   category_tree: Array<TreeNode> = [];
 
   constructor() {
     super();
-    const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, open: true, selected: false, children: dummy_data };
-    //const root = { item: { id: 0, title: "Root" }, children: [] };
-    this.tree = root;
+    // const root = { item: { id: 0, title: "Root", tag_type: "Category"} as Tag, open: true, selected: false, children: [] };
+    // this.tree = root;
   }
 
   protected willUpdate(_changedProperties: PropertyValues): void {
@@ -114,89 +113,89 @@ export class Tree extends LitElement {
   }
 }
 
-const dummy_data: Array<TreeNode> = [
-  {
-    item: {
-      id: 1,
-      title: "item_1",
-      tag_type: "Category",
-    },
-    children: [
-      {
-        item: {
-          id: 11,
-          title: "item_1.1",
-          tag_type: "Category",
-          parent_id: 1,
-        },
-        children: [
-          {
-            item: {
-              id: 111,
-              title: "item_1.1.1",
-              tag_type: "Category",
-              parent_id: 11,
-            },
-            children: [],
-          },
-          {
-            item: {
-              id: 112,
-              title: "item_1.1.2",
-              tag_type: "Category",
-              parent_id: 11,
-            },
-            children: [],
-          },
-        ],
-        open: true,
-      },
-      {
-        item: {
-          id: 12,
-          title: "item_1.2",
-          tag_type: "Category",
-          parent_id: 1,
-        },
-        children: [],
-      },
-    ],
-    open: true,
-  },
-  {
-    item: {
-      id: 2,
-      title: "item_2",
-      tag_type: "Category",
-    },
-    children: [
-      {
-        item: {
-          id: 21,
-          title: "item_2.1",
-          tag_type: "Category",
-          parent_id: 2,
-        },
-        children: [],
-      },
-      {
-        item: {
-          id: 22,
-          title: "item_2.2",
-          tag_type: "Category",
-          parent_id: 2,
-        },
-        children: [],
-      },
-    ],
-    open: true,
-  },
-  {
-    item: {
-      id: 3,
-      title: "item_3",
-      tag_type: "Category",
-    },
-    children: [],
-  },
-];
+// const dummy_data: Array<TreeNode> = [
+//   {
+//     item: {
+//       id: 1,
+//       title: "item_1",
+//       tag_type: "Category",
+//     },
+//     children: [
+//       {
+//         item: {
+//           id: 11,
+//           title: "item_1.1",
+//           tag_type: "Category",
+//           parent_id: 1,
+//         },
+//         children: [
+//           {
+//             item: {
+//               id: 111,
+//               title: "item_1.1.1",
+//               tag_type: "Category",
+//               parent_id: 11,
+//             },
+//             children: [],
+//           },
+//           {
+//             item: {
+//               id: 112,
+//               title: "item_1.1.2",
+//               tag_type: "Category",
+//               parent_id: 11,
+//             },
+//             children: [],
+//           },
+//         ],
+//         open: true,
+//       },
+//       {
+//         item: {
+//           id: 12,
+//           title: "item_1.2",
+//           tag_type: "Category",
+//           parent_id: 1,
+//         },
+//         children: [],
+//       },
+//     ],
+//     open: true,
+//   },
+//   {
+//     item: {
+//       id: 2,
+//       title: "item_2",
+//       tag_type: "Category",
+//     },
+//     children: [
+//       {
+//         item: {
+//           id: 21,
+//           title: "item_2.1",
+//           tag_type: "Category",
+//           parent_id: 2,
+//         },
+//         children: [],
+//       },
+//       {
+//         item: {
+//           id: 22,
+//           title: "item_2.2",
+//           tag_type: "Category",
+//           parent_id: 2,
+//         },
+//         children: [],
+//       },
+//     ],
+//     open: true,
+//   },
+//   {
+//     item: {
+//       id: 3,
+//       title: "item_3",
+//       tag_type: "Category",
+//     },
+//     children: [],
+//   },
+// ];
