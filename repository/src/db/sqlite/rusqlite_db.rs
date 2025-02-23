@@ -1,4 +1,4 @@
-use std::{any::Any, path::Path, sync::Mutex, time};
+use std::{any::Any, collections::HashMap, path::Path, sync::Mutex, time};
 
 use domain::{
     entities::entry::*,
@@ -8,12 +8,13 @@ use rusqlite::{Connection, OpenFlags, Row};
 
 use crate::{
     errors::CheatsheetError,
-    ports::stores::{SnippetStore, StateTrait, TagStore}
+    ports::stores::{SnippetStore, StateTrait, TagStore}, types::SearchOrder
 };
 
 #[derive(Debug)]
 pub struct Rusqlite {
     pub conn: Mutex<Connection>,
+    pub table_column_map: HashMap<String, Vec<String>>,
 }
 
 impl StateTrait for Rusqlite {
@@ -26,10 +27,12 @@ impl Rusqlite {
         let conn = Connection::open(path)?;
         let mut db = Self {
             conn: Mutex::new(conn),
+            table_column_map: HashMap::new(),
         };
 
         db.create_default_tables()?;
         db.create_dummy_entries()?;
+        db.create_table_name_column_map()?;
 
         Ok(db)
     }
@@ -42,10 +45,12 @@ impl Rusqlite {
                 | OpenFlags::SQLITE_OPEN_NO_MUTEX,
         )?;
 
-        let db = Self {
+        let mut db = Self {
             conn: Mutex::new(conn),
+            table_column_map: HashMap::new(),
         };
 
+        db.create_table_name_column_map()?;
         //db.create_default_tables()?;
 
         Ok(db)
@@ -58,13 +63,36 @@ impl Rusqlite {
                 | OpenFlags::SQLITE_OPEN_NO_MUTEX,
         )?;
 
-        let db = Self {
+        let mut db = Self {
             conn: Mutex::new(conn),
+            table_column_map: HashMap::new(),
         };
 
         db.create_default_tables()?;
+        db.create_table_name_column_map()?;
         //db.create_dummy_entries()?;
         Ok(db)
+    }
+    pub fn create_table_name_column_map(&mut self) -> rusqlite::Result<bool> {
+        let c = self.conn.try_lock().unwrap();
+        let mut stmt = c.prepare("SELECT name FROM sqlite_master WHERE type='table'")?;
+        let rows = stmt.query_map([], |row| row.get(0))?;
+        let table_names: Vec<String> = rows.into_iter().filter_map(|name| name.ok()).collect();
+
+        //let mut table_map: HashMap<String, Vec<String>> = HashMap::new();
+
+        //println!("tables :{:?}", table_names);
+        for name in table_names {
+
+            let mut stmt = c.prepare("SELECT name FROM PRAGMA_TABLE_INFO(?1)")?;
+            let rows = stmt.query_map([&name], |row| row.get(0))?;
+            let column_names: Vec<String> = rows.into_iter().filter_map(|c| c.ok()).collect();
+            //println!("columns :{:?}", column_names);
+           self.table_column_map.insert(name, column_names);
+        }
+
+        //println!("table_map: {:?}", self.table_column_map);
+        Ok(true)
     }
     pub fn backup<P: AsRef<Path>>(&self, dst: P) -> rusqlite::Result<()> {
         let c = self.conn.try_lock().unwrap();
@@ -302,6 +330,7 @@ impl SnippetStore for Rusqlite {
     fn get_snippet_list(
         &self,
         tag_filter: Option<Vec<TagID>>,
+        order: Option<Vec<SearchOrder>>,
         time_boundry: Option<(Timestamp, Timestamp)>,
     ) -> Result<SnippetList, CheatsheetError> {
         let mut sql = String::from("SELECT * FROM Snippet");
@@ -332,8 +361,26 @@ impl SnippetStore for Rusqlite {
             sql.push_str(&temp);
         }
 
+        if let Some(order) = order {
+            let valid_columns = match self.table_column_map.get("Snippet") {
+                Some(columns) => columns,
+                None => &Vec::new(),
+            };
+            //let valid_columns = self.table_column_map.get("Snippet").unwrap_or(&Vec::new());
+            let orderby_str: Vec<String> = order.into_iter().filter_map(|item| {
+                if (item.order_dir != 0) && valid_columns.contains(&item.column_name) {
+                    //let str = format!("{} {}", item.column_name, item.order_dir.to_string());
+                    let str = item.to_string();
+                    Some(str)
+                } else {
+                    None
+                }
+            }).collect();
+            let order_str = format!(" ORDER BY {}", orderby_str.join(" ,"));
+            sql.push_str(&order_str);
+        }
         let c = self.conn.try_lock().unwrap();
-        //println!("the query: {}", sql);
+        // println!("the query: {}", sql);
 
         let mut stmt = c.prepare(&sql)?;
         let snippet_iter = stmt.query_map([], |row| self.create_snippet_from_row(row, &c))?;

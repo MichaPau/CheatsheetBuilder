@@ -58,10 +58,10 @@ fn test_delete_category() -> TestResult {
 fn test_02_list_filter() -> TestResult {
     let db = STATIC_DB.lock().unwrap();
 
-    let snippet_list_1 = db.get_snippet_list(Some(vec![7, 2]), None).unwrap();
+    let snippet_list_1 = db.get_snippet_list(Some(vec![7, 2]), None, None).unwrap();
     assert_eq!(snippet_list_1.len(), 5);
 
-    let snippet_list_2 = db.get_snippet_list(Some(vec![8]), None).unwrap();
+    let snippet_list_2 = db.get_snippet_list(Some(vec![8]), None, None).unwrap();
     assert_eq!(snippet_list_2.len(), 2);
 
     thread::sleep(time::Duration::from_secs(2));
@@ -72,7 +72,7 @@ fn test_02_list_filter() -> TestResult {
     let ts_after = Timestamp::from_utc_now();
 
     let snippet_list_3 = db
-        .get_snippet_list(None, Some((ts_before, ts_after)))
+        .get_snippet_list(None, None, Some((ts_before, ts_after)))
         .unwrap();
     println!("last list: {:#?}", snippet_list_3);
     assert_eq!(snippet_list_3.len(), 1);

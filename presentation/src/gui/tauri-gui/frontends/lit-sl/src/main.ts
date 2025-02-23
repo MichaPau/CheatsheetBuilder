@@ -87,8 +87,8 @@ export class App extends LitElement {
     selected_categories: [],
     search_order: [
       { title: "title", value: "title", order: Order.NONE },
-      { title: "created", value: "createdat", order: Order.NONE },
-      { title: "updated", value: "updatedat", order: Order.NONE },
+      { title: "created", value: "created_at", order: Order.NONE },
+      { title: "updated", value: "updated_at", order: Order.NONE },
       { title: "nonvalid", value: "nonvalidcomumn", order: Order.NONE },
     ],
     toggle_open: (id: number, state: boolean) => {

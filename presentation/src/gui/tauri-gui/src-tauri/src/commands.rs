@@ -1,7 +1,20 @@
-use domain::entities::entry::{CreateSnippet, CreateTag, Snippet, SnippetID, Tag, TagList, TagType};
-use repository::{errors::CheatsheetError, types::AppState};
+use std::usize;
+
+use domain::{entities::entry::{CreateSnippet, CreateTag, Snippet, SnippetID, Tag, TagType}, utils::types::Timestamp};
+use repository::{errors::CheatsheetError, types::{AppState, SearchOrder}};
 use tauri::State;
 
+#[tauri::command]
+pub fn load_config() -> Result<(), CheatsheetError> {
+    Err(CheatsheetError::NotImplemented("load config".into()))
+}
+#[tauri::command]
+pub fn test_invoke(tag_filter: Option<Vec<usize>>, order: Option<Vec<String>>, _app_state: State<'_, AppState>) -> Result<(), CheatsheetError> {
+    println!("tag_filter: {:?}", tag_filter);
+    println!("order: {:?}", order);
+
+    Err(CheatsheetError::NotImplemented("test_invoke".into()))
+}
 #[tauri::command]
 pub fn add_default_snippet(app_state: State<'_, AppState>) -> Result<Snippet, CheatsheetError> {
     app_state.service.add_entry(CreateSnippet::default())
@@ -150,8 +163,18 @@ pub fn search_tags(
     }
 }
 #[tauri::command]
-pub fn get_snippets(app_state: State<'_, AppState>) -> Result<Vec<Snippet>, CheatsheetError> {
-    let r = app_state.service.get_snippet_list(None, None);
+pub fn get_snippets(
+    tag_filter: Option<Vec<usize>>,
+    order: Option<Vec<SearchOrder>>,
+    time_boundry: Option<(u64, u64)>, app_state: State<'_, AppState>) -> Result<Vec<Snippet>, CheatsheetError> {
+
+    //println!("order: {:?}", order);
+    let tb = match time_boundry {
+        Some((from, to)) => Some((from.into(), to.into())),
+        None => None,
+    };
+
+    let r = app_state.service.get_snippet_list(tag_filter, order, tb);
     //println!("Snippets: {:?}", r);
     r
     // let snippet_result = app_state.service.get_snippet_list(None, None).unwrap();

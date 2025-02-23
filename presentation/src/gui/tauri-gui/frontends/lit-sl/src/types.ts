@@ -55,6 +55,7 @@ export { default as TagListInvoker } from './invokers/tag-list-invoker.js';
 declare global {
   interface GlobalEventHandlersEventMap {
     'reload-snippets': Event;
+    'reload_snippets-settings-change': Event;
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;
     'get-parent-tags': CustomEvent<{tag_id: number}>;
     'remove-tag-from-snippet': CustomEvent<{tag_id: number }>;

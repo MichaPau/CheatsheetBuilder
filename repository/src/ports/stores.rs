@@ -4,6 +4,7 @@ use domain::entities::entry::*;
 use domain::utils::types::SearchPattern;
 
 use crate::errors::CheatsheetError;
+use crate::types::SearchOrder;
 
 //use super::services::Service;
 
@@ -31,6 +32,7 @@ pub trait SnippetStore {
     fn get_snippet_list(
         &self,
         tag_filter: Option<Vec<TagID>>,
+        order: Option<Vec<SearchOrder>>,
         time_boundry: Option<(Timestamp, Timestamp)>,
     ) -> Result<SnippetList, CheatsheetError>;
     fn search_by_title(&self, pattern: SearchPattern) -> Result<SnippetList, CheatsheetError>;

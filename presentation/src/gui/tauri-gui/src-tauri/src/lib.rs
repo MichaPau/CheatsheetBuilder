@@ -2,7 +2,7 @@
 use repository::types::AppState;
 use tauri::Manager;
 
-mod commands;
+pub mod commands;
 
 //#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run(app_state: AppState) {
@@ -13,6 +13,8 @@ pub fn run(app_state: AppState) {
         })
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
+            commands::test_invoke,
+            commands::load_config,
             commands::add_default_snippet,
             commands::get_categories,
             commands::get_snippets,

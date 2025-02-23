@@ -2,7 +2,7 @@ use domain::entities::entry::{
     CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType, TextType, Timestamp
 };
 
-use crate::{db::sqlite::rusqlite_db::Rusqlite, errors::CheatsheetError};
+use crate::{db::sqlite::rusqlite_db::Rusqlite, errors::CheatsheetError, types::SearchOrder};
 
 use super::stores::StateTrait;
 
@@ -72,9 +72,10 @@ impl Service {
     pub fn get_snippet_list(
         &self,
         tag_filter: Option<Vec<TagID>>,
+        order: Option<Vec<SearchOrder>>,
         time_boundry: Option<(Timestamp, Timestamp)>,
     ) -> Result<SnippetList, CheatsheetError> {
-        self.store.get_snippet_list(tag_filter, time_boundry)
+        self.store.get_snippet_list(tag_filter, order, time_boundry)
     }
 
     //tags
