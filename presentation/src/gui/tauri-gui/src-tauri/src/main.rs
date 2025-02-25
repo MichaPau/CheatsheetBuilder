@@ -3,6 +3,10 @@
 
 use repository::{db::sqlite::rusqlite_db::Rusqlite, ports::services::Service, types::AppState};
 
+// pub mod app_config;
+// use app_config::ConfigState;
+
+use tauri_gui_lib::app_config::ConfigState;
 fn main() {
 
 
@@ -19,6 +23,7 @@ fn main() {
     let service = Service::new(Box::new(store));
 
     let app_state = AppState { service };
+    let config = ConfigState { id : "test-config".into()};
 
-    tauri_gui_lib::run(app_state);
+    tauri_gui_lib::run(app_state, config);
 }

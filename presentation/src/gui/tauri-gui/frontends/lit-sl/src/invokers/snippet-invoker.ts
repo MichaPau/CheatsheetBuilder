@@ -69,7 +69,14 @@ export default class SnippetInvoker {
     });
   }
 
-  static async createTag(snippet_id: number, title: string): Promise<Array<Tag>> {
+  static async createTag(title: string): Promise<Tag> {
+    return new Promise(async (resolve, reject) => {
+      await invoke("create_tag", { title })
+        .then((result) => resolve(result as Tag))
+        .catch((err) => reject(err));
+    });
+  }
+  static async createTagAndAdd(snippet_id: number, title: string): Promise<Array<Tag>> {
     return new Promise(async (resolve, reject) => {
       await invoke("create_tag", { title })
         .then((result) => SnippetInvoker.addTag((result as Tag).id, snippet_id))

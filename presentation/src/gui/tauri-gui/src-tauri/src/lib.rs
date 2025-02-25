@@ -3,12 +3,17 @@ use repository::types::AppState;
 use tauri::Manager;
 
 pub mod commands;
+pub mod menu;
+pub mod app_config;
+use app_config::ConfigState;
+//use tauri_gui_lib::app_config::ConfigState;
 
 //#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run(app_state: AppState) {
+pub fn run(app_state: AppState, config_state: ConfigState) {
     tauri::Builder::default()
         .setup(|app| {
             app.manage(app_state);
+            app.manage(config_state);
             Ok(())
         })
         .plugin(tauri_plugin_shell::init())
@@ -33,6 +38,7 @@ pub fn run(app_state: AppState) {
             commands::create_snippet,
             commands::delete_snippet,
         ])
+        .menu(menu::build)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

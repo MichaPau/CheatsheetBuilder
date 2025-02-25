@@ -10,11 +10,13 @@ import './snippet-editor.js';
 import './snippet-tag-list.js';
 import { SnippetEditor } from './snippet-editor.js';
 import { Drawer } from '../drawer.js';
+import { BaseElement } from '../../utils/base-element.js';
 
 
 @customElement('create-snippet')
-export class CreateSnippet extends LitElement {
+export class CreateSnippet extends BaseElement {
   static styles = [
+    super.styles,
     sharedStyles,
     snippetStyles,
   ];
@@ -67,9 +69,18 @@ export class CreateSnippet extends LitElement {
     if (this.tags.findIndex((_t => _t.id === tag.id)) == -1) {
       const tags = this.tags.concat(tag);
       this.tags = [...tags];
-      const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-      search_target?.replaceChildren();
+      this.clearTagSearchResult();
     }
+  }
+  createTag = async (title: string) => {
+    await SnippetInvoker.createTag(title).then((tag_result) => {
+      const tags = this.tags.concat(tag_result);
+      this.tags = [...tags];
+      this.clearTagSearchResult();
+    }).catch((err) => {
+      console.log("create-tag:", err);
+      super.showError();
+    });
   }
 
   removeTag = async (ev:CustomEvent) => {
@@ -77,6 +88,12 @@ export class CreateSnippet extends LitElement {
     let tags = this.tags.filter((_t => _t.id !== ev.detail.tag_id));
     this.tags = [...tags];
 
+  }
+  clearTagSearchResult() {
+        const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+        search_target?.replaceChildren();
+        const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
+        search_input.value = "";
   }
   // tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
 
@@ -110,7 +127,6 @@ export class CreateSnippet extends LitElement {
           tag.innerHTML = `${t.title}`;
 
           if (this.tags.some(st => st.id === t.id)) {
-            console.log("tag already included");
             tag.classList.add("disabled");
           } else {
             tag.addEventListener("click", (e) => this.addTag(t, e));
@@ -118,6 +134,16 @@ export class CreateSnippet extends LitElement {
 
           this.tagSearchResult.appendChild(tag);
 
+      }
+      if(tags.findIndex((tag) => tag.title === pattern) === -1) {
+        var tag = document.createElement("div");
+        tag.classList.add("tag");
+        tag.classList.add("create");
+
+        tag.innerHTML = `${pattern}`;
+        tag.addEventListener("click", (_e) => this.createTag(pattern));
+
+        this.tagSearchResult.appendChild(tag);
       }
     }
   }

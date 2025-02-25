@@ -1,4 +1,4 @@
-import { html, LitElement, PropertyValues } from 'lit';
+import { html, PropertyValues } from 'lit';
 import { customElement, query, property } from 'lit/decorators.js';
 
 import sharedStyles from '../../styles/shared-styles.js';
@@ -94,7 +94,7 @@ export class SnippetContainer extends BaseElement {
   }
 
   createTag = async (title: string) => {
-    await SnippetInvoker.createTag(this.snippet.id, title).then((tag_result) => {
+    await SnippetInvoker.createTagAndAdd(this.snippet.id, title).then((tag_result) => {
       this.snippet = { ...this.snippet, tags: tag_result };
       super.showSuccess();
       this.clearTagSearchResult();
