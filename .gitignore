@@ -1,8 +1,10 @@
 /target
 /data
-# /presentation/src/gui/tauri-gui-solid
-/presentation/src/gui
-!/presentation/src/gui/tauri-gui
+/presentation/src/gui/tauri-gui-solid
+/presentation/src/gui/dioxus
+/presentation/src/gui/tauri
+#/presentation/src/gui/**
+#!/presentation/src/gui/tauri-gui/**
 /presentation/src/tui
 *_old.*
 
