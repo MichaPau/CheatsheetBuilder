@@ -41,15 +41,15 @@ export type SearchOrder = {
 
 //export const md = markdownit();
 
-export { default as MainInvoker } from './invokers/main-invoker.js';
-export { default as SnippetInvoker} from './invokers/snippet-invoker.js';
-export { default as CategoriesInvoker } from './invokers/categories-invoker.js';
-export { default as TagListInvoker } from './invokers/tag-list-invoker.js';
+// export { default as MainInvoker } from './invokers/main-invoker.js';
+// export { default as SnippetInvoker} from './invokers/snippet-invoker.js';
+// export { default as CategoriesInvoker } from './invokers/categories-invoker.js';
+// export { default as TagListInvoker } from './invokers/tag-list-invoker.js';
 
-// export { default as MainInvoker } from './invokers/mock-invokers/main-invoker.js';
-// export { default as SnippetInvoker} from './invokers/mock-invokers/snippet-invoker.js';
-// export { default as CategoriesInvoker } from './invokers/mock-invokers/categories-invoker.js';
-// export { default as TagListInvoker} from './invokers/mock-invokers/tag-list-invoker.js';
+export { default as MainInvoker } from './invokers/mock-invokers/main-invoker.js';
+export { default as SnippetInvoker} from './invokers/mock-invokers/snippet-invoker.js';
+export { default as CategoriesInvoker } from './invokers/mock-invokers/categories-invoker.js';
+export { default as TagListInvoker} from './invokers/mock-invokers/tag-list-invoker.js';
 
 
 declare global {
@@ -67,6 +67,9 @@ declare global {
     'add-category': CustomEvent<{ parent_id: number, title: string }>;
     'create-snippet': CustomEvent<{ snippet: Snippet}>;
     'editor-content-update': CustomEvent<{ content_text: string, text_type: TextType }>,
+    'add-search-tag': CustomEvent<{ tag: Tag}>,
+    'create-search-tag': CustomEvent<{ label: string}>
+
     //'change-category-selection': CustomEvent<{id: number, state: boolean}>
   }
 }

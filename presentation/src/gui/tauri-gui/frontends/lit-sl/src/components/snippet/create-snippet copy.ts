@@ -1,4 +1,4 @@
-import { html} from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
 
 
@@ -8,9 +8,7 @@ import { Snippet, SnippetInvoker, Tag } from '../../types.js';
 
 import './snippet-editor.js';
 import './snippet-tag-list.js';
-import '../tag-search-bar.js';
 import { SnippetEditor } from './snippet-editor.js';
-import { TagSearchBar } from '../tag-search-bar.js';
 import { Drawer } from '../drawer.js';
 import { BaseElement } from '../../utils/base-element.js';
 
@@ -35,10 +33,11 @@ export class CreateSnippet extends BaseElement {
   @query("#editor-component")
   editorComponent!: SnippetEditor;
 
-  @query("#tag-search-bar")
-  tagSearchBar!: TagSearchBar;
+  @query("#tag-search-input")
+  tagSearchInput!: HTMLInputElement;
 
-
+  @query("#tag-search-result")
+  tagSearchResult!: HTMLElement;
 
   //private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
 
@@ -65,22 +64,19 @@ export class CreateSnippet extends BaseElement {
         (ev.target! as HTMLElement).blur();
     }
   }
-  addTag = async (ev: CustomEvent) => {
-
-    const add_tag = ev.detail.tag;
-    if (this.tags.findIndex((_t => _t.id === add_tag.id)) == -1) {
-      const tags = this.tags.concat(add_tag);
+  addTag = async (tag: Tag, _ev: Event) => {
+    //console.log("create-snippet::addTag", tag);
+    if (this.tags.findIndex((_t => _t.id === tag.id)) == -1) {
+      const tags = this.tags.concat(tag);
       this.tags = [...tags];
-      this.tagSearchBar.clearResult();
+      this.clearTagSearchResult();
     }
   }
-  createTag = async (ev: CustomEvent) => {
-    const title = ev.detail.label;
+  createTag = async (title: string) => {
     await SnippetInvoker.createTag(title).then((tag_result) => {
-      console.log("createTag result:", tag_result);
       const tags = this.tags.concat(tag_result);
       this.tags = [...tags];
-      this.tagSearchBar.clearResult();
+      this.clearTagSearchResult();
     }).catch((err) => {
       console.log("create-tag:", err);
       super.showError();
@@ -93,18 +89,73 @@ export class CreateSnippet extends BaseElement {
     this.tags = [...tags];
 
   }
+  clearTagSearchResult() {
+        const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+        search_target?.replaceChildren();
+        const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
+        search_input.value = "";
+  }
+  // tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
 
+  //   if (clear_search) {
+  //     const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+  //     search_target?.replaceChildren();
+  //     const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
+  //     search_input.value = "";
+  //   }
+  //   this.snippet.tags = new_tags;
+  //   this.requestUpdate();
+  // }
+  onSearchTagChange = async (ev: Event) => {
 
+    this.tagSearchResult.replaceChildren();
 
+    let pattern = (ev.target as HTMLInputElement).value;
+
+    if (pattern.length >= 3) {
+
+      //let tags: Array<Tag> = await this.snippet_controler.searchTags(pattern);
+      let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
+
+      for (const t of tags) {
+
+          var tag = document.createElement("div");
+          //tag.setAttribute("tabindex", "0");
+          tag.classList.add("tag");
+          t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
+
+          tag.innerHTML = `${t.title}`;
+
+          if (this.tags.some(st => st.id === t.id)) {
+            tag.classList.add("disabled");
+          } else {
+            tag.addEventListener("click", (e) => this.addTag(t, e));
+          }
+
+          this.tagSearchResult.appendChild(tag);
+
+      }
+      if(tags.findIndex((tag) => tag.title === pattern) === -1) {
+        var tag = document.createElement("div");
+        tag.classList.add("tag");
+        tag.classList.add("create");
+
+        tag.innerHTML = `${pattern}`;
+        tag.addEventListener("click", (_e) => this.createTag(pattern));
+
+        this.tagSearchResult.appendChild(tag);
+      }
+    }
+  }
 
   clearAndClose() {
     this.titleInput.value = "";
-    //this.tagSearchInput.value = "";
+    this.tagSearchInput.value = "";
 
     this.editorComponent.text_data = "";
     this.tags = [];
 
-    //this.tagSearchResult.replaceChildren();
+    this.tagSearchResult.replaceChildren();
 
     const t = this.shadowRoot?.host!;
     const p = t.parentElement as Drawer;
@@ -119,7 +170,8 @@ export class CreateSnippet extends BaseElement {
   }
 
   async onSave(_ev: Event) {
-    const snippet: Snippet = { id: 0, title: this.titleInput.value, text: this.editorComponent.text_data, tags: this.tags, text_type: "Markdown", created_at: 0, updated_at: 0 };
+    const snippet: Snippet = { id: 0, title: this.titleInput.value, text: this.editorComponent.text_data, tags: this.tags, text_type: "Markdown", created_at: 0, updated_at: 0 };;
+    //this.dispatchEvent(new CustomEvent('create-snippet', { detail: { snippet: snippet }, bubbles: true, composed: true }));
     await SnippetInvoker.createSnippet(snippet)
       .then((_) => {
         this.dispatchEvent(new Event('reload-snippets', { bubbles: true, composed: true}));
@@ -146,7 +198,10 @@ export class CreateSnippet extends BaseElement {
             <snippet-editor id="editor-component"></snippet-editor>
             <details id="footer" class="footer">
                 <summary><snippet-tag-list .tag_list=${this.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
-                <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
+                <div class="tag-search-container">
+                    <input id="tag-search-input" class="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
+                    <div id="tag-search-result"></div>
+                </div>
             </details>
             <div>
                 <button type="button" @click=${this.onCancel}>Cancel</button>

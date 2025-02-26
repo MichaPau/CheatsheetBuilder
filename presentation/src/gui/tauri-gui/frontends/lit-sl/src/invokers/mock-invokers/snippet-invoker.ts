@@ -22,6 +22,14 @@ export default class SnippetInvoker  {
     });
 
   }
+  static async createTag(title: string): Promise<Tag> {
+    let new_id = Math.max(...tags.map(t => t.id)) + 1;
+    const tag: Tag = { id: new_id, title, parent_id: null, tag_style: null, tag_type: "Normal"};
+    return new Promise((resolve, _reject) => {
+      tags.push(tag);
+      resolve(tag);
+    });
+  }
   static async searchTags(pattern: string): Promise<Array<Tag>> {
 
     let search_tags_result: Array<Tag> = tags.filter((tag) => tag.title.toLowerCase().includes(pattern.toLowerCase()));
