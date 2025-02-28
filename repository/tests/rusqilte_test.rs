@@ -26,8 +26,11 @@ type TestResult<T = (), E = Box<dyn std::error::Error>> = std::result::Result<T,
 #[test]
 fn test_sql_batch_creation() -> TestResult {
     let db = STATIC_DB.lock().unwrap();
-    let result = db.get_tag_list(None).unwrap();
+    let result = db.get_tag_list(None, None).unwrap();
     assert_eq!(result.len(), 11);
+
+    let result = db.get_tag_list(None, Some(Vec::from([1, 2, 3]))).unwrap();
+     assert_eq!(result.len(), 3);
     Ok(())
 }
 

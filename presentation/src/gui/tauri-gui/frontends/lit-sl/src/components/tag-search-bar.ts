@@ -26,6 +26,9 @@ export class TagSearchBar extends LitElement {
   @state()
   recurrent_tags: Array<Tag> = [];
 
+  @state()
+  allowNewTags: boolean = true;
+
   connectedCallback(): void {
     super.connectedCallback();
   }
@@ -36,7 +39,7 @@ export class TagSearchBar extends LitElement {
     let pattern = this.tagSearchInput.value;
 
     if (pattern.length >= 3) {
-      console.log(SnippetInvoker.searchTags);
+
       let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
 
       for (const t of tags) {
@@ -56,16 +59,18 @@ export class TagSearchBar extends LitElement {
           this.tagSearchResult.appendChild(tag);
       }
 
-      if(tags.findIndex((tag) => tag.title.toLowerCase() === pattern.toLowerCase()) === -1) {
-        var tag = document.createElement("div");
-        tag.classList.add("tag");
-        tag.classList.add("create");
+      if (this.allowNewTags) {
+        if (tags.findIndex((tag) => tag.title.toLowerCase() === pattern.toLowerCase()) === -1) {
+          var tag = document.createElement("div");
+          tag.classList.add("tag");
+          tag.classList.add("create");
 
-        tag.innerHTML = `${pattern}`;
+          tag.innerHTML = `${pattern}`;
 
-        tag.addEventListener("click", (_e) => this.dispatchEvent(new CustomEvent("create-search-tag", { bubbles: true, composed: true, detail: {label: pattern} })));
+          tag.addEventListener("click", (_e) => this.dispatchEvent(new CustomEvent("create-search-tag", { bubbles: true, composed: true, detail: { label: pattern } })));
 
-        this.tagSearchResult.appendChild(tag);
+          this.tagSearchResult.appendChild(tag);
+        }
       }
     }
   }

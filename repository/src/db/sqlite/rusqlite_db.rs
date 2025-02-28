@@ -468,22 +468,23 @@ impl TagStore for Rusqlite {
         new_parent_id: Option<TagID>,
     ) -> Result<bool, CheatsheetError> {
         let c = self.conn.try_lock().unwrap();
+        let ts = u64::from(Timestamp::from_utc_now());
         if new_parent_id == Some(id) {
             return Ok(false);
         }
         c.execute(
-            "UPDATE Tag SET parent_id = ?1 WHERE tag_id = ?2",
-            (new_parent_id, id),
+            "UPDATE Tag SET parent_id = ?1, updated_at = ?2 WHERE tag_id = ?3",
+            (new_parent_id, ts, id),
         )?;
 
         Ok(true)
     }
     fn update_tag_title(&self, id: TagID, new_title: String) -> Result<bool, CheatsheetError> {
         let c = self.conn.try_lock().unwrap();
-
+        let ts = u64::from(Timestamp::from_utc_now());
         c.execute(
-            "UPDATE Tag SET title = ?1 WHERE tag_id = ?2",
-            (new_title, id),
+            "UPDATE Tag SET title = ?1, updated_at = ?2 WHERE tag_id = ?3",
+            (new_title, ts, id),
         )?;
 
         Ok(true)
@@ -491,24 +492,42 @@ impl TagStore for Rusqlite {
 
     fn update_tag_type(&self, id: TagID, new_type: TagType) -> Result<bool, CheatsheetError> {
         let c = self.conn.try_lock().unwrap();
+        let ts = u64::from(Timestamp::from_utc_now());
 
         c.execute(
-            "UPDATE Tag SET tag_type = ?1 WHERE tag_id = ?2",
-            (new_type as usize, id),
+            "UPDATE Tag SET tag_type = ?1, updated_at = ?2 WHERE tag_id = ?3",
+            (new_type as usize, ts, id),
         )?;
 
         Ok(true)
     }
 
-    fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError> {
+
+    fn get_tag_list(&self, type_filter: Option<TagType>, tag_id_filter: Option<Vec<TagID>>) -> Result<TagList, CheatsheetError> {
         let c = self.conn.try_lock().unwrap();
 
         let mut sql: String = String::from("SELECT * FROM Tag");
+        let mut type_filter_flag = false;
         if let Some(tag_type) = type_filter {
             let temp = format!(" WHERE tag_type = {}", tag_type as usize);
+            type_filter_flag = true;
             sql.push_str(&temp);
         }
+
+
+        if let Some(id_filter_list) = tag_id_filter {
+            let clause = if type_filter_flag { "AND" } else { "WHERE" };
+            let s = id_filter_list
+                .iter()
+                .map(|id| id.to_string())
+                .collect::<Vec<String>>()
+                .join(",");
+            let temp = format!(" {}  tag_id IN ({})", clause, s);
+            sql.push_str(&temp);
+
+        }
         //let mut stmt = c.prepare("SELECT * FROM Tag")?;
+        println!("get_tag_list sql:{}", sql);
         let mut stmt = c.prepare(&sql)?;
         let tag_iter = stmt.query_map([], |row| self.create_tag_from_row(row))?;
 

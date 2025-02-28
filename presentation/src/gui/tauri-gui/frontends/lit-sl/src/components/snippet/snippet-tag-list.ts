@@ -40,7 +40,7 @@ export class SnippetTagList extends LitElement {
   @property({attribute: false})
   tag_list!: Array<Tag>;
 
-  private controller: TagListInvoker = new TagListInvoker(this);
+  //private controller: TagListInvoker = new TagListInvoker(this);
 
   protected shouldUpdate(_changedProperties: PropertyValues): boolean {
     //console.log("TagList::shouldUpdate", _changedProperties);
@@ -58,7 +58,7 @@ export class SnippetTagList extends LitElement {
     const tag_target = ev.composedPath()[0] as TagItem;
 
     const id = ev.detail.id;
-    this.controller.getParentTags(id).then(result => {
+    await TagListInvoker.getParentTags(id).then(result => {
       //console.log(t);
       tag_target.showParents(result);
     });

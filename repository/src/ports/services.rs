@@ -107,7 +107,7 @@ impl Service {
         let deleted_tag = self.store.delete_tag(tag_id)?;
         //reparent
         if deleted_tag.tag_type == TagType::Category {
-            if let Ok(cats) = self.get_tag_list(Some(TagType::Category)) {
+            if let Ok(cats) = self.get_tag_list(Some(TagType::Category), None) {
                 let childs: Vec<&Tag> = cats.iter().filter(|&item| {
                     if let Some(p_id) = item.parent_id {
                         p_id == deleted_tag.id
@@ -124,8 +124,8 @@ impl Service {
         Ok(deleted_tag)
     }
 
-    pub fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError> {
-        self.store.get_tag_list(type_filter)
+    pub fn get_tag_list(&self, type_filter: Option<TagType>, tag_id_filter: Option<Vec<TagID>>) -> Result<TagList, CheatsheetError> {
+        self.store.get_tag_list(type_filter, tag_id_filter)
     }
     pub fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError> {
         self.store.get_tag_hierarchy(tag_id)

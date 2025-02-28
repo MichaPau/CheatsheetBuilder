@@ -4,7 +4,7 @@ import { customElement, state, query } from 'lit/decorators.js';
 
 import {provide} from '@lit/context';
 
-import { Order, SearchOrder, Snippet} from './types';
+import { Order, SearchOrder, Snippet, Tag} from './types';
 
 import './components/categories.js';
 import './components/header-comp.js';
@@ -85,6 +85,8 @@ export class App extends LitElement {
   appSettings: AppSettings = {
     open_categories: [],
     selected_categories: [],
+    tag_filter: [],
+    category_filter_flag: false,
     search_order: [
       { title: "title", value: "title", order: Order.NONE },
       { title: "created", value: "created_at", order: Order.NONE },
@@ -98,12 +100,18 @@ export class App extends LitElement {
       }
       this.appSettings = {...this.appSettings,  open_categories: open_ids };
     },
+    set_category_filter_flag: (state) => {
+      this.appSettings = {...this.appSettings,  category_filter_flag: state };
+    },
     save_selected: (ids: Array<number>) => {
       this.appSettings = {...this.appSettings,  selected_categories: ids };
     },
     save_search_order: (order: Array<SearchOrder>) => {
       this.appSettings = {...this.appSettings, search_order: order};
     },
+    save_tag_filter: (tags: Array<number>) => {
+      this.appSettings = { ...this.appSettings, tag_filter: tags };
+    }
   };
 
   // @provide({ context: saveSettingsContext })

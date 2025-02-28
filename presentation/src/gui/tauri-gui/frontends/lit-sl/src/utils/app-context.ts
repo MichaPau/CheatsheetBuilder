@@ -17,9 +17,13 @@ export interface AppSettings {
   open_categories: Array<number>,
   selected_categories: Array<number>,
   search_order: Array<SearchOrder>,
+  tag_filter: Array<number>,
+  category_filter_flag: boolean,
   toggle_open: (id: number, state: boolean) => void;
+  set_category_filter_flag: (state: boolean) => void,
   save_selected: (ids: Array<number>) => void;
   save_search_order: (order: Array<SearchOrder>) => void;
+  save_tag_filter: (tags: Array<number>) => void;
 }
 
 export const appSettingContext = createContext<AppSettings>(Symbol('app-setting-context'));

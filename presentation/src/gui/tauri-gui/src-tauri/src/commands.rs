@@ -75,7 +75,14 @@ pub fn remove_tag_from_snippet(
 }
 #[tauri::command]
 pub fn get_categories(app_state: State<'_, AppState>) -> Result<Vec<Tag>, CheatsheetError> {
-    match app_state.service.get_tag_list(Some(TagType::Category)) {
+    match app_state.service.get_tag_list(Some(TagType::Category), None) {
+        Ok(result) => Ok(result.inner),
+        Err(e) => Err(e),
+    }
+}
+#[tauri::command]
+pub fn get_tags(tag_id_filter : Option<Vec<usize>>, app_state: State<'_, AppState>) -> Result<Vec<Tag>, CheatsheetError> {
+    match app_state.service.get_tag_list(None, tag_id_filter) {
         Ok(result) => Ok(result.inner),
         Err(e) => Err(e),
     }

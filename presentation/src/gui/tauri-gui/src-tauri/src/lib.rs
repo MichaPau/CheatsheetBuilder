@@ -22,6 +22,7 @@ pub fn run(app_state: AppState, config_state: ConfigState) {
             commands::load_config,
             commands::add_default_snippet,
             commands::get_categories,
+            commands::get_tags,
             commands::get_snippets,
             commands::set_tag_parent_id,
             commands::get_parent_tags,

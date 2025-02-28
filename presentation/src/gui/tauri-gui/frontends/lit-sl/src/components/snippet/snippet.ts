@@ -9,6 +9,8 @@ import { Snippet, Tag, SnippetInvoker } from '../../types.js';
 import {BaseElement } from '../../utils/base-element.js';
 import './snippet-editor.js';
 import './snippet-tag-list.js';
+import '../tag-search-bar.js';
+import { TagSearchBar } from '../tag-search-bar.js';
 
 @customElement('snippet-item')
 export class SnippetContainer extends BaseElement {
@@ -21,11 +23,14 @@ export class SnippetContainer extends BaseElement {
   @property({attribute: false})
   snippet!: Snippet;
 
-  @query("#tag-search-input")
-  tagSearchInput!: HTMLInputElement;
+  @query("#tag-search-bar")
+  tagSearchBar!: TagSearchBar;
 
-  @query("#tag-search-result")
-  tagSearchResult!: HTMLElement;
+  // @query("#tag-search-input")
+  // tagSearchInput!: HTMLInputElement;
+
+  // @query("#tag-search-result")
+  // tagSearchResult!: HTMLElement;
 
   // private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
 
@@ -78,26 +83,31 @@ export class SnippetContainer extends BaseElement {
     }
   }
 
-  addTag = async (id: number, _ev: Event) => {
+  addTag = async (ev: CustomEvent) => {
 
-    const index = this.snippet.tags.findIndex(e => e.id === id);
+    const tag: Tag = ev.detail.tag;
+    const index = this.snippet.tags.findIndex(e => e.id === tag.id);
     if (index === -1) {
       //this.snippet_controler.addTag(id);
-      await SnippetInvoker.addTag(id, this.snippet.id)
+      await SnippetInvoker.addTag(tag.id, this.snippet.id)
         .then((tag_result) => {
           this.snippet = { ...this.snippet, tags: tag_result };
+          super.showSuccess();
+          this.tagSearchBar.clearResult();
         })
         .catch((err) => {
           console.log(err);
+          super.showError();
         })
     }
   }
 
-  createTag = async (title: string) => {
+  createTag = async (ev: CustomEvent) => {
+    const title = ev.detail.label;
     await SnippetInvoker.createTagAndAdd(this.snippet.id, title).then((tag_result) => {
       this.snippet = { ...this.snippet, tags: tag_result };
       super.showSuccess();
-      this.clearTagSearchResult();
+      this.tagSearchBar.clearResult();
     }).catch((err) => {
       console.log("create-tag:", err);
       super.showError();
@@ -117,12 +127,12 @@ export class SnippetContainer extends BaseElement {
 
   }
 
-  clearTagSearchResult() {
-        const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-        search_target?.replaceChildren();
-        const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
-        search_input.value = "";
-  }
+  // clearTagSearchResult() {
+  //       const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+  //       search_target?.replaceChildren();
+  //       const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
+  //       search_input.value = "";
+  // }
   // tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
 
   //   if (clear_search) {
@@ -134,44 +144,44 @@ export class SnippetContainer extends BaseElement {
   //   this.snippet.tags = new_tags;
   //   this.requestUpdate();
   // }
-  onSearchTagChange = async (ev: Event) => {
-    const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-    search_target?.replaceChildren();
+  // onSearchTagChange = async (ev: Event) => {
+  //   const search_target = this.shadowRoot?.querySelector("#tag-search-result");
+  //   search_target?.replaceChildren();
 
-    let pattern = (ev.target as HTMLInputElement).value;
+  //   let pattern = (ev.target as HTMLInputElement).value;
 
-    if (pattern.length >= 3) {
-      console.log(SnippetInvoker.searchTags);
-      let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
+  //   if (pattern.length >= 3) {
+  //     console.log(SnippetInvoker.searchTags);
+  //     let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
 
-      for (const t of tags) {
+  //     for (const t of tags) {
 
-          var tag = document.createElement("div");
-          tag.classList.add("tag");
-          t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
+  //         var tag = document.createElement("div");
+  //         tag.classList.add("tag");
+  //         t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
 
-          tag.innerHTML = `${t.title}`;
+  //         tag.innerHTML = `${t.title}`;
 
-          if (this.snippet.tags.some(st => st.id === t.id)) {
-            tag.classList.add("disabled");
-          } else {
-            tag.addEventListener("click", (e) => this.addTag(t.id, e));
-          }
-          search_target?.appendChild(tag);
-      }
+  //         if (this.snippet.tags.some(st => st.id === t.id)) {
+  //           tag.classList.add("disabled");
+  //         } else {
+  //           tag.addEventListener("click", (e) => this.addTag(t.id, e));
+  //         }
+  //         search_target?.appendChild(tag);
+  //     }
 
-      if(tags.findIndex((tag) => tag.title === pattern) === -1) {
-        var tag = document.createElement("div");
-        tag.classList.add("tag");
-        tag.classList.add("create");
+  //     if(tags.findIndex((tag) => tag.title === pattern) === -1) {
+  //       var tag = document.createElement("div");
+  //       tag.classList.add("tag");
+  //       tag.classList.add("create");
 
-        tag.innerHTML = `${pattern}`;
-        tag.addEventListener("click", (_e) => this.createTag(pattern));
+  //       tag.innerHTML = `${pattern}`;
+  //       tag.addEventListener("click", (_e) => this.createTag(pattern));
 
-        search_target?.appendChild(tag);
-      }
-    }
-  }
+  //       search_target?.appendChild(tag);
+  //     }
+  //   }
+  // }
 
   async removeSnippet(_ev:Event) {
     await SnippetInvoker.deleteSnippet(this.snippet.id)
@@ -204,10 +214,11 @@ export class SnippetContainer extends BaseElement {
             <snippet-editor id="editor-component" .text_data=${this.snippet.text} @editor-content-update=${this.editorContentUpdate}></snippet-editor>
             <details id="footer" class="footer">
                 <summary><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
-                <div class="tag-search-container">
+                <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.snippet.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
+                <!-- <div class="tag-search-container">
                     <input class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
                     <div id="tag-search-result"></div>
-                </div>
+                </div> -->
             </details>
 
 

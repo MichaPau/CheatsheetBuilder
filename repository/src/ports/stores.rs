@@ -49,8 +49,9 @@ pub trait TagStore {
     ) -> Result<bool, CheatsheetError>;
     fn update_tag_type(&self, tag_id: TagID, new_type: TagType) -> Result<bool, CheatsheetError>;
     fn get_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
+
     fn delete_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
-    fn get_tag_list(&self, type_filter: Option<TagType>) -> Result<TagList, CheatsheetError>;
+    fn get_tag_list(&self, type_filter: Option<TagType>, tag_id_filter: Option<Vec<TagID>>) -> Result<TagList, CheatsheetError>;
     fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError>;
     fn get_snippet_count_for_tag(&self, tag_id: TagID) -> Result<usize, CheatsheetError>;
     fn search_tags_by_title(

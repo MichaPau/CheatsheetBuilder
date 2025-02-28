@@ -3,8 +3,6 @@ import { ReactiveController, ReactiveControllerHost } from "lit";
 import { App } from "../../main.js";
 
 import { snippets, get_snippets, snippet_tags } from "./mockData.js";
-
-
 import { CategoriesInvoker, Snippet } from '../../types.js';
 
 export default class MainInvoker implements ReactiveController {
@@ -19,17 +17,55 @@ export default class MainInvoker implements ReactiveController {
 
   async load_data() {
 
-    //this.host.snippets = snippets;
-    this.host.appData.snippets = get_snippets();
+    const snippets = get_snippets();
+    const categories = await this.categories_invoker.load_categories();
+    this.host.appData = { categories, snippets };
+    //this.host.appData.snippets = get_snippets();
   }
 
+  get_snippet_setting_params() {
+    let order_strings: Array<object> | null = this.host.appSettings.search_order.map((item) => {
+      return { column_name: item.value, order_dir: item.order };
+
+    });
+
+    if (order_strings.length === 0) order_strings = null;
+    let cat_filter = this.host.appSettings.category_filter_flag ? this.host.appSettings.selected_categories : [];
+    let tag_filter: Array<number> | null = [...this.host.appSettings.tag_filter, ...cat_filter];
+    if (tag_filter.length === 0) {
+      tag_filter = null;
+    }
+    let time_boundry = null;
+
+    return {
+      tagFilter: tag_filter,
+      order: order_strings,
+      timeBoundry: time_boundry,
+    };
+  }
+  reload_data = async (_ev: Event) => {
+    //console.log("reload data", this);
+    const params = this.get_snippet_setting_params();
+    const snippets = get_snippets();
+    const categories = await this.categories_invoker.load_categories();
+    this.host.appData = { categories, snippets };
+  }
+
+  reload_snippets = async (_ev: Event) => {
+
+    const params = this.get_snippet_setting_params();
+    //console.log(params);
+    const snippets = get_snippets();
+
+    this.host.appData = { ...this.host.appData, snippets };
+  }
   hostConnected(): void {
-    //this.host.addEventListener('create-snippet', this.createSnippet);
+    this.host.addEventListener('reload-snippets', this.reload_data);
     this.host.addEventListener('set-selected-categories', this.setSelectedCategories);
-    this.host.addEventListener('reload-snippets', this.reloadSnippets);
+    this.host.addEventListener('reload_snippets-settings-change', this.reload_snippets);
 
   }
-  hostDisconnected(): void {}
+
 
   setSelectedCategories = (ev: CustomEvent) => {
     let ids = (ev as CustomEvent).detail;
@@ -37,25 +73,5 @@ export default class MainInvoker implements ReactiveController {
     this.host.appSettings = {...this.host.appSettings, selected_categories: ids};
   }
 
-  reloadSnippets = (_ev: Event) =>  {
-    console.log("reload Snippets");
-    let s = get_snippets();
-    console.log(s);
-    this.host.appData = { ...this.host.appData, snippets: get_snippets() };
-  }
-  // createSnippet = (ev: CustomEvent<{snippet: Snippet}>) => {
-
-  //   console.log("mock invoker::createSnippet:", ev.composedPath());
-  //   console.log("mock invoker::createSnippet:", ev.currentTarget);
-  //   let new_id = Math.max(...snippets.map(s => s.id)) + 1;
-  //   let new_snippet = ev.detail.snippet;
-  //   for (const tag of new_snippet.tags) {
-  //     snippet_tags.push({ snippet_id: new_id, tag_id: tag.id });
-  //   }
-  //   new_snippet.tags = [];
-  //   new_snippet.id = new_id;
-  //   snippets.push(new_snippet);
-
-  //   this.host.appData = { ...this.host.appData, snippets: get_snippets() };
-  // }
+   hostDisconnected(): void {}
 }

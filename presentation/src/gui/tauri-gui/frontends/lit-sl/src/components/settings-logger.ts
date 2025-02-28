@@ -1,6 +1,6 @@
 import { html, css, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import {consume, ContextConsumer} from '@lit/context';
+import {consume} from '@lit/context';
 
 import { appSettingContext, AppSettings } from '../utils/app-context.js';
 
@@ -59,6 +59,13 @@ export class SettingsLogger extends LitElement {
                 Search order:
                 ${this.appSettings.search_order.map((order) =>
                     html`<div>${order.value} ${order.order}</div>`
+                )}
+            </div>
+            <div> || </div>
+            <div class="id-container">
+                Search order:
+                ${this.appSettings.tag_filter.map((tag_id) =>
+                    html`<div>${tag_id}</div>`
                 )}
             </div>
         </div>

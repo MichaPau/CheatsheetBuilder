@@ -1,14 +1,14 @@
 import { ReactiveController, ReactiveControllerHost } from "lit";
 
 import { App } from "../main.js";
-//import { buildTreeArray } from '../utils/utils.js';
+
 import { invoke } from "@tauri-apps/api/core";
 import { CategoriesInvoker, Snippet} from "../types";
-
 
 export default class MainInvoker implements ReactiveController {
   private host: App;
   private categories_invoker;
+
   constructor(host: ReactiveControllerHost & App) {
     this.host = host;
     this.host.addController(this);
@@ -26,21 +26,15 @@ export default class MainInvoker implements ReactiveController {
   get_snippet_setting_params() {
     let order_strings: Array<object> | null = this.host.appSettings.search_order.map((item) => {
       return { column_name: item.value, order_dir: item.order };
-      // switch (item.order) {
-      //   case 1:
-      //     return item.value + " ASC";
-      //     return { columnName: item.value, orderDir: item.order };
-      //     break;
-      //   case 2:
-      //     return item.value + " DESC";
-      //     break;
-      //   default:
-      //     return "";
-      // }
+
     });
 
     if (order_strings.length === 0) order_strings = null;
-    let tag_filter = this.host.appSettings.selected_categories.length > 0 ? this.host.appSettings.selected_categories : null;
+    let cat_filter = this.host.appSettings.category_filter_flag ? this.host.appSettings.selected_categories : [];
+    let tag_filter: Array<number> | null = [...this.host.appSettings.tag_filter, ...cat_filter];
+    if (tag_filter.length === 0) {
+      tag_filter = null;
+    }
     let time_boundry = null;
 
     return {
