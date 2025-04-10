@@ -27,7 +27,9 @@ pub fn create_snippet(title: String, text: String, text_type: String, tag_ids: V
             .map(|id| app_state.service.get_tag(id))
             .collect::<Result<Vec<_>, _>>()?;
     let entry: CreateSnippet = CreateSnippet::new(title, text, text_type.as_str().into(), tags);
-    app_state.service.add_entry(entry)
+    let result = app_state.service.add_entry(entry);
+    //println!("create snippet result:{:?} ", result);
+    result
 }
 #[tauri::command]
 pub fn delete_snippet(id: usize, app_state: State<'_, AppState>) -> Result<Snippet, CheatsheetError> {
