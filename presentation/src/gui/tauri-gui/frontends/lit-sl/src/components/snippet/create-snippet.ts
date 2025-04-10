@@ -126,13 +126,14 @@ export class CreateSnippet extends BaseElement {
         this.clearAndClose();
       })
       .catch((err) => {
-        console.log(err);
+        console.log(JSON.stringify(err));
       });
 
   }
   render() {
 
     return html`
+
         <div class="snippet-item card">
             <div id="header">
                 <input readonly class="snippet-title-label"

@@ -1,11 +1,11 @@
 import { html, css, LitElement, PropertyValues } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { consume, ContextConsumer } from '@lit/context';
+import { customElement, state } from 'lit/decorators.js';
+import { consume } from '@lit/context';
 
 import sharedStyles from '../styles/shared-styles.js';
 
 import './snippet/snippet.js';
-import { AppData, appDataContext } from '../utils/app-context.js';
+import { AppDataSnippets, appDataSnippetsContext } from '../utils/app-context.js';
 
 @customElement('snippet-list')
 export class SnippetList extends LitElement {
@@ -37,9 +37,9 @@ export class SnippetList extends LitElement {
   //     subscribe: true,
   //   }
   // );
-  @consume({ context: appDataContext, subscribe: true })
+  @consume({ context: appDataSnippetsContext, subscribe: true })
   @state()
-  appData!: AppData;
+  appDataSnippets!: AppDataSnippets;
   // @state()
   // snippets: Array<Snippet> = [];
 
@@ -60,7 +60,7 @@ export class SnippetList extends LitElement {
   render() {
     return html`
         <div class="snippet-container">
-            ${this.appData.snippets.map((snippet) =>
+            ${this.appDataSnippets.snippets.map((snippet) =>
                 html`
                     <snippet-item .snippet=${snippet}></snippet-item>
                 `

@@ -4,7 +4,7 @@ import { customElement, state, query } from 'lit/decorators.js';
 
 import {provide} from '@lit/context';
 
-import { Order, SearchOrder, Snippet, Tag} from './types';
+import { Order, SearchOrder, Snippet} from './types';
 
 import './components/categories.js';
 import './components/header-comp.js';
@@ -20,7 +20,10 @@ import mainStyles from './styles/mainStyle.js';
 import sharedStyles from './styles/shared-styles.js';
 
 
-import { AppData, appDataContext, appSettingContext, AppSettings } from './utils/app-context.js';
+import {
+  AppDataSnippets, appDataSnippetsContext,
+  AppDataCategories, appDataCategoriesContext,
+  AppSettings, appSettingContext  } from './utils/app-context.js';
 
 // const controllerModule = import.meta.env.VITE_USE_MOCK_DATA ? await import('./test-controllers/main-controller.js') : await import('./controllers/main-controller.js');
 // const MainController: typeof controllerModule = controllerModule;
@@ -73,11 +76,22 @@ export class App extends LitElement {
     `
   ];
 
-  @provide({ context: appDataContext })
+  // @provide({ context: appDataContext })
+  // @state()
+  // appData: AppData = {
+  //   snippets: [],
+  //   categories: [],
+  // };
+  @provide({ context: appDataSnippetsContext })
   @state()
-  appData: AppData = {
-    snippets: [],
-    categories: [],
+  appDataSnippets: AppDataSnippets = {
+    snippets: []
+  };
+
+  @provide({ context: appDataCategoriesContext })
+  @state()
+  appDataCategories: AppDataCategories = {
+    categories: []
   };
 
   @provide({ context: appSettingContext })

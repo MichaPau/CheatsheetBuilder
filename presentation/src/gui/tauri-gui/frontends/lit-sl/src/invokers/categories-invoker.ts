@@ -23,7 +23,7 @@ export default class CategoriesInvoker implements ReactiveController {
   }
   async reload_categories() {
     const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-    this.host.appData = { ... this.host.appData, categories:  this.buildTreeArray(load_categories)};
+    this.host.appDataCategories = { ... this.host.appDataCategories, categories:  this.buildTreeArray(load_categories)};
   }
   hostConnected(): void {
     //this.load_data();

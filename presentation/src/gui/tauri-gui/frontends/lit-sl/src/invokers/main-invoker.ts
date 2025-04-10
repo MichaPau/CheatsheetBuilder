@@ -19,13 +19,14 @@ export default class MainInvoker implements ReactiveController {
     //console.log("load data", this);
     const snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
     const categories = await this.categories_invoker.load_categories();
-    this.host.appData = { categories, snippets };
+    this.host.appDataSnippets = { snippets };
+    this.host.appDataCategories = { categories };
     //console.log(this.host.appData.snippets);
   }
 
   get_snippet_setting_params() {
-    let order_strings: Array<object> | null = this.host.appSettings.search_order.map((item) => {
-      return { column_name: item.value, order_dir: item.order };
+    let order_strings: Array<object> | null = this.host.appSettings.search_order.filter((item) => item.order !== 0).map((item) => {
+        return { column_name: item.value, order_dir: item.order };
 
     });
 
@@ -48,7 +49,9 @@ export default class MainInvoker implements ReactiveController {
     const params = this.get_snippet_setting_params();
     const snippets = await invoke("get_snippets", params).catch(err => console.log(err)) as Array<Snippet>;
     const categories = await this.categories_invoker.load_categories();
-    this.host.appData = { categories, snippets };
+    //this.host.appData = { categories, snippets };
+    this.host.appDataSnippets = { snippets };
+    this.host.appDataCategories = { categories };
   }
 
   reload_snippets = async (_ev: Event) => {
@@ -57,7 +60,7 @@ export default class MainInvoker implements ReactiveController {
     //console.log(params);
     const snippets = await invoke("get_snippets", params).catch(err => console.log(err)) as Array<Snippet>;
 
-    this.host.appData = { ...this.host.appData, snippets };
+    this.host.appDataSnippets = { snippets };
   }
 
 

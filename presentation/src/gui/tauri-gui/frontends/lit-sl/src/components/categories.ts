@@ -1,10 +1,10 @@
 import { html, css, LitElement, PropertyValues } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { consume, ContextConsumer, ContextType } from '@lit/context';
+import { consume } from '@lit/context';
 
 //import './category_node.js';
 import sharedStyles from '../styles/shared-styles.js';
-import { appSettingContext, AppSettings, saveSettingsContext, appDataContext, AppData } from '../utils/app-context.js';
+import { appSettingContext, AppSettings, appDataCategoriesContext, AppDataCategories } from '../utils/app-context.js';
 
 
 
@@ -42,9 +42,9 @@ export class Categories extends LitElement {
   // @consume({ context: saveSettingsContext, subscribe: true })
   // update_selection!: (selected_ids: Array<number>) => void;
 
-  @consume({ context: appDataContext, subscribe: true })
+  @consume({ context: appDataCategoriesContext, subscribe: true })
   @state()
-  appData!: AppData;
+  appDataCategories!: AppDataCategories;
 
   @state()
   category_tree: Array<TreeNode> = [];
@@ -85,7 +85,7 @@ export class Categories extends LitElement {
 
   render() {
     return html`
-        <tree-view .category_tree=${this.appData.categories}></tree-view>
+        <tree-view .category_tree=${this.appDataCategories.categories}></tree-view>
     `;
   }
 }

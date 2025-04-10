@@ -4,7 +4,7 @@ import { TreeNode } from "../../components/tree";
 import { Tag } from "../../types";
 import { ConfirmDialog } from "../../components/confirm-dialog";
 
-import { snippets, tags, get_categories, get_snippets } from "./mockData";
+import { snippets, tags, get_categories } from "./mockData";
 import { App } from "../../main";
 
 export default class CategoriesInvoker implements ReactiveController {
@@ -23,7 +23,7 @@ export default class CategoriesInvoker implements ReactiveController {
   }
   async reload_categories() {
     const load_categories = get_categories();
-    this.host.appData = { ... this.host.appData, categories:  this.buildTreeArray(load_categories)};
+    this.host.appDataCategories = { categories:  this.buildTreeArray(load_categories)};
   }
   hostConnected(): void {
 
