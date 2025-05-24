@@ -46,8 +46,8 @@ export default css`
   .footer {
       display: flex;
       flex-direction: column;
-      gap: var(--sl-spacing-2x-small);
-      border: 1px solid black;
+      gap: var(--spacing-small);
+      //border: 1px solid black;
   }
 
   details > summary {

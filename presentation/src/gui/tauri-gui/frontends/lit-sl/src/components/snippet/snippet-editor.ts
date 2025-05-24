@@ -15,6 +15,10 @@ import { marked } from 'marked';
 type Editor = HTMLTextAreaElement;
 @customElement('snippet-editor')
 export class SnippetEditor extends LitElement {
+// static override shadowRootOptions = {
+//     ...LitElement.shadowRootOptions,
+//     delegatesFocus: true,
+// };
   static styles = [
     sharedStyles,
     mdStyles,
@@ -74,25 +78,6 @@ export class SnippetEditor extends LitElement {
           opacity: 0;
       }
 
-      /* sl-textarea {
-          min-width: 0;
-          height:100%;
-          //max-height: 10em;
-      } */
-      /* sl-textarea::part(base) {
-          max-height: 10em;
-      } */
-      /* sl-textarea::part(form-control) {
-          max-height: 10em;
-      } */
-      /* sl-textarea::part(textarea) {
-          resize: vertical;
-          overflow-y: scroll;
-          max-height: 15em;
-      } */
-
-
-      //.textarea--medium .textarea__control { padding: 0em var(--sl-input-spacing-medium); }
     `
   ];
 
@@ -143,6 +128,11 @@ export class SnippetEditor extends LitElement {
   }
   connectedCallback(): void {
     super.connectedCallback();
+    this.addEventListener("focusin", this.focusHandler);
+  }
+  disconnectedCallback(): void {
+    this.removeEventListener("focusin", this.focusHandler);
+    super.disconnectedCallback();
   }
   protected firstUpdated(_changedProperties: PropertyValues): void {
     //this.render_data = marked.parse(this.text_data, { async: false });
@@ -151,10 +141,23 @@ export class SnippetEditor extends LitElement {
   private parseMarkdown(value: string) {
     return marked.parse(value, { async: false });
   }
+  focusHandler = async (_ev: Event) => {
+
+    console.log("editor focus");
+    this.edit_mode = true;
+    await this.updateComplete.then((_) => {
+      this.shadowRoot?.getElementById("editor")?.focus();
+    });
+
+  }
   onFocusText = (ev: Event) => {
+
     (ev.target as Editor).removeAttribute("readonly");
   }
   onBlurText = (ev: Event) => {
+    ev.stopPropagation();
+    ev.preventDefault();
+    console.log("blur text");
     const editor = (ev.target as Editor);
     editor.setAttribute("readonly", "");
 
@@ -196,9 +199,9 @@ export class SnippetEditor extends LitElement {
     if (this.edit_mode) {
        editor_node =  html`
 
-           <textarea class="editor" .value=${live(this.text_data)}
+           <textarea id="editor" class="editor" .value=${live(this.text_data)}
                @focus=${this.onFocusText}
-               @blur=${this.onBlurText}
+               @focusout=${this.onBlurText}
                @keydown=${this.onEditorKeyDown}
             ></textarea>
         `;

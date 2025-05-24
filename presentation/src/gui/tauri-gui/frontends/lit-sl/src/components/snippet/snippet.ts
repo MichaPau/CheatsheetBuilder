@@ -26,6 +26,8 @@ export class SnippetContainer extends BaseElement {
   @query("#tag-search-bar")
   tagSearchBar!: TagSearchBar;
 
+  @query("#footer")
+  footer!: HTMLDetailsElement;
   // @query("#tag-search-input")
   // tagSearchInput!: HTMLInputElement;
 
@@ -38,9 +40,22 @@ export class SnippetContainer extends BaseElement {
     super.connectedCallback();
   }
 
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.footer.removeEventListener("toggle", this.toggleDetailsHandler);
+  }
+  protected firstUpdated(_changedProperties: PropertyValues): void {
+    this.footer.addEventListener("toggle", this.toggleDetailsHandler);
+  }
   protected shouldUpdate(_changedProperties: PropertyValues): boolean {
     //console.log("Snippet::shouldUpdate", _changedProperties);
     return super.shouldUpdate(_changedProperties);
+  }
+
+  toggleDetailsHandler = (ev: Event) => {
+    if (this.footer.open) {
+      this.footer.focus();
+    }
   }
 
   onEditTitle = (ev: Event) => {
@@ -51,7 +66,6 @@ export class SnippetContainer extends BaseElement {
     //label_elem.focus();
   }
   onBlurTitle = async (ev: Event) => {
-    console.log("onblutitle");
 
     const title_elem = ev.target! as HTMLInputElement;
     title_elem.readOnly = true;
@@ -66,11 +80,13 @@ export class SnippetContainer extends BaseElement {
           super.showError();
           title_elem.value = this.snippet.title;
         })
-      // let r = await this.snippet_controler.updateTitle(this.snippet.id, title_elem.value);
-      // if(r === false) {
-      //   title_elem.value = this.snippet.title;
-      // }
+
     }
+  }
+
+  onBlurDetails = (ev: Event) => {
+    const details_elem = ev.target as HTMLDetailsElement;
+    details_elem.open = false;
   }
   onTitleKeyDown = (ev: KeyboardEvent) => {
     if (ev.key === "Escape") {
@@ -211,14 +227,11 @@ export class SnippetContainer extends BaseElement {
                     <button @click=${this.removeSnippet}>X</button>
             </div>
 
-            <snippet-editor id="editor-component" .text_data=${this.snippet.text} @editor-content-update=${this.editorContentUpdate}></snippet-editor>
-            <details id="footer" class="footer">
+            <snippet-editor class="hide-focus" tabindex="0" id="editor-component" .text_data=${this.snippet.text} @editor-content-update=${this.editorContentUpdate}></snippet-editor>
+            <details id="footer" class="footer focusable" tabindex="0" @blur=${this.onBlurDetails}>
                 <summary><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.snippet.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
-                <!-- <div class="tag-search-container">
-                    <input class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
-                    <div id="tag-search-result"></div>
-                </div> -->
+
             </details>
 
 

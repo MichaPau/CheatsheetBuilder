@@ -1,5 +1,6 @@
 use domain::entities::entry::{
-    CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList, TagType, TextType, Timestamp
+    Category, CreateSnippet, CreateTag, Snippet, SnippetID, SnippetList, Tag, TagID, TagList,
+    TagType, TextType, Timestamp,
 };
 
 use crate::{db::sqlite::rusqlite_db::Rusqlite, errors::CheatsheetError, types::SearchOrder};
@@ -36,7 +37,12 @@ impl Service {
 
         self.store.add_entry(entry)
     }
-    pub fn update_text(&self, id: SnippetID, new_text: String, text_type: TextType) -> Result<bool, CheatsheetError> {
+    pub fn update_text(
+        &self,
+        id: SnippetID,
+        new_text: String,
+        text_type: TextType,
+    ) -> Result<bool, CheatsheetError> {
         self.store.update_text(id, new_text, text_type)
     }
     pub fn update_title(&self, id: SnippetID, new_title: String) -> Result<bool, CheatsheetError> {
@@ -108,29 +114,48 @@ impl Service {
         //reparent
         if deleted_tag.tag_type == TagType::Category {
             if let Ok(cats) = self.get_tag_list(Some(TagType::Category), None) {
-                let childs: Vec<&Tag> = cats.iter().filter(|&item| {
-                    if let Some(p_id) = item.parent_id {
-                        p_id == deleted_tag.id
-                    } else {
-                        false
-                    }
-                }).collect();
+                let childs: Vec<&Tag> = cats
+                    .iter()
+                    .filter(|&item| {
+                        if let Some(p_id) = item.parent_id {
+                            p_id == deleted_tag.id
+                        } else {
+                            false
+                        }
+                    })
+                    .collect();
                 for c in childs {
                     self.update_tag_parent(c.id, deleted_tag.parent_id)?;
                 }
             };
-
         }
         Ok(deleted_tag)
     }
 
-    pub fn get_tag_list(&self, type_filter: Option<TagType>, tag_id_filter: Option<Vec<TagID>>) -> Result<TagList, CheatsheetError> {
+    pub fn get_tag_list(
+        &self,
+        type_filter: Option<TagType>,
+        tag_id_filter: Option<Vec<TagID>>,
+    ) -> Result<TagList, CheatsheetError> {
         self.store.get_tag_list(type_filter, tag_id_filter)
     }
     pub fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError> {
         self.store.get_tag_hierarchy(tag_id)
     }
-
+    pub fn get_categories_flat(&self) -> Result<Vec<Category>, CheatsheetError> {
+        let cat_tags = self.get_tag_list(Some(TagType::Category), None)?;
+        let cats = cat_tags
+            .iter()
+            .map(|c| match self.get_tag_hierarchy(c.id) {
+                Ok(l) => Ok(Category {
+                    tag: c.clone(),
+                    parents: l.inner,
+                }),
+                Err(e) => Err(e),
+            })
+            .collect::<Result<Vec<Category>, _>>()?;
+        Ok(cats)
+    }
     pub fn get_snippet_count_for_tag(&self, tag_id: TagID) -> Result<usize, CheatsheetError> {
         self.store.get_snippet_count_for_tag(tag_id)
     }

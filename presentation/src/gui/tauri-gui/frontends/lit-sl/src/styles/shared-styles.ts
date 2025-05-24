@@ -15,7 +15,12 @@ export default css`
             border: var(--focus-ring-style) var(--focus-ring-width) var(--focus-ring-color);
         }
     }
-
+    .hide-focus {
+        &:focus {
+            outline: none;
+            border: none;
+        }
+    }
     .tag {
         display: flex;
         justify-content: center;

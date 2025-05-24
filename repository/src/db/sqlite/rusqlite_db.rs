@@ -8,7 +8,8 @@ use rusqlite::{Connection, OpenFlags, Row};
 
 use crate::{
     errors::CheatsheetError,
-    ports::stores::{SnippetStore, StateTrait, TagStore}, types::SearchOrder
+    ports::stores::{SnippetStore, StateTrait, TagStore},
+    types::SearchOrder,
 };
 
 #[derive(Debug)]
@@ -83,12 +84,11 @@ impl Rusqlite {
 
         //println!("tables :{:?}", table_names);
         for name in table_names {
-
             let mut stmt = c.prepare("SELECT name FROM PRAGMA_TABLE_INFO(?1)")?;
             let rows = stmt.query_map([&name], |row| row.get(0))?;
             let column_names: Vec<String> = rows.into_iter().filter_map(|c| c.ok()).collect();
             //println!("columns :{:?}", column_names);
-           self.table_column_map.insert(name, column_names);
+            self.table_column_map.insert(name, column_names);
         }
 
         //println!("table_map: {:?}", self.table_column_map);
@@ -111,7 +111,6 @@ impl Rusqlite {
             .unwrap()
             .execute_batch(include_str!("./sql/insert_test_data.sql"))?;
         Ok(true)
-
     }
     fn create_default_tables(&self) -> rusqlite::Result<bool> {
         self.conn
@@ -120,8 +119,6 @@ impl Rusqlite {
             .execute_batch(include_str!("./sql/create_db.sql"))?;
         Ok(true)
     }
-
-
 
     #[allow(dead_code)]
     fn get_tag_ids_for_snippet(
@@ -272,7 +269,12 @@ impl SnippetStore for Rusqlite {
 
         Ok(count)
     }
-    fn update_text(&self, id: SnippetID, new_text: String, text_type: TextType) -> Result<bool, CheatsheetError> {
+    fn update_text(
+        &self,
+        id: SnippetID,
+        new_text: String,
+        text_type: TextType,
+    ) -> Result<bool, CheatsheetError> {
         let ts = u64::from(Timestamp::from_utc_now());
 
         let c = self.conn.try_lock().unwrap();
@@ -367,15 +369,18 @@ impl SnippetStore for Rusqlite {
                 None => &Vec::new(),
             };
             //let valid_columns = self.table_column_map.get("Snippet").unwrap_or(&Vec::new());
-            let orderby_str: Vec<String> = order.into_iter().filter_map(|item| {
-                if (item.order_dir != 0) && valid_columns.contains(&item.column_name) {
-                    //let str = format!("{} {}", item.column_name, item.order_dir.to_string());
-                    let str = item.to_string();
-                    Some(str)
-                } else {
-                    None
-                }
-            }).collect();
+            let orderby_str: Vec<String> = order
+                .into_iter()
+                .filter_map(|item| {
+                    if (item.order_dir != 0) && valid_columns.contains(&item.column_name) {
+                        //let str = format!("{} {}", item.column_name, item.order_dir.to_string());
+                        let str = item.to_string();
+                        Some(str)
+                    } else {
+                        None
+                    }
+                })
+                .collect();
             let order_str = format!(" ORDER BY {}", orderby_str.join(" ,"));
             sql.push_str(&order_str);
         }
@@ -422,7 +427,9 @@ impl TagStore for Rusqlite {
                 });
             println!("{:?}", parent_tag);
             if parent_tag.is_err() {
-                return Err(CheatsheetError::CreateTagError("parent_id does not exists".into()));
+                return Err(CheatsheetError::CreateTagError(
+                    "parent_id does not exists".into(),
+                ));
             }
         }
         let color_option: Option<u32> = tag.tag_style.clone().map(|o| o.color.into());
@@ -502,8 +509,11 @@ impl TagStore for Rusqlite {
         Ok(true)
     }
 
-
-    fn get_tag_list(&self, type_filter: Option<TagType>, tag_id_filter: Option<Vec<TagID>>) -> Result<TagList, CheatsheetError> {
+    fn get_tag_list(
+        &self,
+        type_filter: Option<TagType>,
+        tag_id_filter: Option<Vec<TagID>>,
+    ) -> Result<TagList, CheatsheetError> {
         let c = self.conn.try_lock().unwrap();
 
         let mut sql: String = String::from("SELECT * FROM Tag");
@@ -514,7 +524,6 @@ impl TagStore for Rusqlite {
             sql.push_str(&temp);
         }
 
-
         if let Some(id_filter_list) = tag_id_filter {
             let clause = if type_filter_flag { "AND" } else { "WHERE" };
             let s = id_filter_list
@@ -524,7 +533,6 @@ impl TagStore for Rusqlite {
                 .join(",");
             let temp = format!(" {}  tag_id IN ({})", clause, s);
             sql.push_str(&temp);
-
         }
         //let mut stmt = c.prepare("SELECT * FROM Tag")?;
         println!("get_tag_list sql:{}", sql);

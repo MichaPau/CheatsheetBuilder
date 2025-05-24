@@ -83,6 +83,7 @@ export class TagSearchBar extends LitElement {
   render() {
     return html`
         <div class="tag-search-container">
+            <label for="tag-search-input">Search tags:</label>
             <input class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
             <div id="tag-search-result"></div>
         </div>

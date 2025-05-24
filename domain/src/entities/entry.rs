@@ -21,6 +21,13 @@ pub struct TagList {
     pub inner: Vec<Tag>,
 }
 
+#[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+pub struct Category {
+    pub tag: Tag,
+    pub parents: Vec<Tag>,
+}
+
 impl Deref for TagList {
     type Target = Vec<Tag>;
     fn deref(&self) -> &Self::Target {

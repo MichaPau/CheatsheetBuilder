@@ -1,16 +1,21 @@
 use domain::{
     //entities::entry::{CreateSnippet, CreateTag, TagType, TextType},
-    entities::entry::TextType, utils::types::Timestamp
+    entities::entry::TextType,
+    utils::types::Timestamp,
 };
 
 use core::time;
 use std::{
-    sync::{LazyLock, Mutex}, thread
+    sync::{LazyLock, Mutex},
+    thread,
 };
 
 use repository::{
     db::sqlite::rusqlite_db::{self, Rusqlite},
-    ports::{services::Service, stores::{SnippetStore, TagStore}},
+    ports::{
+        services::Service,
+        stores::{SnippetStore, TagStore},
+    },
 };
 
 static STATIC_DB: LazyLock<Mutex<Rusqlite>> = LazyLock::new(|| {
@@ -30,7 +35,8 @@ fn test_sql_batch_creation() -> TestResult {
     assert_eq!(result.len(), 11);
 
     let result = db.get_tag_list(None, Some(Vec::from([1, 2, 3]))).unwrap();
-     assert_eq!(result.len(), 3);
+    assert_eq!(result.len(), 3);
+
     Ok(())
 }
 
@@ -54,6 +60,19 @@ fn test_delete_category() -> TestResult {
     sub_deleted = service.get_tag(111).unwrap();
     assert_eq!(sub_deleted.parent_id, None);
 
+    Ok(())
+}
+#[test]
+fn test_categories_flat() -> TestResult {
+    let mut db = rusqlite_db::Rusqlite::new_in_memory().unwrap();
+
+    db.create_dummy_entries().unwrap();
+    let service = Service {
+        store: Box::new(db),
+    };
+    let c = service.get_categories_flat().unwrap();
+    assert!(c.len() != 0);
+    println!("{:#?}", c);
     Ok(())
 }
 #[test]
