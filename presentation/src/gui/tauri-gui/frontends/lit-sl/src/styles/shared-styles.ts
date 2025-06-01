@@ -11,8 +11,10 @@ export default css`
         font-family: var(--default-font-family);
         accent-color: var(--checkbox-color);
         &:focus {
-            outline: none;
-            border: var(--focus-ring-style) var(--focus-ring-width) var(--focus-ring-color);
+            /* outline: none;
+            border: var(--focus-ring-style) var(--focus-ring-width) var(--focus-ring-color); */
+            
+            outline: var(--focus-ring-style) var(--focus-ring-width) var(--focus-ring-color);
         }
     }
     .hide-focus {

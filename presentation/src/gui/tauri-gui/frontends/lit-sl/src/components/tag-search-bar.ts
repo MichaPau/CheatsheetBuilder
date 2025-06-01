@@ -29,6 +29,9 @@ export class TagSearchBar extends LitElement {
   @state()
   allowNewTags: boolean = true;
 
+  @state()
+  min_char_trigger_search: number = 2;
+  
   connectedCallback(): void {
     super.connectedCallback();
   }
@@ -38,7 +41,7 @@ export class TagSearchBar extends LitElement {
 
     let pattern = this.tagSearchInput.value;
 
-    if (pattern.length >= 3) {
+    if (pattern.length >= this.min_char_trigger_search) {
 
       let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
 
@@ -74,6 +77,10 @@ export class TagSearchBar extends LitElement {
       }
     }
   }
+  onInputBlur(ev: Event) {
+    ev.stopPropagation();
+    ev.preventDefault();
+  }
   clearResult() {
         //const search_target = this.shadowRoot?.querySelector("#tag-search-result");
         this.tagSearchResult.replaceChildren();
@@ -84,7 +91,7 @@ export class TagSearchBar extends LitElement {
     return html`
         <div class="tag-search-container">
             <label for="tag-search-input">Search tags:</label>
-            <input class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange}></input>
+            <input class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange} @blur=${this.onInputBlur}></input>
             <div id="tag-search-result"></div>
         </div>
     `;

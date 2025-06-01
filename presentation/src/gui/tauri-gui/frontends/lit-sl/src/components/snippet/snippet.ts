@@ -10,6 +10,7 @@ import {BaseElement } from '../../utils/base-element.js';
 import './snippet-editor.js';
 import './snippet-tag-list.js';
 import '../tag-search-bar.js';
+import 'mp-webcomponents/components/ui/mp-markdown-editor';
 import { TagSearchBar } from '../tag-search-bar.js';
 
 @customElement('snippet-item')
@@ -46,16 +47,16 @@ export class SnippetContainer extends BaseElement {
   }
   protected firstUpdated(_changedProperties: PropertyValues): void {
     this.footer.addEventListener("toggle", this.toggleDetailsHandler);
-  }
+ }
   protected shouldUpdate(_changedProperties: PropertyValues): boolean {
     //console.log("Snippet::shouldUpdate", _changedProperties);
     return super.shouldUpdate(_changedProperties);
   }
 
   toggleDetailsHandler = (ev: Event) => {
-    if (this.footer.open) {
+    /* if (this.footer.open) {
       this.footer.focus();
-    }
+    } */
   }
 
   onEditTitle = (ev: Event) => {
@@ -84,9 +85,18 @@ export class SnippetContainer extends BaseElement {
     }
   }
 
-  onBlurDetails = (ev: Event) => {
-    const details_elem = ev.target as HTMLDetailsElement;
-    details_elem.open = false;
+  onBlurDetails = (ev: FocusEvent) => {
+    console.log("new2");
+    /* console.log("onBlurDetails relatedTarget:",ev.relatedTarget);
+    console.log("onBlurDetails currentTarget:",ev.currentTarget);
+    console.log("onBlurDetails target:",ev.target); */
+
+    if (!(ev.currentTarget as HTMLElement).contains(ev.relatedTarget as Node)) {
+
+      const details_elem = ev.target as HTMLDetailsElement;
+      details_elem.open = false;
+    }
+
   }
   onTitleKeyDown = (ev: KeyboardEvent) => {
     if (ev.key === "Escape") {
@@ -214,6 +224,16 @@ export class SnippetContainer extends BaseElement {
         super.showError();
       });
   }
+
+  async md_update(ev: CustomEvent) {
+    await SnippetInvoker.updateTextContent(this.snippet.id, ev.detail, "Markdown")
+      .then((_result) => {
+        super.showSuccess();
+      })
+      .catch((_err) => {
+        super.showError();
+      });
+  }
   render() {
     return html`
         <div class="snippet-item card">
@@ -226,10 +246,10 @@ export class SnippetContainer extends BaseElement {
                         />
                     <button @click=${this.removeSnippet}>X</button>
             </div>
+            <mp-markdown-editor id="editor" value=${this.snippet.text} @mp-markdown-update=${this.md_update}></mp-markdown-editor>
 
-            <snippet-editor class="hide-focus" tabindex="0" id="editor-component" .text_data=${this.snippet.text} @editor-content-update=${this.editorContentUpdate}></snippet-editor>
-            <details id="footer" class="footer focusable" tabindex="0" @blur=${this.onBlurDetails}>
-                <summary><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
+            <details id="footer" class="footer focusable" >
+                <summary tabindex="0" @focusout=${this.onBlurDetails}><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.snippet.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
 
             </details>
@@ -240,3 +260,5 @@ export class SnippetContainer extends BaseElement {
     `;
   }
 }
+// <snippet-editor class="hide-focus" tabindex="0" id="editor-component" .text_data=${this.snippet.text} @editor-content-update=${this.editorContentUpdate}></snippet-editor>
+

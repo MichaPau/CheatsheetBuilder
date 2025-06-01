@@ -385,7 +385,7 @@ impl SnippetStore for Rusqlite {
             sql.push_str(&order_str);
         }
         let c = self.conn.try_lock().unwrap();
-        println!("the query: {}", sql);
+        // println!("the query: {}", sql);
 
         let mut stmt = c.prepare(&sql)?;
         let snippet_iter = stmt.query_map([], |row| self.create_snippet_from_row(row, &c))?;

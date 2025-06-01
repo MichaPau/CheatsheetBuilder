@@ -1,47 +1,46 @@
 :root,
-:host
-{
-    --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
-    --font-sans: Roboto, sans-serif;
-    --font-serif: Georgia, "Times New Roman", serif;
+:host {
+  --font-mono: Consolas, "Liberation Mono", Menlo, monospace;
+  --font-sans: Roboto, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
 
-    --spacing-small: 0.25rem;
-    --spacing-medium : 0.5rem;
-    --spacing-large: 0.75rem;
-    --spacing-tree: 1.25rem;
+  --spacing-small: 0.25rem;
+  --spacing-medium: 0.5rem;
+  --spacing-large: 0.75rem;
+  --spacing-tree: 1.25rem;
 
-    --border-radius-small: 0.1875rem;
-    --border-radius-medium: 0.25rem;
-    --border-radius-large: 0.5rem;
-    --border-width: 1px;
+  --border-radius-small: 0.1875rem;
+  --border-radius-medium: 0.25rem;
+  --border-radius-large: 0.5rem;
+  --border-width: 1px;
 
-    --border-color: lch(var(--l-90) 1.52 285.35);
-    --border-style: solid;
+  --border-color: lch(var(--l-90) 1.52 285.35);
+  --border-style: solid;
 
-    --font-size-small: 0.875rem;
-    --font-size-medium: 1rem;
-    --font-size-large: 1.25rem;
+  --font-size-small: 0.875rem;
+  --font-size-medium: 1rem;
+  --font-size-large: 1.25rem;
 
-    --shadow-x-small: 0 1px 2px hsl(240 3.8% 46.1% / 6%);
-    --shadow-small: 0 1px 2px hsl(240 3.8% 46.1% / 12%);
-    --shadow-medium: 0 2px 4px hsl(240 3.8% 46.1% / 12%);
-    --shadow-large: 0 2px 8px hsl(240 3.8% 46.1% / 12%);
-    --shadow-x-large: 0 4px 16px hsl(240 3.8% 46.1% / 12%);
+  --shadow-x-small: 0 1px 2px hsl(240 3.8% 46.1% / 6%);
+  --shadow-small: 0 1px 2px hsl(240 3.8% 46.1% / 12%);
+  --shadow-medium: 0 2px 4px hsl(240 3.8% 46.1% / 12%);
+  --shadow-large: 0 2px 8px hsl(240 3.8% 46.1% / 12%);
+  --shadow-x-large: 0 4px 16px hsl(240 3.8% 46.1% / 12%);
 
-    --default-font-family: var(--font-sans);
+  --default-font-family: var(--font-sans);
 
-    --focus-ring-color: lch(var(--l-80) 45 224);
-    --focus-ring-width: 1px;
-    --focus-ring-style: solid;
-    --checkbox-color: lch(var(--l-60) 37 214);
-    --panel-background-color: lch(var(--l-100) 0 297);
+  --focus-ring-color: lch(var(--l-80) 45 224);
+  --focus-ring-width: 1px;
+  --focus-ring-style: solid;
+  --checkbox-color: lch(var(--l-60) 37 214);
+  --panel-background-color: lch(var(--l-100) 0 297);
 
-    --placeholder-color: lch(var(--l-90) 1.52 285.35);
+  --placeholder-color: lch(var(--l-90) 1.52 285.35);
 
-    --tag-color-normal: 38 221;
-    --tag-color-category: 56 82;
-    --tag-color-create: 35 190;
+  --tag-color-normal: 38 221;
+  --tag-color-category: 56 82;
+  --tag-color-create: 35 190;
 
-    --z-index-menu: 900;
+  --z-index-menu: 900;
 
 }

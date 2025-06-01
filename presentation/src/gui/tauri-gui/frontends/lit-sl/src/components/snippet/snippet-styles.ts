@@ -47,7 +47,7 @@ export default css`
       display: flex;
       flex-direction: column;
       gap: var(--spacing-small);
-      //border: 1px solid black;
+      /* border: 1px solid black; */
   }
 
   details > summary {

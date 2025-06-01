@@ -11,6 +11,7 @@ import { SearchOrderButton } from './search-order-button.js';
 import './search-order-button.js';
 import './tag-search-bar.js';
 import './snippet/snippet-tag-list.js';
+import '../test/track_active_element.js';
 import { TagSearchBar } from './tag-search-bar.js';
 
 @customElement('header-comp')
@@ -145,6 +146,7 @@ export class HeaderComp extends LitElement {
             <search-order-button draggable="true" label="test" value="test" .state=${Order.NONE} id="button_4"></search-order-button>
         </div> -->
         <div id="header-container">
+            <track-active-element></track-active-element>
             <div id="search-button-container">
                 ${this.appSettings.search_order.map((item, index) => {
                     const id = "button_" + (index + 1);
