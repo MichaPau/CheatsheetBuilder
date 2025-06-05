@@ -1,6 +1,6 @@
 import { ReactiveController, ReactiveControllerHost } from "lit";
 
-import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "../types";
 
 import { SnippetTagList } from "../components/snippet/snippet-tag-list";
 import { Tag } from "../types";

@@ -1,3 +1,4 @@
+import { InvokeArgs, InvokeOptions } from "@tauri-apps/api/core";
 import { Snippet, Tag } from "../../types";
 
 export let tags: Array<Tag> = [
@@ -28,6 +29,37 @@ export let snippet_tags: Array<{ snippet_id: number, tag_id: number }> = [
   { snippet_id: 2, tag_id: 1002 },
 ];
 
+export function invoke(cmd:string,args:InvokeArgs = {},options?:InvokeOptions): Promise<any> {
+
+  return new Promise(async (resolve, reject) => {
+    switch (cmd) {
+      case "get_snippets":
+        resolve(get_snippets());
+        break;
+      case "get_categories":
+        resolve(get_categories());
+        break;
+      case "get_parent_tags"://tagId
+      case "get_tags"://tagIdFilter,
+      case "append_tag": //snippetId, tagId
+      case "search_tags": //pattern
+      case "update_snippet_title": //id, newTitle
+      case "remove_tag_from_snippet": //snippetId, tagId
+      case "update_tag_title": //tagId, newTitle
+      case "get_snippet_count_for_tag": //tagId
+      case "delete_category": //tagId
+      case "create_category": //parentId, title
+      case "set_tag_parent_id": //tagid, newParentId
+      case "delete_snippet": //id
+      case "update_snippet_text": //id, newText, textType
+      case "create_tag": //title
+      case "create_snippet": //title, text, textType, tagIds
+      
+      default:
+        reject("not implemented");
+    }
+  })
+}
 export function get_categories(): Array<Tag> {
   const result: Array<Tag> = [];
   const draft = tags.filter((tag) => tag.tag_type === "Category");
@@ -45,38 +77,15 @@ export function get_snippets() {
       return item.snippet_id === snippet.id;
     }).map((item) => item.tag_id);
     let st = tags.filter((tag) => tag_ids.includes(tag.id));
-    snippet.tags = structuredClone(st);
-    result.push(structuredClone(snippet));
+    snippet.tags = st;
+    result.push(snippet);
   }
 
   return result
 }
-// export function get_snippets_immer() {
-//   const result: Array<Snippet> = produce(snippets, draft => {
-//     for (let snippet of draft) {
-//       let tag_ids: Array<number> = snippet_tags.filter((item) => {
 
-//         return item.snippet_id === snippet.id;
-//       }).map((item) => item.tag_id);
-//       let st = tags.filter((tag) => tag_ids.includes(tag.id));
-//       snippet.tags = st;
-//     }
-//     return draft;
-//   });
-
-//   return result
-// }
-
-// export function get_categories_immer(): Array<Tag> {
-//   const result: Array<Tag> = produce(tags, draft => {
-//     draft = draft.filter((tag) => tag.tag_type === "Category");
-//     return draft;
-//   });
-
-//   return result;
-
-// }
 export function generate_random_snippets(size: number) {
+
   snippets = [];
   for (let i = 1; i <= size; i++) {
     let snippet: Snippet = {
@@ -91,8 +100,6 @@ export function generate_random_snippets(size: number) {
     //console.log("snippet tags: ", s_tags, " count: ", tag_count);
     snippet.tags = s_tags;
     snippets.push(snippet);
-
-
 
   }
 }

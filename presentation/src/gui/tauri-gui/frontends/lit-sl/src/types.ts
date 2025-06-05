@@ -1,4 +1,4 @@
-
+import { InvokeArgs } from "@tauri-apps/api/core";
 
 export type Tag = {
   id: number;
@@ -39,23 +39,27 @@ export type SearchOrder = {
 //     children: Array<TreeCategory>
 // };
 
-//export const md = markdownit();
+
+//export { invoke } from "@tauri-apps/api/core";
+export { invoke } from "./invokers/mock-invokers/mockData";
 
 export { default as MainInvoker } from './invokers/main-invoker.js';
 export { default as SnippetInvoker} from './invokers/snippet-invoker.js';
 export { default as CategoriesInvoker } from './invokers/categories-invoker.js';
 export { default as TagListInvoker } from './invokers/tag-list-invoker.js';
 
-// export { default as MainInvoker } from './invokers/mock-invokers/main-invoker.js';
-// export { default as SnippetInvoker} from './invokers/mock-invokers/snippet-invoker.js';
-// export { default as CategoriesInvoker } from './invokers/mock-invokers/categories-invoker.js';
-// export { default as TagListInvoker} from './invokers/mock-invokers/tag-list-invoker.js';
+/* export { default as MainInvoker } from './invokers/mock-invokers/main-invoker.js';
+export { default as SnippetInvoker} from './invokers/mock-invokers/snippet-invoker.js';
+export { default as CategoriesInvoker } from './invokers/mock-invokers/categories-invoker.js';
+export { default as TagListInvoker} from './invokers/mock-invokers/tag-list-invoker.js'; */
 
 
 declare global {
   interface GlobalEventHandlersEventMap {
+    'invoke-error': CustomEvent<{info: string, cmd: string, args: InvokeArgs, meta_url: string}>,
+    'invoke-debug': CustomEvent<{info: string, cmd: string, args: InvokeArgs, meta_url: string}>,
     'reload-snippets': Event;
-    'reload_snippets-settings-change': Event;
+    'reload-snippets-settings-change': Event;
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;
     'get-parent-tags': CustomEvent<{tag_id: number}>;
     'remove-tag-from-snippet': CustomEvent<{tag_id: number }>;

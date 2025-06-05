@@ -1,5 +1,5 @@
 
-import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "../types";
 import { Snippet, Tag, TextType } from "../types";
 import { ConfirmDialog } from "../components/confirm-dialog";
 

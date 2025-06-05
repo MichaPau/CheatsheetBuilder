@@ -95,7 +95,7 @@ export class HeaderComp extends LitElement {
       //container?.append(c);
     }
     this.appSettings.save_search_order(orderSettings);
-    this.dispatchEvent(new Event("reload_snippets-settings-change", { bubbles: true, composed: true }));
+    this.dispatchEvent(new Event("reload-snippets-settings-change", { bubbles: true, composed: true }));
   }
   swapOrder(ev: Event) {
     console.log("swap");
@@ -115,7 +115,7 @@ export class HeaderComp extends LitElement {
     [orderSettings[draggedIndex], orderSettings[targetIndex]] = [orderSettings[targetIndex], orderSettings[draggedIndex]];
 
     this.appSettings.save_search_order(orderSettings);
-    this.dispatchEvent(new Event("reload_snippets-settings-change", { bubbles: true, composed: true }));
+    this.dispatchEvent(new Event("reload-snippets-settings-change", { bubbles: true, composed: true }));
 
   }
 

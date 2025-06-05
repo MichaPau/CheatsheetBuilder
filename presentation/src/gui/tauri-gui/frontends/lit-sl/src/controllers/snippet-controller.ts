@@ -1,7 +1,7 @@
 import { ReactiveController, ReactiveControllerHost } from "lit";
 import { SnippetContainer } from "../components/snippet";
 
-import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "../types";
 import { Tag } from "../types";
 
 export class SnippetController implements ReactiveController {
