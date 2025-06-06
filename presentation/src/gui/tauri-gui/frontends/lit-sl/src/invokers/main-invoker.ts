@@ -30,10 +30,9 @@ export default class MainInvoker implements ReactiveController {
     await invoke("get_snippets", params).then((result) => {
       const snippets = result as Array<Snippet>;
       this.host.appDataSnippets = { snippets };
-      /* if(this.host.appSettings.log_level >= Log_Level.Debug_Frontend) {
-        
-      } */
-      this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "load_data: success", cmd: "get_snippets", args: {}, meta_url: import.meta.url }}));
+      if(this.host.appSettings.log_level >= Log_Level.Debug_Frontend) {
+        this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "load_data: success", cmd: "get_snippets", args: {}, meta_url: import.meta.url }}));
+      }
     }).catch((err) => {
        this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "load_data: " + err, cmd: "get_snippets", args: {}, meta_url: import.meta.url }}));
     });
@@ -52,7 +51,6 @@ export default class MainInvoker implements ReactiveController {
   get_snippet_setting_params() {
     let order_strings: Array<object> | null = this.host.appSettings.search_order.filter((item) => item.order !== 0).map((item) => {
         return { column_name: item.value, order_dir: item.order };
-
     });
 
     if (order_strings.length === 0) order_strings = null;

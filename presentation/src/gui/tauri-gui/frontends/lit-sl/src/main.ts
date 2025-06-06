@@ -1,5 +1,4 @@
 import { html, css, LitElement, PropertyValues } from 'lit';
-//import { LitElementLightDOM } from './utils/litlightdom.js';
 import { customElement, state, query } from 'lit/decorators.js';
 
 import {provide} from '@lit/context';
@@ -12,32 +11,17 @@ import './components/snippet-list.js';
 import './components/settings-logger.js';
 import './components/drawer.js';
 import './components/snippet/create-snippet.js';
-// import './test/test-vanilla-comp.js';
-// import './test/test-wrapper.js';
-
-
 import mainStyles from './styles/mainStyle.js';
 import sharedStyles from './styles/shared-styles.js';
-
-
 import {
   AppDataSnippets, appDataSnippetsContext,
   AppDataCategories, appDataCategoriesContext,
   AppSettings, appSettingContext  } from './utils/app-context.js';
 
-// const controllerModule = import.meta.env.VITE_USE_MOCK_DATA ? await import('./test-controllers/main-controller.js') : await import('./controllers/main-controller.js');
-// const MainController: typeof controllerModule = controllerModule;
-//import MainController from './controllers/main-controller.js';
 import { MainInvoker } from './types.js';
 import { Categories } from './components/categories.js';
 import { SnippetList } from './components/snippet-list.js';
 import { TreeNode } from './components/tree.js';
-//import { MainController } from './test-controllers/main-controller.js';
-
-//
-//import { TreeNode } from './components/tree.js';
-
-
 
 @customElement('main-app')
 export class App extends LitElement {
@@ -45,7 +29,6 @@ export class App extends LitElement {
     mainStyles,
     sharedStyles,
     css `
-
       :host {
         display: block;
         border: 1px solid red;
@@ -76,12 +59,6 @@ export class App extends LitElement {
     `
   ];
 
-  // @provide({ context: appDataContext })
-  // @state()
-  // appData: AppData = {
-  //   snippets: [],
-  //   categories: [],
-  // };
   @provide({ context: appDataSnippetsContext })
   @state()
   appDataSnippets: AppDataSnippets = {
@@ -101,7 +78,7 @@ export class App extends LitElement {
     selected_categories: [],
     tag_filter: [],
     category_filter_flag: false,
-    log_level: Log_Level.Debug,
+    log_level: Log_Level.Debug_Frontend,
     search_order: [
       { title: "title", value: "title", order: Order.NONE },
       { title: "created", value: "created_at", order: Order.NONE },
@@ -129,11 +106,6 @@ export class App extends LitElement {
     }
   };
 
-  // @provide({ context: saveSettingsContext })
-  // update_selection = (selected_ids: Array<number>) => {
-  //   this.appSettings = {open_categories: this.appSettings.open_categories,  selected_categories: selected_ids };
-  // }
-
   @state()
   categories: Array<TreeNode> = [];
 
@@ -151,17 +123,7 @@ export class App extends LitElement {
   constructor() {
     super();
     this.main_controller.load_data();
-    //console.log("USE_MOCK_DATA:", import.meta.env.VITE_USE_MOCK_DATA);
-    //this.main_controler.init_handlers();
-
   }
-
-  // async loadData() {
-  //   const load_categories = await invoke("get_categories").catch(err => console.log(err)) as Array<Tag>;
-  //   this.categories = buildTreeArray(load_categories);
-
-  //   this.snippets = await invoke("get_snippets").catch(err => console.log(err)) as Array<Snippet>;
-  // }
 
   toggleStyle() {
     console.log("toggleStyle");
@@ -181,8 +143,7 @@ export class App extends LitElement {
   }
 
   protected async firstUpdated(_changedProperties: PropertyValues) {
-    //await new Promise(requestAnimationFrame);
-    //this.main_controler.load_data();
+    //
   }
 
 
@@ -211,7 +172,6 @@ export class App extends LitElement {
 
               </div>
           </footer>
-
       </div>
       <drawer-comp>
           <create-snippet></create-snippet>
