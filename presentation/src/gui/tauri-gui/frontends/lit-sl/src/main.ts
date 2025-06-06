@@ -4,7 +4,7 @@ import { customElement, state, query } from 'lit/decorators.js';
 
 import {provide} from '@lit/context';
 
-import { Order, SearchOrder, Snippet} from './types';
+import { Order, SearchOrder, Snippet, Log_Level} from './types';
 
 import './components/categories.js';
 import './components/header-comp.js';
@@ -101,6 +101,7 @@ export class App extends LitElement {
     selected_categories: [],
     tag_filter: [],
     category_filter_flag: false,
+    log_level: Log_Level.Debug,
     search_order: [
       { title: "title", value: "title", order: Order.NONE },
       { title: "created", value: "created_at", order: Order.NONE },

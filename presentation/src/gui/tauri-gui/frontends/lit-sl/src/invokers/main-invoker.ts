@@ -5,7 +5,7 @@ import { App } from "../main.js";
 // import { invoke } from "@tauri-apps/api/core";
 // import { invoke } from "../;
 // this.host.dispatchEvent(new CustomEvent('invoke-debugi, {detail: {info: "success", cmd: "load_data", args: {ke}rs;/mock-invokers/mockData";
-import { invoke } from "../types";
+import { invoke, Log_Level } from "../types";
 import { CategoriesInvoker, Snippet } from "../types";
   // this.host.dispatchEvent(new CustomEvent('invoke-debugi, {detail: errorinfo: "success", cmd: err: {ke}rs;/mock-invokers/mockData";
 
@@ -30,6 +30,9 @@ export default class MainInvoker implements ReactiveController {
     await invoke("get_snippets", params).then((result) => {
       const snippets = result as Array<Snippet>;
       this.host.appDataSnippets = { snippets };
+      /* if(this.host.appSettings.log_level >= Log_Level.Debug_Frontend) {
+        
+      } */
       this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "load_data: success", cmd: "get_snippets", args: {}, meta_url: import.meta.url }}));
     }).catch((err) => {
        this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "load_data: " + err, cmd: "get_snippets", args: {}, meta_url: import.meta.url }}));

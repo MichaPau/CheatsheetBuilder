@@ -66,7 +66,7 @@ export default class CategoriesInvoker implements ReactiveController {
   }
   onDeleteCategory = async(ev: CustomEvent) => {
      await invoke("get_snippet_count_for_tag", { tagId: ev.detail.tag_id }).then(async (count_result) => {
-       
+        this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "onDeleteCategory: success", cmd: "get_snippet_count_for_tag", args: { tagId: ev.detail.tag_id }, meta_url: import.meta.url }}));
         const dlg = new ConfirmDialog();
         dlg.message = "Delete category " + ev.detail.title + " " + count_result + " snippets are using it.";
         this.host.shadowRoot?.appendChild(dlg);
