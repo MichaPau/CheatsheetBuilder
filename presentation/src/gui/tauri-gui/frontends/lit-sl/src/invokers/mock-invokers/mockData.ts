@@ -29,7 +29,7 @@ export let snippet_tags: Array<{ snippet_id: number, tag_id: number }> = [
   { snippet_id: 2, tag_id: 1002 },
 ];
 
-export function invoke(cmd:string,args:InvokeArgs = {},options?:InvokeOptions): Promise<any> {
+export function invoke(cmd:string,args:InvokeArgs = {},_options?:InvokeOptions): Promise<any> {
 
   return new Promise(async (resolve, reject) => {
     switch (cmd) {
@@ -39,8 +39,13 @@ export function invoke(cmd:string,args:InvokeArgs = {},options?:InvokeOptions): 
       case "get_categories":
         resolve(get_categories());
         break;
-      case "get_parent_tags"://tagId
+      //tagId
+      case "get_parent_tags": 
+        resolve(get_parent_tags((args as any).tagId));
+        break;
       case "get_tags"://tagIdFilter,
+        resolve(get_tags((args as any).tagIdList));
+        break;
       case "append_tag": //snippetId, tagId
       case "search_tags": //pattern
       case "update_snippet_title": //id, newTitle
@@ -83,7 +88,25 @@ export function get_snippets() {
 
   return result
 }
-
+function get_parent_tags(tag_id: number) {
+  const tag = tags.find((tag) => tag.id === tag_id);
+  let result = [tag];
+  let parent_id = tag?.parent_id;
+  while (parent_id) {
+    const p_tag = tags.find((tag) => tag.id === parent_id);
+    if(p_tag) {
+      result.push(p_tag);
+      parent_id = p_tag.parent_id;
+    } else {
+      parent_id = null;
+    }
+  }
+  return result;  
+}
+function get_tags(id_list: Array<number>) {
+  const result = tags.filter((tag) => id_list.includes(tag.id));
+  return result;
+}
 export function generate_random_snippets(size: number) {
 
   snippets = [];

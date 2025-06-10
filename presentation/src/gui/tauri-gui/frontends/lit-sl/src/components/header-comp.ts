@@ -75,10 +75,8 @@ export class HeaderComp extends LitElement {
     return super.shouldUpdate(_changedProperties);
   }
   async loadTagList() {
-      console.log("load tag list");
       if (this.tag_id_list.length > 0) {
-        await TagListInvoker.getTags(this.tag_id_list).then(result => {
-          console.log("load tag list result:", result);
+        await TagListInvoker.getTags(this.tag_id_list, this).then(result => {
           this.tag_list = result;
         });
       } else {
@@ -139,12 +137,6 @@ export class HeaderComp extends LitElement {
   }
   render() {
     return html`
-        <!-- <div id="search-button-container2">
-            <search-order-button draggable="true" label="title" value="title" .state=${Order.DESC} id="button_1"></search-order-button>
-            <search-order-button draggable="true" label="created" value="createdat" .state=${Order.ASC} id="button_2"></search-order-button>
-            <search-order-button draggable="true" label="updated" value="updatedat" .state=${Order.NONE} id="button_3"></search-order-button>
-            <search-order-button draggable="true" label="test" value="test" .state=${Order.NONE} id="button_4"></search-order-button>
-        </div> -->
         <div id="header-container">
             <track-active-element></track-active-element>
             <div id="search-button-container">

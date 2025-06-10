@@ -35,7 +35,7 @@ export type SearchOrder = {
 export enum Log_Level {
   Error = 1,
   Debug = 2,
-  Debug_Frontend = 3,
+  Debug_With_Stack = 3,
 } 
 // export type TreeCategory = {
 //     item: Tag,

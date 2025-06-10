@@ -16,8 +16,6 @@ export class TagItem extends LitElement {
       .icon-button {
           all: unset;
           cursor: pointer;
-          /* margin-left: var(--spacer-small); */
-          /* border: 1px solid black; */
 
           img {
               vertical-align: middle;
@@ -49,8 +47,6 @@ export class TagItem extends LitElement {
               z-index: var(--z-index-menu);
               bottom: 100%;
               left: 0;
-              /* width: 300px;
-              height: 300px; */
           }
       }
 
@@ -58,8 +54,6 @@ export class TagItem extends LitElement {
           border-bottom: 1px solid black;
       }
     `
-
-
   ];
 
   @property({type: Object})
@@ -74,11 +68,9 @@ export class TagItem extends LitElement {
   }
 
   protected shouldUpdate(_changedProperties: PropertyValues): boolean {
-    //console.log("TagItem::shouldUpdate", _changedProperties);
     return super.shouldUpdate(_changedProperties);
   }
   showParents(tag_list: Array<Tag>) {
-    console.log("show parents");
     this.parent_tags = tag_list;
     const dropdown = this.shadowRoot?.querySelector(".menu-container");
     if (dropdown) {
@@ -86,10 +78,10 @@ export class TagItem extends LitElement {
     }
   }
   onTriggerParents = (_ev:Event) => {
-    console.log("Tag::onTriggerParents:", this);
-
+    console.log("onTriggeraParents: ", _ev.target, _ev.currentTarget);
     this.dispatchEvent(new CustomEvent("get-parent-tags", { bubbles: false, composed: false, detail: { id: this.tag.id } }));
   }
+
   async removeParents() {
 
     const dropdown = this.shadowRoot?.querySelector(".menu-container");
@@ -105,10 +97,12 @@ export class TagItem extends LitElement {
   render() {
     if (this.tag.tag_type === "Category") {
         return html`
-            <div class="tag-container" @mouseover=${this.onTriggerParents} @mouseleave=${this.removeParents}>
-                <div class="tag category">
+            <div class="tag-container">
+                <div class="tag category" @mouseenter=${this.onTriggerParents} @mouseleave=${this.removeParents}>
                     ${this.tag.title}
-                    <button class="icon-button" @click=${this.removeTag}>
+                    <button class="icon-button"
+                      @click=${this.removeTag}
+>
                         <img src="./src/assets/icons/x-circle.svg"/>
                     </button>
                 </div>
@@ -136,9 +130,5 @@ export class TagItem extends LitElement {
   }
 }
 
-//<div class="tag-text">${this.tag.title}</div>
-// <sl-button
-//     @mouseover=${this.onTriggerParents}
-//     @mouseleave=${this.removeParents}
-//     variant="warning" slot="trigger" size="small" caret>${this.tag.title}
-// </sl-button>
+                      // @mouseover=${(ev: Event) => { ev.stopPropagation(); return false;}}
+                      // @mouseleave=${(ev: Event) => { ev.stopPropagation(); return false;}}

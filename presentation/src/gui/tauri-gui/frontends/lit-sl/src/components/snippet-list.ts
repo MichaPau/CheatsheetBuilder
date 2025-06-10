@@ -27,24 +27,9 @@ export class SnippetList extends LitElement {
       }
     `
   ];
-  // private _myData = new ContextConsumer(this, {
-  //     context: appDataContext,
-  //   callback: (value: AppData) => {
-  //     console.log("callback from snippet-list");
-  //     console.log(JSON.stringify(value.snippets));
-  //     this.snippets = value.snippets;
-  //   },
-  //     subscribe: true,
-  //   }
-  // );
   @consume({ context: appDataSnippetsContext, subscribe: true })
   @state()
   appDataSnippets!: AppDataSnippets;
-  // @state()
-  // snippets: Array<Snippet> = [];
-
-  // @property({attribute: false})
-  // snippets: Array<Snippet> = [];
 
   protected shouldUpdate(_changedProperties: PropertyValues): boolean {
     //console.log("SnippetList::shouldUpdate", _changedProperties);
@@ -52,7 +37,6 @@ export class SnippetList extends LitElement {
   }
   connectedCallback(): void {
     super.connectedCallback();
-    console.log("connectedCallback");
   }
   protected firstUpdated(_changedProperties: PropertyValues): void {
     //this.dispatchEvent(new Event('get_data', { bubbles: true, composed: true }));

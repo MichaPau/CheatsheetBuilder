@@ -78,12 +78,12 @@ export class App extends LitElement {
     selected_categories: [],
     tag_filter: [],
     category_filter_flag: false,
-    log_level: Log_Level.Debug_Frontend,
+    log_level: Log_Level.Error,
     search_order: [
       { title: "title", value: "title", order: Order.NONE },
       { title: "created", value: "created_at", order: Order.NONE },
       { title: "updated", value: "updated_at", order: Order.NONE },
-      { title: "nonvalid", value: "nonvalidcomumn", order: Order.NONE },
+      // { title: "nonvalid", value: "nonvalidcomumn", order: Order.NONE },
     ],
     toggle_open: (id: number, state: boolean) => {
       let open_ids = this.appSettings.open_categories.filter(i => i !== id);;
@@ -138,8 +138,6 @@ export class App extends LitElement {
   }
   connectedCallback(): void {
     super.connectedCallback();
-    console.log("connectedCallback main");
-
   }
 
   protected async firstUpdated(_changedProperties: PropertyValues) {

@@ -5,38 +5,48 @@ import { ConfirmDialog } from "../components/confirm-dialog";
 
 export default class SnippetInvoker {
 
-  static async addTag(tag_id: number, snippet_id: number): Promise<Array<Tag>> {
+  static async addTag(tag_id: number, snippet_id: number, host: HTMLElement): Promise<Array<Tag>> {
     return new Promise(async (resolve, reject) => {
-      let result: Array<Tag> = await invoke("append_tag", { snippetId: snippet_id, tagId: tag_id }) as Array<Tag>;
-      if (result) {
-        resolve(result);
-      } else {
-        reject("SnippetInvoker::addTag no result");
-      }
+      const args = { snippetId: snippet_id, tagId: tag_id };
+      await invoke("append_tag", args)
+        .then((result) => {
+          resolve(result as Array<Tag>); 
+          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "addTag: success", cmd: "append_tag", args }}));
+        }).catch((err) => {
+          reject("SnippetInvoker::addTag no result");
+          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "addTag: " + err, cmd: "append_tag", args }}));
+        });
     });
-
-  }
-  static async searchTags(pattern: string): Promise<Array<Tag>> {
-    let search_tags_result: Array<Tag> = await invoke("search_tags", { pattern: pattern, }).catch(err => {
-      console.log(err);
-      return [];
-    }) as Array<Tag>;
-    return search_tags_result;
   }
 
-  static async updateTitle(id: number, new_title: string): Promise<boolean> {
+  static async searchTags(pattern: string, host: HTMLElement): Promise<Array<Tag>> {
     return new Promise(async (resolve, reject) => {
-      await invoke("update_snippet_title", { id: id, newTitle: new_title }).then((_result)=> {
-        resolve(true);
+      await invoke("search_tags", { pattern: pattern, }).then((search_tag_result) => {
+        resolve(search_tag_result as Array<Tag>);
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "searchTags: success", cmd: "search_tags", args: {pattern: pattern} }}));
       }).catch(err => {
-        console.log(err);
+        reject(err);
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "searchTags: " + err, cmd: "search_tags", args: { pattern: pattern } }}));
+      }) 
+    });
+    
+  }
+
+  static async updateTitle(id: number, new_title: string, host: HTMLElement): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      const args = { id: id, newTitle: new_title };
+      await invoke("update_snippet_title", args ).then((_result)=> {
+        resolve(true);
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "updateTitle: success", cmd: "update_snippet_title", args }}));
+       }).catch(err => {
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "updateTitle: " + err, cmd: "update_snippet_title", args }}));
         reject(false);
       });
 
     });
 
   }
-  static async deleteSnippet(id: number): Promise<boolean> {
+  static async deleteSnippet(id: number, host: HTMLElement): Promise<boolean> {
 
       return new Promise(async (resolve, reject) => {
         const dlg = new ConfirmDialog();
@@ -47,8 +57,10 @@ export default class SnippetInvoker {
         if (answer) {
           await invoke("delete_snippet", { id: id }).then((_result) => {
             resolve(true);
+            host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "deleteSnippet: success", cmd: "delete_snippet", args: { id: id } }}));
           }).catch((err) => {
             reject(err);
+            host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "deleteSnippet: " + err, cmd: "delete_snippet", args: { id: id } }}));
           });
         } else {
           reject("delete canceled");
@@ -58,55 +70,76 @@ export default class SnippetInvoker {
 
   }
 
-  static async updateTextContent(id: number, new_content: string, text_type: TextType): Promise<boolean> {
+  static async updateTextContent(id: number, new_content: string, text_type: TextType, host: HTMLElement): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
-      await invoke("update_snippet_text", { id: id, newText: new_content, textType: text_type }).then((_result) => {
+      const args = { id: id, newText: new_content, textType: text_type };
+      await invoke("update_snippet_text", args).then((_result) => {
         resolve(true);
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "updateTextContent: success", cmd: "update_snippet_text", args }}));
       }).catch((err) => {
-        console.log(err);
         reject(err);
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "updateTextContent: " + err, cmd: "update_snippet_text", args }}));
       })
     });
   }
 
-  static async createTag(title: string): Promise<Tag> {
+  static async createTag(title: string, host: HTMLElement): Promise<Tag> {
     return new Promise(async (resolve, reject) => {
       await invoke("create_tag", { title })
-        .then((result) => resolve(result as Tag))
-        .catch((err) => reject(err));
+        .then((result) => {
+          resolve(result as Tag);        
+          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createTag: success", cmd: "create_tag", args: { title } }}));
+        })
+        .catch((err) => {
+          reject(err);        
+          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createTag: " + err, cmd: "create_tag", args: { title } }}));
+        });
     });
   }
-  static async createTagAndAdd(snippet_id: number, title: string): Promise<Array<Tag>> {
+  static async createTagAndAdd(snippet_id: number, title: string, host: HTMLElement): Promise<Array<Tag>> {
     return new Promise(async (resolve, reject) => {
       await invoke("create_tag", { title })
-        .then((result) => SnippetInvoker.addTag((result as Tag).id, snippet_id))
-        .then((result) => resolve(result))
-        .catch((err) => reject(err));
+        .then((result) => SnippetInvoker.addTag((result as Tag).id, snippet_id, host))
+        .then((result) => {
+          resolve(result);
+          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createTagAndAdd: success", cmd: "create_tag", args: { title } }}));
+        })
+        .catch((err) => {
+          reject(err);
+          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createTagAndAdd: " + err, cmd: "create_tag", args: { title } }}));
+        });
     });
   }
-  static async removeTag(snippet_id: number, tag_id: number): Promise<Array<Tag>> {
+
+  static async removeTag(snippet_id: number, tag_id: number, host: HTMLElement): Promise<Array<Tag>> {
     return new Promise(async (resolve, reject) => {
-      let result: Array<Tag> = await invoke("remove_tag_from_snippet", { snippetId: snippet_id, tagId: tag_id }) as Array<Tag>;
-      if (result) {
+      const args = { snippetId: snippet_id, tagId: tag_id };
+      await invoke("remove_tag_from_snippet", args).then((result) => {
         resolve(result);
-      } else {
-        reject("SnippetInvoker::removeTag error");
-      }
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "removeTag: success", cmd: "remove_tag_from_snippet", args }}));
+      }).catch((err) => {
+        reject(err);
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "removeTag: " + err, cmd: "remove_tag_from_snippet", args }}));
+      });
     });
 
   }
-  static async createSnippet(snippet: Snippet): Promise<boolean> {
 
-    console.log("SnippetInvoker::createSnippet");
+  static async createSnippet(snippet: Snippet, host: HTMLElement): Promise<boolean> {
+
     const tagIds = snippet.tags.map((tag) => tag.id);
 
     return new Promise(async (resolve, reject) => {
-      await invoke("create_snippet", { title: snippet.title, text: snippet.text, textType: snippet.text_type, tagIds: tagIds })
+      const args = { title: snippet.title, text: snippet.text, textType: snippet.text_type, tagIds: tagIds };
+      await invoke("create_snippet", args)
         .then((_result) => {
-          console.log("result: ", _result);
           resolve(true);
+          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createSnippet: success", cmd: "create_snippet", args }}));
         })
-        .catch((err) => reject("Error createSnippet: " + err));
+        .catch((err) => {
+          reject(err);
+          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createSnippet: " + err, cmd: "create_snippet", args }}));
+        });
     });
 
   }

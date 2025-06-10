@@ -35,6 +35,7 @@ export class TagSearchBar extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
   }
+
   onSearchTagChange = async (_ev: Event) => {
 
     this.tagSearchResult.replaceChildren();
@@ -43,50 +44,54 @@ export class TagSearchBar extends LitElement {
 
     if (pattern.length >= this.min_char_trigger_search) {
 
-      let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
+      await SnippetInvoker.searchTags(pattern, this).then((tags) => {
 
-      for (const t of tags) {
+        for (const t of tags) {
 
-          var tag = document.createElement("div");
-          tag.classList.add("tag");
-          t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
+            var tag = document.createElement("div");
+            tag.classList.add("tag");
+            t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
 
-          tag.innerHTML = `${t.title}`;
+            tag.innerHTML = `${t.title}`;
 
-          if (this.recurrent_tags.some(st => st.id === t.id)) {
-            tag.classList.add("disabled");
-          } else {
+            if (this.recurrent_tags.some(st => st.id === t.id)) {
+              tag.classList.add("disabled");
+            } else {
 
-            tag.addEventListener("click", (_e) => this.dispatchEvent(new CustomEvent("add-search-tag", { bubbles: true, composed: true, detail: {tag: t} })));
-          }
-          this.tagSearchResult.appendChild(tag);
-      }
-
-      if (this.allowNewTags) {
-        if (tags.findIndex((tag) => tag.title.toLowerCase() === pattern.toLowerCase()) === -1) {
-          var tag = document.createElement("div");
-          tag.classList.add("tag");
-          tag.classList.add("create");
-
-          tag.innerHTML = `${pattern}`;
-
-          tag.addEventListener("click", (_e) => this.dispatchEvent(new CustomEvent("create-search-tag", { bubbles: true, composed: true, detail: { label: pattern } })));
-
-          this.tagSearchResult.appendChild(tag);
+              tag.addEventListener("click", (_e) => this.dispatchEvent(new CustomEvent("add-search-tag", { bubbles: true, composed: true, detail: {tag: t} })));
+            }
+            this.tagSearchResult.appendChild(tag);
         }
-      }
+
+        if (this.allowNewTags) {
+          if (tags.findIndex((tag) => tag.title.toLowerCase() === pattern.toLowerCase()) === -1) {
+            var tag = document.createElement("div");
+            tag.classList.add("tag");
+            tag.classList.add("create");
+
+            tag.innerHTML = `${pattern}`;
+
+            tag.addEventListener("click", (_e) => this.dispatchEvent(new CustomEvent("create-search-tag", { bubbles: true, composed: true, detail: { label: pattern } })));
+
+            this.tagSearchResult.appendChild(tag);
+          }
+        }
+      });
     }
   }
+
   onInputBlur(ev: Event) {
     ev.stopPropagation();
     ev.preventDefault();
   }
+
   clearResult() {
         //const search_target = this.shadowRoot?.querySelector("#tag-search-result");
         this.tagSearchResult.replaceChildren();
         //const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
         this.tagSearchInput.value = "";
   }
+
   render() {
     return html`
         <div class="tag-search-container">

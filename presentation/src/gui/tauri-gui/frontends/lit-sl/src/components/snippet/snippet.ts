@@ -4,7 +4,6 @@ import { customElement, query, property } from 'lit/decorators.js';
 import sharedStyles from '../../styles/shared-styles.js';
 import snippetStyles from './snippet-styles.js';
 import { Snippet, Tag, SnippetInvoker } from '../../types.js';
-//import SnippetInvoker from '../../invokers/mock-invokers/snippet-invoker.js';
 
 import {BaseElement } from '../../utils/base-element.js';
 import './snippet-editor.js';
@@ -29,13 +28,6 @@ export class SnippetContainer extends BaseElement {
 
   @query("#footer")
   footer!: HTMLDetailsElement;
-  // @query("#tag-search-input")
-  // tagSearchInput!: HTMLInputElement;
-
-  // @query("#tag-search-result")
-  // tagSearchResult!: HTMLElement;
-
-  // private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -49,22 +41,18 @@ export class SnippetContainer extends BaseElement {
     this.footer.addEventListener("toggle", this.toggleDetailsHandler);
  }
   protected shouldUpdate(_changedProperties: PropertyValues): boolean {
-    //console.log("Snippet::shouldUpdate", _changedProperties);
     return super.shouldUpdate(_changedProperties);
   }
 
-  toggleDetailsHandler = (ev: Event) => {
+  toggleDetailsHandler = (_ev: Event) => {
     /* if (this.footer.open) {
       this.footer.focus();
     } */
   }
 
   onEditTitle = (ev: Event) => {
-    console.log("onedittitle");
     const title_elem = ev.target! as HTMLInputElement;
-
     title_elem.readOnly = false;
-    //label_elem.focus();
   }
   onBlurTitle = async (ev: Event) => {
 
@@ -72,8 +60,7 @@ export class SnippetContainer extends BaseElement {
     title_elem.readOnly = true;
 
     if (this.snippet.title !== title_elem.value) {
-      // console.log("title changed!");
-      await SnippetInvoker.updateTitle(this.snippet.id, title_elem.value)
+      await SnippetInvoker.updateTitle(this.snippet.id, title_elem.value, this)
         .then((_result_flag) => {
           super.showSuccess();
         })
@@ -86,10 +73,6 @@ export class SnippetContainer extends BaseElement {
   }
 
   onBlurDetails = (ev: FocusEvent) => {
-    console.log("new2");
-    /* console.log("onBlurDetails relatedTarget:",ev.relatedTarget);
-    console.log("onBlurDetails currentTarget:",ev.currentTarget);
-    console.log("onBlurDetails target:",ev.target); */
 
     if (!(ev.currentTarget as HTMLElement).contains(ev.relatedTarget as Node)) {
 
@@ -115,14 +98,13 @@ export class SnippetContainer extends BaseElement {
     const index = this.snippet.tags.findIndex(e => e.id === tag.id);
     if (index === -1) {
       //this.snippet_controler.addTag(id);
-      await SnippetInvoker.addTag(tag.id, this.snippet.id)
+      await SnippetInvoker.addTag(tag.id, this.snippet.id, this)
         .then((tag_result) => {
           this.snippet = { ...this.snippet, tags: tag_result };
           super.showSuccess();
           this.tagSearchBar.clearResult();
         })
-        .catch((err) => {
-          console.log(err);
+        .catch((_err) => {
           super.showError();
         })
     }
@@ -130,93 +112,34 @@ export class SnippetContainer extends BaseElement {
 
   createTag = async (ev: CustomEvent) => {
     const title = ev.detail.label;
-    await SnippetInvoker.createTagAndAdd(this.snippet.id, title).then((tag_result) => {
+    await SnippetInvoker.createTagAndAdd(this.snippet.id, title, this).then((tag_result) => {
       this.snippet = { ...this.snippet, tags: tag_result };
       super.showSuccess();
       this.tagSearchBar.clearResult();
-    }).catch((err) => {
-      console.log("create-tag:", err);
+    }).catch((_err) => {
       super.showError();
     });
   }
+
   removeTag = async (ev:CustomEvent) => {
 
-    await SnippetInvoker.removeTag(this.snippet.id, ev.detail.tag_id)
+    await SnippetInvoker.removeTag(this.snippet.id, ev.detail.tag_id, this)
       .then((tag_result) => {
         this.snippet = { ...this.snippet, tags: tag_result };
       })
-      .catch((err) => {
-        console.log(err);
+      .catch((_err) => {
+        super.showError();
       })
-    //this.snippet_controler.removeTag(this.snippet.id, ev.detail.tag_id)
-    //console.log("removetag: ", this.snippet.id, ev.detail.tag_id);
-
   }
 
-  // clearTagSearchResult() {
-  //       const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-  //       search_target?.replaceChildren();
-  //       const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
-  //       search_input.value = "";
-  // }
-  // tagResult(new_tags: Array<Tag>, clear_search: boolean = false) {
-
-  //   if (clear_search) {
-  //     const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-  //     search_target?.replaceChildren();
-  //     const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
-  //     search_input.value = "";
-  //   }
-  //   this.snippet.tags = new_tags;
-  //   this.requestUpdate();
-  // }
-  // onSearchTagChange = async (ev: Event) => {
-  //   const search_target = this.shadowRoot?.querySelector("#tag-search-result");
-  //   search_target?.replaceChildren();
-
-  //   let pattern = (ev.target as HTMLInputElement).value;
-
-  //   if (pattern.length >= 3) {
-  //     console.log(SnippetInvoker.searchTags);
-  //     let tags: Array<Tag> = await SnippetInvoker.searchTags(pattern);
-
-  //     for (const t of tags) {
-
-  //         var tag = document.createElement("div");
-  //         tag.classList.add("tag");
-  //         t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
-
-  //         tag.innerHTML = `${t.title}`;
-
-  //         if (this.snippet.tags.some(st => st.id === t.id)) {
-  //           tag.classList.add("disabled");
-  //         } else {
-  //           tag.addEventListener("click", (e) => this.addTag(t.id, e));
-  //         }
-  //         search_target?.appendChild(tag);
-  //     }
-
-  //     if(tags.findIndex((tag) => tag.title === pattern) === -1) {
-  //       var tag = document.createElement("div");
-  //       tag.classList.add("tag");
-  //       tag.classList.add("create");
-
-  //       tag.innerHTML = `${pattern}`;
-  //       tag.addEventListener("click", (_e) => this.createTag(pattern));
-
-  //       search_target?.appendChild(tag);
-  //     }
-  //   }
-  // }
-
   async removeSnippet(_ev:Event) {
-    await SnippetInvoker.deleteSnippet(this.snippet.id)
+    await SnippetInvoker.deleteSnippet(this.snippet.id, this)
       .then((_result) => {
         this.dispatchEvent(new Event('reload-snippets', { bubbles: true, composed: true }));
       }).catch(_err => super.showError());
   }
   async editorContentUpdate(ev: CustomEvent) {
-    await SnippetInvoker.updateTextContent(this.snippet.id, ev.detail.content_text, ev.detail.text_type)
+    await SnippetInvoker.updateTextContent(this.snippet.id, ev.detail.content_text, ev.detail.text_type, this)
       .then((_result) => {
         super.showSuccess();
       })
@@ -226,7 +149,7 @@ export class SnippetContainer extends BaseElement {
   }
 
   async md_update(ev: CustomEvent) {
-    await SnippetInvoker.updateTextContent(this.snippet.id, ev.detail, "Markdown")
+    await SnippetInvoker.updateTextContent(this.snippet.id, ev.detail, "Markdown", this)
       .then((_result) => {
         super.showSuccess();
       })
@@ -253,10 +176,7 @@ export class SnippetContainer extends BaseElement {
                 <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.snippet.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
 
             </details>
-
-
         </div>
-
     `;
   }
 }

@@ -30,11 +30,9 @@ export default class MainInvoker implements ReactiveController {
     await invoke("get_snippets", params).then((result) => {
       const snippets = result as Array<Snippet>;
       this.host.appDataSnippets = { snippets };
-      if(this.host.appSettings.log_level >= Log_Level.Debug_Frontend) {
-        this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "load_data: success", cmd: "get_snippets", args: {}, meta_url: import.meta.url }}));
-      }
+        this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "load_data: success", cmd: "get_snippets", args: {} }}));
     }).catch((err) => {
-       this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "load_data: " + err, cmd: "get_snippets", args: {}, meta_url: import.meta.url }}));
+       this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "load_data: " + err, cmd: "get_snippets", args: {} }}));
     });
 
   }
@@ -70,7 +68,13 @@ export default class MainInvoker implements ReactiveController {
 
 
   invoke_debug = async (ev: Event) => {
-    console.log("Debug: %o", (ev as CustomEvent).detail);
+    if (this.host.appSettings.log_level >= Log_Level.Debug) {
+      console.log("Debug: %o", (ev as CustomEvent).detail);
+      if (this.host.appSettings.log_level >= Log_Level.Debug_With_Stack) {
+        var stackTrace = Error().stack;
+        console.log(stackTrace);
+      }
+    }
   }
   invoke_error = async (ev: Event) => {
     console.log("Error: %o", (ev as CustomEvent).detail);

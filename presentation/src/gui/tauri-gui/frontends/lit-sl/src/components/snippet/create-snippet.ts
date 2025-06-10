@@ -38,10 +38,6 @@ export class CreateSnippet extends BaseElement {
   @query("#tag-search-bar")
   tagSearchBar!: TagSearchBar;
 
-
-
-  //private snippet_controler: SnippetInvoker = new SnippetInvoker(this);
-
   connectedCallback(): void {
     super.connectedCallback();
   }
@@ -76,26 +72,20 @@ export class CreateSnippet extends BaseElement {
   }
   createTag = async (ev: CustomEvent) => {
     const title = ev.detail.label;
-    await SnippetInvoker.createTag(title).then((tag_result) => {
-      console.log("createTag result:", tag_result);
+    await SnippetInvoker.createTag(title, this).then((tag_result) => {
       const tags = this.tags.concat(tag_result);
       this.tags = [...tags];
       this.tagSearchBar.clearResult();
-    }).catch((err) => {
-      console.log("create-tag:", err);
+    }).catch((_err) => {
       super.showError();
     });
   }
 
   removeTag = async (ev:CustomEvent) => {
-    //console.log("create-snippet::removeTag", ev.detail.tag_id);
     let tags = this.tags.filter((_t => _t.id !== ev.detail.tag_id));
     this.tags = [...tags];
 
   }
-
-
-
 
   clearAndClose() {
     this.titleInput.value = "";
@@ -120,13 +110,13 @@ export class CreateSnippet extends BaseElement {
 
   async onSave(_ev: Event) {
     const snippet: Snippet = { id: 0, title: this.titleInput.value, text: this.editorComponent.text_data, tags: this.tags, text_type: "Markdown", created_at: 0, updated_at: 0 };
-    await SnippetInvoker.createSnippet(snippet)
+    await SnippetInvoker.createSnippet(snippet, this)
       .then((_) => {
         this.dispatchEvent(new Event('reload-snippets', { bubbles: true, composed: true}));
         this.clearAndClose();
       })
-      .catch((err) => {
-        console.log(JSON.stringify(err));
+      .catch((_err) => {
+        super.showError();
       });
 
   }
