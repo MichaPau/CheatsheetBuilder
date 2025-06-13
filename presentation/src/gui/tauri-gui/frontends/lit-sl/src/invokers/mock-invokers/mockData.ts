@@ -43,11 +43,15 @@ export function invoke(cmd:string,args:InvokeArgs = {},_options?:InvokeOptions):
       case "get_parent_tags": 
         resolve(get_parent_tags((args as any).tagId));
         break;
-      case "get_tags"://tagIdFilter,
-        resolve(get_tags((args as any).tagIdList));
+      //tagIdFilter,
+      case "get_tags":
+        resolve(get_tags((args as any).tagIdFilter));
+        break;
+       //pattern
+      case "search_tags":
+        resolve(search_tags((args as any).pattern));
         break;
       case "append_tag": //snippetId, tagId
-      case "search_tags": //pattern
       case "update_snippet_title": //id, newTitle
       case "remove_tag_from_snippet": //snippetId, tagId
       case "update_tag_title": //tagId, newTitle
@@ -59,7 +63,8 @@ export function invoke(cmd:string,args:InvokeArgs = {},_options?:InvokeOptions):
       case "update_snippet_text": //id, newText, textType
       case "create_tag": //title
       case "create_snippet": //title, text, textType, tagIds
-      
+        reject("not implemented");
+        break;
       default:
         reject("not implemented");
     }
@@ -105,6 +110,11 @@ function get_parent_tags(tag_id: number) {
 }
 function get_tags(id_list: Array<number>) {
   const result = tags.filter((tag) => id_list.includes(tag.id));
+  return result;
+}
+
+function search_tags(pattern: string) {
+  const result = tags.filter((tag) => tag.title.toLowerCase().indexOf(pattern.toLowerCase()) !== -1);
   return result;
 }
 export function generate_random_snippets(size: number) {

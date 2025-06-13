@@ -32,7 +32,7 @@ export default css`
       grid-area: header;
       resize: vertical;
       overflow: scroll;
-      height: 5em;
+      height: auto;
       width: 100%;
       max-height: 15em;
       min-height: 1em;

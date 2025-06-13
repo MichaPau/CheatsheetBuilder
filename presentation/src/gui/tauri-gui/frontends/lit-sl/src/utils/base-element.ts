@@ -45,24 +45,24 @@ export class BaseElement extends LitElement {
     this.classList.add("on-success");
   }
   onSuccessStart = (_ev:Event) => {
-    console.log("success anim start");
+    // console.log("success anim start");
   }
   onSuccessEnd = (_ev:Event) => {
-    console.log("success anim stop");
+    // console.log("success anim stop");
     this.classList.remove("on-success");
     this.removeEventListener("animationstart", this.onSuccessStart);
     this.removeEventListener("animationend", this.onSuccessEnd);
   }
 
   showError() {
-    console.log("show error");
+    // console.log("show error");
     this.addEventListener("animationstart", this.onErrorStart);
     this.addEventListener("animationend", this.onErrorEnd);
 
     this.classList.add("on-error");
   }
   onErrorStart = (_ev:Event) => {
-    console.log("error anim start");
+    // console.log("error anim start");
   }
   onErrorEnd = (_ev:Event) => {
 

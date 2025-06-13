@@ -10,11 +10,11 @@ export default class SnippetInvoker {
       const args = { snippetId: snippet_id, tagId: tag_id };
       await invoke("append_tag", args)
         .then((result) => {
+          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "addTag: success", cmd: "append_tag", args }, composed: true, bubbles: true}));
           resolve(result as Array<Tag>); 
-          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "addTag: success", cmd: "append_tag", args }}));
         }).catch((err) => {
+          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "addTag: " + err, cmd: "append_tag", args }, composed: true, bubbles: true}));
           reject("SnippetInvoker::addTag no result");
-          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "addTag: " + err, cmd: "append_tag", args }}));
         });
     });
   }
@@ -23,10 +23,10 @@ export default class SnippetInvoker {
     return new Promise(async (resolve, reject) => {
       await invoke("search_tags", { pattern: pattern, }).then((search_tag_result) => {
         resolve(search_tag_result as Array<Tag>);
-        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "searchTags: success", cmd: "search_tags", args: {pattern: pattern} }}));
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "searchTags: success", cmd: "search_tags", args: {pattern: pattern} }, composed: true, bubbles: true}));
       }).catch(err => {
         reject(err);
-        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "searchTags: " + err, cmd: "search_tags", args: { pattern: pattern } }}));
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "searchTags: " + err, cmd: "search_tags", args: { pattern: pattern } }, composed: true, bubbles: true}));
       }) 
     });
     
@@ -37,9 +37,9 @@ export default class SnippetInvoker {
       const args = { id: id, newTitle: new_title };
       await invoke("update_snippet_title", args ).then((_result)=> {
         resolve(true);
-        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "updateTitle: success", cmd: "update_snippet_title", args }}));
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "updateTitle: success", cmd: "update_snippet_title", args }, composed: true, bubbles: true}));
        }).catch(err => {
-        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "updateTitle: " + err, cmd: "update_snippet_title", args }}));
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "updateTitle: " + err, cmd: "update_snippet_title", args }, composed: true, bubbles: true}));
         reject(false);
       });
 
@@ -57,10 +57,10 @@ export default class SnippetInvoker {
         if (answer) {
           await invoke("delete_snippet", { id: id }).then((_result) => {
             resolve(true);
-            host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "deleteSnippet: success", cmd: "delete_snippet", args: { id: id } }}));
+            host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "deleteSnippet: success", cmd: "delete_snippet", args: { id: id } }, composed: true, bubbles: true}));
           }).catch((err) => {
             reject(err);
-            host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "deleteSnippet: " + err, cmd: "delete_snippet", args: { id: id } }}));
+            host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "deleteSnippet: " + err, cmd: "delete_snippet", args: { id: id } }, composed: true, bubbles: true}));
           });
         } else {
           reject("delete canceled");
@@ -75,10 +75,10 @@ export default class SnippetInvoker {
       const args = { id: id, newText: new_content, textType: text_type };
       await invoke("update_snippet_text", args).then((_result) => {
         resolve(true);
-        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "updateTextContent: success", cmd: "update_snippet_text", args }}));
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "updateTextContent: success", cmd: "update_snippet_text", args }, composed: true, bubbles: true}));
       }).catch((err) => {
         reject(err);
-        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "updateTextContent: " + err, cmd: "update_snippet_text", args }}));
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "updateTextContent: " + err, cmd: "update_snippet_text", args }, composed: true, bubbles: true}));
       })
     });
   }
@@ -88,11 +88,11 @@ export default class SnippetInvoker {
       await invoke("create_tag", { title })
         .then((result) => {
           resolve(result as Tag);        
-          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createTag: success", cmd: "create_tag", args: { title } }}));
+          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createTag: success", cmd: "create_tag", args: { title } }, composed: true, bubbles: true}));
         })
         .catch((err) => {
           reject(err);        
-          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createTag: " + err, cmd: "create_tag", args: { title } }}));
+          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createTag: " + err, cmd: "create_tag", args: { title } }, composed: true, bubbles: true}));
         });
     });
   }
@@ -102,11 +102,11 @@ export default class SnippetInvoker {
         .then((result) => SnippetInvoker.addTag((result as Tag).id, snippet_id, host))
         .then((result) => {
           resolve(result);
-          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createTagAndAdd: success", cmd: "create_tag", args: { title } }}));
+          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createTagAndAdd: success", cmd: "create_tag", args: { title } }, composed: true, bubbles: true}));
         })
         .catch((err) => {
           reject(err);
-          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createTagAndAdd: " + err, cmd: "create_tag", args: { title } }}));
+          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createTagAndAdd: " + err, cmd: "create_tag", args: { title } }, composed: true, bubbles: true}));
         });
     });
   }
@@ -116,10 +116,10 @@ export default class SnippetInvoker {
       const args = { snippetId: snippet_id, tagId: tag_id };
       await invoke("remove_tag_from_snippet", args).then((result) => {
         resolve(result);
-        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "removeTag: success", cmd: "remove_tag_from_snippet", args }}));
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "removeTag: success", cmd: "remove_tag_from_snippet", args }, composed: true, bubbles: true}));
       }).catch((err) => {
         reject(err);
-        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "removeTag: " + err, cmd: "remove_tag_from_snippet", args }}));
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "removeTag: " + err, cmd: "remove_tag_from_snippet", args }, composed: true, bubbles: true}));
       });
     });
 
@@ -134,11 +134,11 @@ export default class SnippetInvoker {
       await invoke("create_snippet", args)
         .then((_result) => {
           resolve(true);
-          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createSnippet: success", cmd: "create_snippet", args }}));
+          host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "createSnippet: success", cmd: "create_snippet", args }, composed: true, bubbles: true}));
         })
         .catch((err) => {
           reject(err);
-          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createSnippet: " + err, cmd: "create_snippet", args }}));
+          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "createSnippet: " + err, cmd: "create_snippet", args }, composed: true, bubbles: true}));
         });
     });
 

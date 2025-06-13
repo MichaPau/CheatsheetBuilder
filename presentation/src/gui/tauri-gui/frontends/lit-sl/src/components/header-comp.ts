@@ -11,7 +11,7 @@ import { SearchOrderButton } from './search-order-button.js';
 import './search-order-button.js';
 import './tag-search-bar.js';
 import './snippet/snippet-tag-list.js';
-import '../test/track_active_element.js';
+// import '../test/track_active_element.js';
 import { TagSearchBar } from './tag-search-bar.js';
 
 @customElement('header-comp')
@@ -96,7 +96,6 @@ export class HeaderComp extends LitElement {
     this.dispatchEvent(new Event("reload-snippets-settings-change", { bubbles: true, composed: true }));
   }
   swapOrder(ev: Event) {
-    console.log("swap");
     const cev = ev as CustomEvent;
     const container = this.shadowRoot!.getElementById("search-button-container");
     let childs = Array.from(container!.children!);
@@ -118,12 +117,12 @@ export class HeaderComp extends LitElement {
   }
 
   addTag = (ev: CustomEvent) => {
-
     const tag: Tag = ev.detail.tag;
     if (this.tag_id_list.findIndex(t => t === tag.id) === -1) {
       this.tag_id_list = [...this.tag_id_list, tag.id];
       this.appSettings.save_tag_filter(this.tag_id_list);
       this.tagSearchBar.clearResult();
+      console.log("this.tag_id_list now:", this.tag_id_list);
     }
 
   }
@@ -138,7 +137,6 @@ export class HeaderComp extends LitElement {
   render() {
     return html`
         <div id="header-container">
-            <track-active-element></track-active-element>
             <div id="search-button-container">
                 ${this.appSettings.search_order.map((item, index) => {
                     const id = "button_" + (index + 1);

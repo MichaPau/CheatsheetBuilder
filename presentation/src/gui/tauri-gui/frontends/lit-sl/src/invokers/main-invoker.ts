@@ -30,9 +30,9 @@ export default class MainInvoker implements ReactiveController {
     await invoke("get_snippets", params).then((result) => {
       const snippets = result as Array<Snippet>;
       this.host.appDataSnippets = { snippets };
-        this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "load_data: success", cmd: "get_snippets", args: {} }}));
+        this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "load_data: success", cmd: "get_snippets", args: { params } }, composed: true, bubbles: true}));
     }).catch((err) => {
-       this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "load_data: " + err, cmd: "get_snippets", args: {} }}));
+       this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "load_data: " + err, cmd: "get_snippets", args: { params } }, composed: true, bubbles: true}));
     });
 
   }

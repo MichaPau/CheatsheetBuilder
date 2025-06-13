@@ -78,7 +78,7 @@ export class App extends LitElement {
     selected_categories: [],
     tag_filter: [],
     category_filter_flag: false,
-    log_level: Log_Level.Error,
+    log_level: Log_Level.Debug,
     search_order: [
       { title: "title", value: "title", order: Order.NONE },
       { title: "created", value: "created_at", order: Order.NONE },
@@ -149,27 +149,26 @@ export class App extends LitElement {
     return html`
       <div id="layout-container">
         <header class="header">
-        <div class="content-wrapper">
-            <button @click=${this.toggleStyle}>Test</button>
-            <header-comp></header-comp>
-        </div>
-          </header>
-          <aside class="sidebar">
-              <div class="content-wrapper">
+          <div class="content-wrapper">
+              <button @click=${this.toggleStyle}>Test</button>
+              <header-comp></header-comp>
+          </div>
+        </header>
+        <aside class="sidebar">
+          <div class="content-wrapper">
             <category-tree .category_tree=${this.categories} id="category-tree" ></category-tree>
-              </div>
-          </aside>
-          <main class="main-content">
-              <div class="content-wrapper">
+          </div>
+        </aside>
+        <main class="main-content">
+          <div class="content-wrapper">
             <snippet-list id="snippet-list" .snippets=${this.snippets}></snippet-list>
-              </div>
-          </main>
-          <footer class="footer">
-              <div class="content-wrapper">
-              <settings-logger></settings-logger>
-
-              </div>
-          </footer>
+          </div>
+        </main>
+        <footer class="footer">
+          <div class="content-wrapper">
+            <settings-logger></settings-logger>
+          </div>
+        </footer>
       </div>
       <drawer-comp>
           <create-snippet></create-snippet>

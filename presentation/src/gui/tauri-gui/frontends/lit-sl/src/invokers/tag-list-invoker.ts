@@ -12,7 +12,7 @@ export default class TagListInvoker {
         host.dispatchEvent(new CustomEvent("invoke-debug", {detail: {info: "getParentTags: success", cmd: "get_parent_tags", args: {tagId: tag_id}, }, composed: true, bubbles: true}));
         resolve(result);
       }).catch(err => {
-         host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "getParentTags: " + err, cmd: "get_parent_tags", args: {tagId: tag_id} }}));
+         host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "getParentTags: " + err, cmd: "get_parent_tags", args: {tagId: tag_id} }, composed: true, bubbles: true}));
           reject(err);
       })
     });
@@ -24,7 +24,7 @@ export default class TagListInvoker {
         host.dispatchEvent(new CustomEvent("invoke-debug", {detail: {info: "getTags: success", cmd: "get_tags", args: {tagIdFilter: id_list}}, composed: true, bubbles: true}));
         resolve(result as Array<Tag>);
       }).catch(err => {
-         host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "getTags: " + err, cmd: "getTags", args: {tagId: id_list} }}));
+         host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "getTags: " + err, cmd: "getTags", args: {tagId: id_list} }, composed: true, bubbles: true}));
         reject(err);
       })
     });
