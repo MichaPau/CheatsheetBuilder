@@ -1,5 +1,5 @@
 import { html, css, LitElement } from 'lit';
-import { customElement, state, query } from 'lit/decorators.js';
+import { customElement, state, query, property } from 'lit/decorators.js';
 
 import sharedStyles from '../styles/shared-styles.js';
 import snippetStyles from './snippet/snippet-styles.js';
@@ -23,6 +23,9 @@ export class TagSearchBar extends LitElement {
   @query("#tag-search-result")
   tagSearchResult!: HTMLElement;
 
+  @property()
+  label = "Search tags:";
+  
   @state()
   recurrent_tags: Array<Tag> = [];
 
@@ -95,7 +98,7 @@ export class TagSearchBar extends LitElement {
   render() {
     return html`
         <div class="tag-search-container">
-            <label for="tag-search-input">Search tags:</label>
+            <label for="tag-search-input">${this.label}</label>
             <input class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange} @blur=${this.onInputBlur}></input>
             <div id="tag-search-result"></div>
         </div>

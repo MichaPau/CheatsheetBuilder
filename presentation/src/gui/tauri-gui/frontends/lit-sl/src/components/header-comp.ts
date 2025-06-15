@@ -2,7 +2,7 @@ import { html, css, LitElement, PropertyValues } from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
 
 import sharedStyles from '../styles/shared-styles.js';
-import { Order, SearchOrder, Tag, TagListInvoker } from '../types.js';
+import { SearchOrder, Tag, TagListInvoker } from '../types.js';
 
 import { appSettingContext, AppSettings } from '../utils/app-context.js';
 import { consume } from '@lit/context';
@@ -24,22 +24,39 @@ export class HeaderComp extends LitElement {
       }
 
       #header-container {
-          display: flex;
-          flex-direction: row;
-          align-items: top;
-          gap: var(--spacing-small);
+          display: grid;
+          width: 100%;
+          height: 100%;
+          grid-template-columns: repeat(3, 1fr);
+          grid-template-rows: repeat(4, 1fr);
+          grid-template-areas:
+            "input input input"
+            "tagsearch tagsearch fields"
+            "taglist taglist fields"
+            "order order order"
+          ;
+          
 
       }
-      #search-button-container {
+      #order-button-container {
+          grid-area: order;
           display: flex;
           align-items: center;
           gap: var(--spacing-small);
       }
-      #tag-filter-container {
-          display: flex;
-          justify-content: center;
-          flex-direction: column;
+      #tag-search-container {
+        grid-area: tagsearch;
+      }
+      #tag-list-container {
+        grid-area: taglist;
+      }
 
+      #search-fields-container {
+        grid-area: fields;
+      }
+
+      #search-input-container{
+        grid-area: input;
       }
     `
   ];
@@ -85,7 +102,7 @@ export class HeaderComp extends LitElement {
 
   }
   searchValueUpdated(_ev: Event) {
-    const container = this.shadowRoot!.getElementById("search-button-container");
+    const container = this.shadowRoot!.getElementById("order-button-container");
     let childs = Array.from(container!.children!);
     let orderSettings: Array<SearchOrder> = [];
     for(const c of childs) {
@@ -97,7 +114,7 @@ export class HeaderComp extends LitElement {
   }
   swapOrder(ev: Event) {
     const cev = ev as CustomEvent;
-    const container = this.shadowRoot!.getElementById("search-button-container");
+    const container = this.shadowRoot!.getElementById("order-button-container");
     let childs = Array.from(container!.children!);
 
     const draggedElem = this.shadowRoot!.getElementById(cev.detail.draggedId)!;
@@ -137,17 +154,40 @@ export class HeaderComp extends LitElement {
   render() {
     return html`
         <div id="header-container">
-            <div id="search-button-container">
+            <div id="tag-search-container">
+                <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.appSettings.tag_filter} .allowNewTags=${false} @add-search-tag=${this.addTag}></tag-search-bar>
+            </div>
+            <div id="tag-list-container">
+                <snippet-tag-list .tag_list=${this.tag_list} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list>
+            </div>
+            <div id="search-fields-container">
+              <fieldset>
+                <legend>Search flags:</legend>
+                  <div>
+                    <input type="checkbox" id="input_include_categories"/>
+                    <label for="input_include_categories">Include Categories</label>
+                  </div>
+                  <div>
+                    <input type="radio" id="input_search_title" name="search_in"/>
+                    <label for="input_search_title">Search in titles</label>
+                    <input type="radio" id="input_search_text" name="search_in"/>
+                    <label for="input_search_text">Search in content</label>
+                    <input type="radio" id="input_search_both" name="search_in"/>
+                    <label for="input_search_both">Search both</label>
+                  </div>
+              </fieldset>
+            </div>
+            <div id="search_input_container">
+              <label for="input_search">Search: </label>
+              <input type="text" id="input_search"/>
+            </div>
+            <div id="order-button-container">
                 ${this.appSettings.search_order.map((item, index) => {
                     const id = "button_" + (index + 1);
                     return html`<search-order-button draggable="true" label=${item.title} value=${item.value} .state=${item.order} id=${id}></search-order-button>`;
                 })}
             </div>
-            <div id="tag-filter-container">
-                <snippet-tag-list .tag_list=${this.tag_list} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list>
-                <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.appSettings.tag_filter} .allowNewTags=${false} @add-search-tag=${this.addTag}></tag-search-bar>
-            </div>
-            <input type="checkbox">
+            
         </div>
     `;
   }

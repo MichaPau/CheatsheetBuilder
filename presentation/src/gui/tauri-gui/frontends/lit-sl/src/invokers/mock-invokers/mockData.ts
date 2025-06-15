@@ -17,8 +17,8 @@ export let tags: Array<Tag> = [
 ];
 
 export let snippets: Array<Snippet> = [
-  {id: 1, title: "one", text: "snippet_one", created_at: 0, updated_at: 0, tags: [], text_type: "Markdown"},
-  {id: 2, title: "two", text: "snippet_two", created_at: 0, updated_at: 0, tags: [], text_type: "Markdown"},
+  {id: 1, title: "one", text: "snippet_one", created_at: 222, updated_at: 0, tags: [], text_type: "Markdown"},
+  {id: 2, title: "two", text: "snippet_two", created_at: 111, updated_at: 0, tags: [], text_type: "Markdown"},
 ];
 
 export let snippet_tags: Array<{ snippet_id: number, tag_id: number }> = [
@@ -34,7 +34,7 @@ export function invoke(cmd:string,args:InvokeArgs = {},_options?:InvokeOptions):
   return new Promise(async (resolve, reject) => {
     switch (cmd) {
       case "get_snippets":
-        resolve(get_snippets());
+        resolve(get_snippets(args));
         break;
       case "get_categories":
         resolve(get_categories());
@@ -79,7 +79,7 @@ export function get_categories(): Array<Tag> {
   return result;
 
 }
-export function get_snippets() {
+export function get_snippets(params: any) {
   const result: Array<Snippet> = [];
   for (let snippet of snippets) {
     let tag_ids: Array<number> = snippet_tags.filter((item) => {
@@ -90,8 +90,41 @@ export function get_snippets() {
     snippet.tags = st;
     result.push(snippet);
   }
-
-  return result
+  if (params.order) {
+    return order_snippets(result, params.order);
+  } else {
+    return result;    
+  }
+  // return result
+}
+function order_snippets(data: Array<Snippet>, order: Array<{column_name: string, order_dir: number}>): Array<Snippet> {
+  
+  const searchCompareFn = (a:SearchIndexable, b: SearchIndexable) => {
+      let result = 0;
+      order.map((item) => {
+        if(typeof a[item.column_name] === "string") {
+          if (item.order_dir === 1) {            
+            var exp:number = a[item.column_name].localeCompare(b[item.column_name]);
+            result = result || exp;
+          } else if (item.order_dir === 2) {
+            
+            var exp:number = b[item.column_name].localeCompare([item.column_name]);
+            result = result || exp;
+          }
+        } else if (typeof a[item.column_name] === "number") {
+          if (item.order_dir === 1) {            
+            var exp:number = a[item.column_name] - b[item.column_name];
+            result = result || exp;
+          } else if (item.order_dir === 2) {
+            var exp:number = b[item.column_name] - a[item.column_name];
+            result = result || exp;
+          }
+        }
+      })
+      return result;
+  }
+  data.sort(searchCompareFn);
+  return data;  
 }
 function get_parent_tags(tag_id: number) {
   const tag = tags.find((tag) => tag.id === tag_id);
@@ -138,6 +171,10 @@ export function generate_random_snippets(size: number) {
 }
 
 
+export interface SearchIndexable extends Snippet, IIndexable {}
+export interface IIndexable<T = any> {
+  [key: string]: T;
+}
 function range(min: number, max: number) {
   return Math.floor(Math.random() * (max - min) + min);
 }
