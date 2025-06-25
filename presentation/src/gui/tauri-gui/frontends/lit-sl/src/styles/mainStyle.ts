@@ -32,10 +32,12 @@ export default css`
       grid-area: header;
       resize: vertical;
       overflow: scroll;
-      height: auto;
+      height: 100%;
       width: 100%;
       max-height: 15em;
       min-height: 1em;
+      display: flex;
+      flex-direction: column;
     }
     aside {
       grid-area: aside;

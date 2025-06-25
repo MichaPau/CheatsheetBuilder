@@ -8,8 +8,6 @@ use repository::{db::sqlite::rusqlite_db::Rusqlite, ports::services::Service, ty
 
 use tauri_gui_lib::app_config::ConfigState;
 fn main() {
-
-
     // let dst = "../../../../../data/dev_db_backup.db";
     // match store.backup(dst) {
     //     Ok(()) => println!("backup created"),
@@ -23,7 +21,9 @@ fn main() {
     let service = Service::new(Box::new(store));
 
     let app_state = AppState { service };
-    let config = ConfigState { id : "test-config".into()};
+    let config = ConfigState {
+        id: "test-config".into(),
+    };
 
     tauri_gui_lib::run(app_state, config);
 }

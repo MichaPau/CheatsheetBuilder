@@ -38,12 +38,25 @@ export default class MainInvoker implements ReactiveController {
   }
 
   reload_data = async (_ev: Event) => {
+
     this.load_snippets();
     this.categories_invoker.load_categories();
   }
 
   reload_snippets = async (_ev: Event) => {
     this.load_snippets();
+  }
+
+  search_snippets = async (ev: CustomEvent) => {
+    const params = ev.detail;
+
+    await invoke("search_snippets", params).then((result) => {
+      const snippets = result as Array<Snippet>;
+      this.host.appDataSnippets = { snippets};
+      this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "search_snippets: success", cmd: "search_snippets", args: { params } }, composed: true, bubbles: true}));
+    }).catch((err) => {
+     this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "search_snippets: " + err, cmd: "search_snippets", args: { params } }, composed: true, bubbles: true}));
+    });
   }
 
   get_snippet_setting_params() {
@@ -81,12 +94,14 @@ export default class MainInvoker implements ReactiveController {
   }
 
   hostConnected(): void {
-    this.host.addEventListener('reload-snippets', this.reload_data);
+    this.host.addEventListener('reload-snippets', this.reload_snippets);
     this.host.addEventListener('set-selected-categories', this.setSelectedCategories);
     this.host.addEventListener('reload-snippets-settings-change', this.reload_snippets);
 
     this.host.addEventListener('invoke-debug', this.invoke_debug);
     this.host.addEventListener('invoke-error', this.invoke_error);
+
+    this.host.addEventListener('search-snippets', this.search_snippets);
   }
   setSelectedCategories(ev: CustomEvent) {
     let ids = (ev as CustomEvent).detail;

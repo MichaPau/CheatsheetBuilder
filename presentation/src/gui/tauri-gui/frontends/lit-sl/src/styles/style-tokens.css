@@ -33,7 +33,8 @@
   --focus-ring-width: 1px;
   --focus-ring-style: solid;
   --checkbox-color: lch(var(--l-60) 37 214);
-  --panel-background-color: lch(var(--l-100) 0 297);
+  --panel-background-color: lch(var(--l-98) 0 297);
+  --component-background-color: lch(var(--l-100) 0 297);
 
   --placeholder-color: lch(var(--l-90) 1.52 285.35);
 

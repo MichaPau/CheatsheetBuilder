@@ -115,7 +115,7 @@ export default class SnippetInvoker {
     return new Promise(async (resolve, reject) => {
       const args = { snippetId: snippet_id, tagId: tag_id };
       await invoke("remove_tag_from_snippet", args).then((result) => {
-        resolve(result);
+        resolve(result as Array<Tag>);
         host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "removeTag: success", cmd: "remove_tag_from_snippet", args }, composed: true, bubbles: true}));
       }).catch((err) => {
         reject(err);
@@ -128,7 +128,7 @@ export default class SnippetInvoker {
   static async createSnippet(snippet: Snippet, host: HTMLElement): Promise<boolean> {
 
     const tagIds = snippet.tags.map((tag) => tag.id);
-
+    console.log("create snippet: ", snippet);
     return new Promise(async (resolve, reject) => {
       const args = { title: snippet.title, text: snippet.text, textType: snippet.text_type, tagIds: tagIds };
       await invoke("create_snippet", args)

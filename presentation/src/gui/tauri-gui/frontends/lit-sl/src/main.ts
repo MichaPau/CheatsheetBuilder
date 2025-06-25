@@ -150,7 +150,6 @@ export class App extends LitElement {
       <div id="layout-container">
         <header class="header">
           <div class="content-wrapper">
-              <button @click=${this.toggleStyle}>Test</button>
               <header-comp></header-comp>
           </div>
         </header>
@@ -176,3 +175,4 @@ export class App extends LitElement {
     `;
   }
 }
+// <button @click=${this.toggleStyle}>Test</button>

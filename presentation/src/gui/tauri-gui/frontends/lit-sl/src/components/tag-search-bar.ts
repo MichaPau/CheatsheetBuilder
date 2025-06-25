@@ -12,7 +12,24 @@ export class TagSearchBar extends LitElement {
     snippetStyles,
     css `
       :host {
-        display: block;
+        display: inline-block;
+      }
+      .tag-search-container {
+        display: inline-grid;
+        grid-template-columns: auto auto;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+        "label input"
+        ". result";
+      }
+      #tag-search-result {
+        grid-area: result;  
+      }
+      label {
+        grid-area: label;
+      }
+      input {
+        grid-area: input;
       }
     `
   ];
@@ -98,9 +115,9 @@ export class TagSearchBar extends LitElement {
   render() {
     return html`
         <div class="tag-search-container">
-            <label for="tag-search-input">${this.label}</label>
-            <input class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange} @blur=${this.onInputBlur}></input>
-            <div id="tag-search-result"></div>
+            <label part="label" for="tag-search-input">${this.label}</label>
+            <input part="input" class="tag-search-input" id="tag-search-input" type="text" @input=${this.onSearchTagChange} @blur=${this.onInputBlur}></input>
+            <div part="result" id="tag-search-result"></div>
         </div>
     `;
   }

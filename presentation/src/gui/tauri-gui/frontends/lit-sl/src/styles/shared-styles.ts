@@ -4,8 +4,16 @@ export default css`
 
     :host {
         font-family: var(--default-font-family);
-    }
+        box-sizing: border-box;
 
+        background-color: var(--component-background-color);
+        * {
+            box-sizing: border-box;
+        }
+    }
+    button {
+        box-sizing: border-box;
+    }
     textarea, input, .focusable {
         border-radius: var(--border-radius-medium);
         font-family: var(--default-font-family);
@@ -26,7 +34,7 @@ export default css`
     .tag {
         display: flex;
         justify-content: center;
-        height: 1.2em;
+        /* height: 1.2em; */
         align-items: center;
 
         padding: var(--spacing-small);

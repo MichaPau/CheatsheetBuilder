@@ -9,7 +9,7 @@ import {BaseElement } from '../../utils/base-element.js';
 import './snippet-editor.js';
 import './snippet-tag-list.js';
 import '../tag-search-bar.js';
-import 'mp-webcomponents/components/ui/mp-markdown-editor';
+import '../extern/mp-markdown-editor.js';
 import { TagSearchBar } from '../tag-search-bar.js';
 
 @customElement('snippet-item')
@@ -170,7 +170,6 @@ export class SnippetContainer extends BaseElement {
                     <button @click=${this.removeSnippet}>X</button>
             </div>
             <mp-markdown-editor id="editor" value=${this.snippet.text} @mp-markdown-update=${this.md_update}></mp-markdown-editor>
-
             <details id="footer" class="footer focusable" >
                 <summary tabindex="0" @focusout=${this.onBlurDetails}><snippet-tag-list .tag_list=${this.snippet.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.snippet.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>

@@ -2,9 +2,9 @@
 use repository::types::AppState;
 use tauri::Manager;
 
-pub mod commands;
-pub mod menu;
 pub mod app_config;
+pub mod commands;
+// pub mod menu;
 use app_config::ConfigState;
 //use tauri_gui_lib::app_config::ConfigState;
 
@@ -38,8 +38,9 @@ pub fn run(app_state: AppState, config_state: ConfigState) {
             commands::delete_category,
             commands::create_snippet,
             commands::delete_snippet,
+            commands::search_snippets,
         ])
-        .menu(menu::build)
+        // .menu(menu::build)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

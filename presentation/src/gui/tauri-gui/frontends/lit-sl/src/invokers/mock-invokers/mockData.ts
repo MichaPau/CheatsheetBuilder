@@ -19,6 +19,8 @@ export let tags: Array<Tag> = [
 export let snippets: Array<Snippet> = [
   {id: 1, title: "one", text: "snippet_one", created_at: 222, updated_at: 0, tags: [], text_type: "Markdown"},
   {id: 2, title: "two", text: "snippet_two", created_at: 111, updated_at: 0, tags: [], text_type: "Markdown"},
+  {id: 3, title: "one and two", text: "some text in a snippet", created_at: 111, updated_at: 0, tags: [], text_type: "Markdown"},
+  {id: 4, title: "three", text: "snippet_three", created_at: 111, updated_at: 0, tags: [], text_type: "Markdown"},
 ];
 
 export let snippet_tags: Array<{ snippet_id: number, tag_id: number }> = [

@@ -1,10 +1,9 @@
 use std::any::Any;
 
 use domain::entities::entry::*;
-use domain::utils::types::SearchPattern;
 
 use crate::errors::CheatsheetError;
-use crate::types::SearchOrder;
+use crate::types::{SearchOrder, SearchPattern};
 
 //use super::services::Service;
 
@@ -27,7 +26,12 @@ pub trait SnippetStore {
     fn remove_tag_from_all(&self, tag_id: TagID) -> Result<usize, CheatsheetError>;
     fn append_tag(&self, snippet_id: SnippetID, tag_id: TagID) -> Result<bool, CheatsheetError>;
     fn remove_tag(&self, snippet_id: SnippetID, tag_id: TagID) -> Result<bool, CheatsheetError>;
-    fn update_text(&self, id: SnippetID, new_text: String, text_type: TextType) -> Result<bool, CheatsheetError>;
+    fn update_text(
+        &self,
+        id: SnippetID,
+        new_text: String,
+        text_type: TextType,
+    ) -> Result<bool, CheatsheetError>;
     fn update_title(&self, id: SnippetID, new_title: String) -> Result<bool, CheatsheetError>;
     fn get_snippet_list(
         &self,
@@ -51,7 +55,11 @@ pub trait TagStore {
     fn get_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
 
     fn delete_tag(&self, id: TagID) -> Result<Tag, CheatsheetError>;
-    fn get_tag_list(&self, type_filter: Option<TagType>, tag_id_filter: Option<Vec<TagID>>) -> Result<TagList, CheatsheetError>;
+    fn get_tag_list(
+        &self,
+        type_filter: Option<TagType>,
+        tag_id_filter: Option<Vec<TagID>>,
+    ) -> Result<TagList, CheatsheetError>;
     fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError>;
     fn get_snippet_count_for_tag(&self, tag_id: TagID) -> Result<usize, CheatsheetError>;
     fn search_tags_by_title(

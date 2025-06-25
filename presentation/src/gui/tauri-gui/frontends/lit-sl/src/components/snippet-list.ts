@@ -44,10 +44,11 @@ export class SnippetList extends LitElement {
   render() {
     return html`
         <div class="snippet-container">
-            ${this.appDataSnippets.snippets.map((snippet) =>
-                html`
+            ${this.appDataSnippets.snippets.map((snippet) => {
+                return html`
                     <snippet-item .snippet=${snippet}></snippet-item>
                 `
+                }
             )}
         </div>
     `;

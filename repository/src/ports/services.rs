@@ -3,6 +3,8 @@ use domain::entities::entry::{
     TagType, TextType, Timestamp,
 };
 
+use crate::types::SearchPattern;
+
 use crate::{db::sqlite::rusqlite_db::Rusqlite, errors::CheatsheetError, types::SearchOrder};
 
 use super::stores::StateTrait;
@@ -82,6 +84,17 @@ impl Service {
         time_boundry: Option<(Timestamp, Timestamp)>,
     ) -> Result<SnippetList, CheatsheetError> {
         self.store.get_snippet_list(tag_filter, order, time_boundry)
+    }
+    pub fn search_snippets(
+        &self,
+        column: String,
+        pattern: SearchPattern,
+    ) -> Result<SnippetList, CheatsheetError> {
+        match column.as_str() {
+            "title" => self.store.search_by_title(pattern),
+            "text" => self.store.search_by_content(pattern),
+            _ => Err(CheatsheetError::UnknownError),
+        }
     }
 
     //tags

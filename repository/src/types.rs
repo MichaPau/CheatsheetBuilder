@@ -3,17 +3,9 @@ use domain::entities::entry::CreateTag;
 use crate::ports::services::Service;
 
 #[cfg(feature = "serde")]
-use serde::{Serialize, Deserialize};
-
-//pub trait StateTrait: SnippetStore + TagStore + Send + Sync + 'static {}
-// impl<T> StateTrait for T
-//     where T: SnippetStore + TagStore + Send + Sync + 'static {}
+use serde::{Deserialize, Serialize};
 
 // #[derive(Debug)]
-// pub struct AppState<R> where R: StateTrait {
-//     pub service: Service<R>,
-// }
-//#[derive(Debug)]
 pub struct AppState {
     pub service: Service,
 }
@@ -50,6 +42,22 @@ impl ToString for SearchOrder {
         }
     }
 }
+
+#[cfg_attr(feature = "serde", derive(Deserialize))]
+#[derive(Debug)]
+pub struct SearchPattern {
+    pub search_type: SearchType,
+    pub pattern: String,
+}
+
+#[cfg_attr(feature = "serde", derive(Deserialize))]
+#[derive(Debug)]
+pub enum SearchType {
+    StartWith,
+    EndWith,
+    Contains,
+}
+
 #[derive(Debug)]
 pub struct TagListItem {
     pub tag: CreateTag,

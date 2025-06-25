@@ -1,15 +1,12 @@
 use std::{any::Any, collections::HashMap, path::Path, sync::Mutex, time};
 
-use domain::{
-    entities::entry::*,
-    utils::types::{SearchPattern, Timestamp},
-};
+use domain::{entities::entry::*, utils::types::Timestamp};
 use rusqlite::{Connection, OpenFlags, Row};
 
 use crate::{
     errors::CheatsheetError,
     ports::stores::{SnippetStore, StateTrait, TagStore},
-    types::SearchOrder,
+    types::{SearchOrder, SearchPattern, SearchType},
 };
 
 #[derive(Debug)]
@@ -183,6 +180,30 @@ impl Rusqlite {
             tag_style: style,
         })
     }
+    fn search(&self, pattern: SearchPattern, column: &str) -> Result<SnippetList, CheatsheetError> {
+        let mut sql = String::from("SELECT * FROM Snippet");
+        let like_clause = match pattern.search_type {
+            SearchType::EndWith => {
+                format!(" WHERE {} LIKE '%{}'", column, pattern.pattern)
+            }
+            SearchType::Contains => {
+                format!(" WHERE {} LIKE '%{}%'", column, pattern.pattern)
+            }
+            SearchType::StartWith => {
+                format!(" WHERE {} LIKE '{}%'", column, pattern.pattern)
+            }
+        };
+
+        sql.push_str(&like_clause);
+        let c = self.conn.try_lock().unwrap();
+
+        let mut stmt = c.prepare(&sql)?;
+        let snippet_iter = stmt.query_map([], |row| self.create_snippet_from_row(row, &c))?;
+
+        let result: Vec<Snippet> = snippet_iter.flatten().collect();
+
+        Ok(result)
+    }
 }
 
 //impl StateTrait for Rusqlite {}
@@ -190,7 +211,6 @@ impl Rusqlite {
 impl SnippetStore for Rusqlite {
     fn add_entry(&self, entry: CreateSnippet) -> Result<Snippet, CheatsheetError> {
         let mut c = self.conn.try_lock().unwrap();
-
         let ts = u64::from(Timestamp::from_utc_now());
         c.execute(
             "INSERT INTO Snippet (title, text, text_type, created_at, updated_at) VALUES (?1, ?2, ?3, ?4, ?5)",
@@ -208,7 +228,6 @@ impl SnippetStore for Rusqlite {
             }
         }
         tx.commit()?;
-
         Ok(Snippet {
             id: snippet_id as usize,
             title: entry.title,
@@ -385,30 +404,21 @@ impl SnippetStore for Rusqlite {
             sql.push_str(&order_str);
         }
         let c = self.conn.try_lock().unwrap();
-        // println!("the query: {}", sql);
 
         let mut stmt = c.prepare(&sql)?;
         let snippet_iter = stmt.query_map([], |row| self.create_snippet_from_row(row, &c))?;
 
+        // let result: Vec<Snippet> = snippet_iter.collect::<Vec<Snippet>>();
         let result: Vec<Snippet> = snippet_iter.flatten().collect();
-
-        // for tag in &result[0].tags {
-        //     match tag.tag_type {
-        //         TagType::Normal => println!("found normal tag"),
-        //         TagType::Category => println!("founf category tag"),
-        //         _ => println!("found something else"),
-        //     }
-        // }
-        //print!("result: {:?}", result);
         Ok(result)
     }
 
     fn search_by_title(&self, pattern: SearchPattern) -> Result<SnippetList, CheatsheetError> {
-        Err(CheatsheetError::NotImplemented("".into()))
+        self.search(pattern, "title")
     }
 
     fn search_by_content(&self, pattern: SearchPattern) -> Result<SnippetList, CheatsheetError> {
-        Err(CheatsheetError::NotImplemented("".into()))
+        self.search(pattern, "text")
     }
 }
 
@@ -535,7 +545,6 @@ impl TagStore for Rusqlite {
             sql.push_str(&temp);
         }
         //let mut stmt = c.prepare("SELECT * FROM Tag")?;
-        println!("get_tag_list sql:{}", sql);
         let mut stmt = c.prepare(&sql)?;
         let tag_iter = stmt.query_map([], |row| self.create_tag_from_row(row))?;
 

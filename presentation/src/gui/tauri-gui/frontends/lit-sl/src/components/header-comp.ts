@@ -21,6 +21,7 @@ export class HeaderComp extends LitElement {
     css `
       :host {
         display: block;
+        height: 100%
       }
 
       #header-container {
@@ -28,18 +29,26 @@ export class HeaderComp extends LitElement {
           width: 100%;
           height: 100%;
           grid-template-columns: repeat(3, 1fr);
-          grid-template-rows: repeat(4, 1fr);
+          grid-template-rows: repeat(4, auto);
           grid-template-areas:
             "input input input"
-            "tagsearch tagsearch fields"
-            "taglist taglist fields"
-            "order order order"
+            "tagsearch taglist fields"
+            ". . fields"
+            "order order fields"
           ;
+          row-gap: 0.25rem;
+          gap: 1px;
+          & > * {
+            outline: 1px solid;
+            display: flex;
+            align-items: center;
+          }
           
 
       }
       #order-button-container {
           grid-area: order;
+          align-self: end;
           display: flex;
           align-items: center;
           gap: var(--spacing-small);
@@ -55,8 +64,27 @@ export class HeaderComp extends LitElement {
         grid-area: fields;
       }
 
-      #search-input-container{
+      #search-input-container {
         grid-area: input;
+
+        & input {
+          width: 30em;
+        }
+        & label {
+          width: 10em;
+          text-align: right;
+        }
+      }
+
+      #tag-search-bar {
+        &::part(label) {
+          display: inline-block;
+          width: 10em;
+          text-align: right;
+        }
+        &::part(input) {
+          width: 30em;
+        }
       }
     `
   ];
@@ -67,6 +95,9 @@ export class HeaderComp extends LitElement {
 
   @query("#tag-search-bar")
   tagSearchBar!: TagSearchBar;
+
+  @query("#input-search")
+  inputSearch!: HTMLInputElement;
 
   @state()
   state_var = false;
@@ -138,6 +169,7 @@ export class HeaderComp extends LitElement {
     if (this.tag_id_list.findIndex(t => t === tag.id) === -1) {
       this.tag_id_list = [...this.tag_id_list, tag.id];
       this.appSettings.save_tag_filter(this.tag_id_list);
+      this.dispatchEvent(new Event("reload-snippets-settings-change", { bubbles: true, composed: true }));
       this.tagSearchBar.clearResult();
       console.log("this.tag_id_list now:", this.tag_id_list);
     }
@@ -149,7 +181,19 @@ export class HeaderComp extends LitElement {
     if (index !== -1) {
       this.tag_id_list = this.tag_id_list.filter(t => t !== tag_id);
       this.appSettings.save_tag_filter(this.tag_id_list);
+      this.dispatchEvent(new Event("reload-snippets-settings-change", { bubbles: true, composed: true }));
     }
+  }
+
+  on_search_change(_ev:Event) {
+     const p = this.inputSearch.value;
+
+     if (p.length >= 2) {
+       const d = {column: "title", searchPattern: {search_type: "Contains", pattern: p}};
+       this.dispatchEvent(new CustomEvent('search-snippets', { bubbles: true, composed: true, detail: d}));
+     } else if (p.length === 0) {
+       this.dispatchEvent(new Event('reload-snippets', { bubbles: true, composed: true }));
+     }
   }
   render() {
     return html`
@@ -164,22 +208,22 @@ export class HeaderComp extends LitElement {
               <fieldset>
                 <legend>Search flags:</legend>
                   <div>
-                    <input type="checkbox" id="input_include_categories"/>
-                    <label for="input_include_categories">Include Categories</label>
+                    <input type="checkbox" id="input-include-categories"/>
+                    <label for="input-include-categories">Include Categories</label>
                   </div>
                   <div>
-                    <input type="radio" id="input_search_title" name="search_in"/>
+                    <input type="radio" id="input-search-title" name="search_in"/>
                     <label for="input_search_title">Search in titles</label>
-                    <input type="radio" id="input_search_text" name="search_in"/>
+                    <input type="radio" id="input-search-text" name="search_in"/>
                     <label for="input_search_text">Search in content</label>
-                    <input type="radio" id="input_search_both" name="search_in"/>
-                    <label for="input_search_both">Search both</label>
+                    <input type="radio" id="input-search-both" name="search_in"/>
+                    <label for="input-search-both">Search both</label>
                   </div>
               </fieldset>
             </div>
-            <div id="search_input_container">
-              <label for="input_search">Search: </label>
-              <input type="text" id="input_search"/>
+            <div id="search-input-container">
+              <label for="input-search">Search: </label>
+              <input type="text" id="input-search" @input=${this.on_search_change}/>
             </div>
             <div id="order-button-container">
                 ${this.appSettings.search_order.map((item, index) => {

@@ -1,6 +1,6 @@
-use std::time::SystemTime;
-#[cfg(feature= "serde")]
+#[cfg(feature = "serde")]
 use serde::Serialize;
+use std::time::SystemTime;
 //use crate::entities::entry::{Tag, TagID, TagList};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -11,7 +11,7 @@ impl std::fmt::Display for Timestamp {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
-} 
+}
 
 impl From<u64> for Timestamp {
     fn from(value: u64) -> Self {
@@ -25,41 +25,28 @@ impl From<Timestamp> for u64 {
     }
 }
 
-
 impl Timestamp {
     pub fn from_utc_now() -> Self {
-        Self(SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs())
+        Self(
+            SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_secs(),
+        )
     }
-
-    
-    
 }
 
+/* #[cfg_attr(feature = "serde", derive(Deserialize))]
+#[derive(Debug)]
 pub struct SearchPattern {
     pub search_type: SearchType,
     pub pattern: String,
-
 }
 
+#[cfg_attr(feature = "serde", derive(Deserialize))]
+#[derive(Debug)]
 pub enum SearchType {
     StartWith,
     EndWith,
     Contains,
-}
-
-// pub struct HierarchyIterator<'a> {
-//     tags: &'a TagList,
-//     parent_id: Option<TagID>,
-// }
-
-// impl<'a> Iterator for HierarchyIterator<'a> {
-//     type Item = (usize, &'a Tag);
-
-//     fn next(&mut self) -> Option<Self::Item> {
-
-
-//         None
-//     }
-// }
-
-
+} */

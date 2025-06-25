@@ -45,8 +45,8 @@ export enum Log_Level {
 // };
 
 
-// export { invoke } from "@tauri-apps/api/core";
-export { invoke } from "./invokers/mock-invokers/mockData";
+export { invoke } from "@tauri-apps/api/core";
+// export { invoke } from "./invokers/mock-invokers/mockData";
 
 export { default as MainInvoker } from './invokers/main-invoker.js';
 export { default as SnippetInvoker} from './invokers/snippet-invoker.js';
@@ -65,6 +65,7 @@ declare global {
     'invoke-debug': CustomEvent<{info: string, cmd: string, args: InvokeArgs, meta_url: string}>,
     'reload-snippets': Event;
     'reload-snippets-settings-change': Event;
+    'search-snippets': CustomEvent<{column: String, searchPattern: {search_type: string, pattern: string}}>;
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;
     'get-parent-tags': CustomEvent<{tag_id: number}>;
     'remove-tag-from-snippet': CustomEvent<{tag_id: number }>;

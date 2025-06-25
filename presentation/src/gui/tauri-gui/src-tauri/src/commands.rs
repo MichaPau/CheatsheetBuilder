@@ -1,9 +1,10 @@
 use std::usize;
 
 use domain::entities::entry::{CreateSnippet, CreateTag, Snippet, SnippetID, Tag, TagType};
+// use domain::utils::types::SearchPattern;
 use repository::{
     errors::CheatsheetError,
-    types::{AppState, SearchOrder},
+    types::{AppState, SearchOrder, SearchPattern},
 };
 use tauri::State;
 
@@ -216,3 +217,17 @@ pub fn get_snippets(
     // let snippet_vec: Vec<Snippet> = snippet_result.iter().map(|s| s.clone()).collect();
     // snippet_vec
 }
+#[tauri::command]
+pub fn search_snippets(
+    column: String,
+    search_pattern: SearchPattern,
+    app_state: State<'_, AppState>,
+) -> Result<Vec<Snippet>, CheatsheetError> {
+    app_state.service.search_snippets(column, search_pattern)
+    // Err(CheatsheetError::NotImplemented("empty".into()))
+}
+/* pub enum SearchType {
+    StartWith,
+    EndWith,
+    Contains,
+} */
