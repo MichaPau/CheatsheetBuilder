@@ -43,7 +43,7 @@ export class App extends LitElement {
         margin: 0 auto;
         bottom: 5px;
         transform: translateY(50%);
-        transition: all 0.2s;
+        transition: all 0.15s;
         right: 0;
         left: 0;
 
@@ -53,9 +53,13 @@ export class App extends LitElement {
       }
 
       create-snippet {
-        width: 500px;
-        height: 300px;
+        width: 75vw;
+        height: 46vh;
       }
+      /* drawer-comp {
+        width: 75%;
+        height: 46%;
+      } */
     `
   ];
 

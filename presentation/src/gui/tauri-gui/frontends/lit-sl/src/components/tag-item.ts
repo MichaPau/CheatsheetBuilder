@@ -14,7 +14,13 @@ export class TagItem extends LitElement {
 
       }
       .icon-button {
-          all: unset;
+          /* all: unset; */
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border: none;
+          background: none;
+          padding: 0;
           cursor: pointer;
 
           img {
@@ -31,7 +37,7 @@ export class TagItem extends LitElement {
           border: var(--border-width) var(--border-style) var(--border-color);
       }
       .tag-container {
-          display: inline-flex;
+          display: flex;
           position: relative;
       }
       .menu-container {
@@ -99,11 +105,9 @@ export class TagItem extends LitElement {
         return html`
             <div class="tag-container">
                 <div class="tag category" @mouseenter=${this.onTriggerParents} @mouseleave=${this.removeParents}>
-                    ${this.tag.title}
-                    <button class="icon-button"
-                      @click=${this.removeTag}
->
-                        <img src="./src/assets/icons/x-circle.svg"/>
+                    <div>${this.tag.title}</div>
+                    <button class="icon-button" @click=${this.removeTag}>
+                      <img src="./src/assets/icons/x-circle.svg"/>
                     </button>
                 </div>
                 <div class="menu-container">
@@ -118,7 +122,7 @@ export class TagItem extends LitElement {
       return html`
             <div class="tag-container">
                 <div class="tag normal">
-                    ${this.tag.title}
+                    <div>${this.tag.title}</div>
                     <button class="icon-button" @click=${this.removeTag}>
                         <img src="./src/assets/icons/x-circle.svg"/>
                     </button>

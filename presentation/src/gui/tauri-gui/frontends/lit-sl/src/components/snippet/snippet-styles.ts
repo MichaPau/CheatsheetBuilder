@@ -12,6 +12,7 @@ export default css`
 .card {
     display: flex;
     flex-direction: column;
+    height: 100%;
     background-color: var(--panel-background-color);
     box-shadow: var(--shadow-small);
     border: var(--border-style) var(--border-width) var(--border-color);

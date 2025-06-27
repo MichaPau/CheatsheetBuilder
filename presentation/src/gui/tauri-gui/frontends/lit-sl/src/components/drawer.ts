@@ -1,4 +1,4 @@
-import { html, css, LitElement, PropertyValues } from 'lit';
+import { html, css, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 import sharedStyles from '../styles/shared-styles.js';
@@ -10,6 +10,7 @@ export class Drawer extends LitElement {
     css `
       :host {
         display: inline-block;
+        background-color: rgba(0, 0, 0, 0);
       }
 
       button {
@@ -48,7 +49,7 @@ export class Drawer extends LitElement {
           bottom: 15px;
           transform: translateY(100%);
           opacity: 0;
-          transition: all .5s;
+          transition: all .2s;
           box-shadow: var(--shadow-medium);
           border: var(--border-style) var(--border-width) var(--border-color);
           border-radius: var(--border-radius-medium);
@@ -80,18 +81,24 @@ export class Drawer extends LitElement {
     super.connectedCallback();
 
   }
+
+  manualOpen(_ev: Event) {
+    console.log("open manual");
+    const popover = this.shadowRoot?.getElementById("thepopover")!;
+    popover.showPopover();
+    const the_slot = this.shadowRoot?.querySelector('slot')!;
+    const item = the_slot.assignedElements({flatten: true})[0] as HTMLElement;
+    item.focus();
+    
+  }
   close() {
     const popover = this.shadowRoot?.getElementById("thepopover")!;
     popover.hidePopover();
   }
-  protected firstUpdated(_changedProperties: PropertyValues): void {
-    // const popover = this.shadowRoot?.getElementById("thepopover")!;
-    // popover.showPopover();
-  }
   render() {
     return html`
-        <button popovertarget="thepopover" aria-label="Add new"><img  src="/src/assets/icons/plus.svg"></button>
-        <div id="thepopover" popover>
+        <button popovertarget_temp="thepopover" @click=${this.manualOpen} aria-label="Add new"><img  src="/src/assets/icons/plus.svg"></button>
+        <div part="popover" id="thepopover" popover>
             <slot></slot>
         </div>
     `;

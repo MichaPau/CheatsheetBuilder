@@ -56,7 +56,7 @@ export class SnippetTagList extends LitElement {
         <div class="tag-container">
         ${this.tag_list.map((_tag) =>
             html`
-              <tag-item .tag=${_tag} @get-parent-tags=${this.getParentTags}></tag-item>
+              <tag-item tabindex="0" .tag=${_tag} @get-parent-tags=${this.getParentTags}></tag-item>
                 `
         )}
         ${this.tag_list.length === 0 ? html`<span class="placeholder">No tags</span>`: ``}

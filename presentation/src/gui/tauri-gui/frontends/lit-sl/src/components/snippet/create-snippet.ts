@@ -1,4 +1,4 @@
-import { html} from 'lit';
+import { html, css, PropertyValues, LitElement} from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
 
 
@@ -13,14 +13,22 @@ import { SnippetEditor } from './snippet-editor.js';
 import { TagSearchBar } from '../tag-search-bar.js';
 import { Drawer } from '../drawer.js';
 import { BaseElement } from '../../utils/base-element.js';
+import { MarkdownEditor } from '../extern/mp-markdown-editor.js';
 
 
 @customElement('create-snippet')
 export class CreateSnippet extends BaseElement {
-  static styles = [
+
+    static shadowRootOptions = {...LitElement.shadowRootOptions, delegatesFocus: true};
+
+    static styles = [
     super.styles,
     sharedStyles,
     snippetStyles,
+    css `
+      #editor-component {
+        flex-grow: 1;
+      }`
   ];
 
   @state()
@@ -33,7 +41,7 @@ export class CreateSnippet extends BaseElement {
   titleInput!: HTMLInputElement;
 
   @query("#editor-component")
-  editorComponent!: SnippetEditor;
+  editorComponent!: MarkdownEditor;
 
   @query("#tag-search-bar")
   tagSearchBar!: TagSearchBar;
@@ -41,14 +49,14 @@ export class CreateSnippet extends BaseElement {
   connectedCallback(): void {
     super.connectedCallback();
   }
-  onEditTitle = (ev: Event) => {
-    const title_elem = ev.target! as HTMLInputElement;
-    title_elem.readOnly = false;
+  onEditTitle = (_ev: Event) => {
+    /* const title_elem = ev.target! as HTMLInputElement;
+    title_elem.readOnly = false; */
 
   }
-  onBlurTitle = async (ev: Event) => {
-    const title_elem = ev.target! as HTMLInputElement;
-    title_elem.readOnly = true;
+  onBlurTitle = async (_ev: Event) => {
+    /* const title_elem = ev.target! as HTMLInputElement;
+    title_elem.readOnly = true; */
 
   }
   onTitleKeyDown = (ev: KeyboardEvent) => {
@@ -86,12 +94,11 @@ export class CreateSnippet extends BaseElement {
     this.tags = [...tags];
 
   }
-
   clearAndClose() {
     this.titleInput.value = "";
     //this.tagSearchInput.value = "";
 
-    this.editorComponent.text_data = "";
+    this.editorComponent.value = "";
     this.tags = [];
 
     //this.tagSearchResult.replaceChildren();
@@ -126,7 +133,7 @@ export class CreateSnippet extends BaseElement {
 
         <div class="snippet-item card">
             <div id="header">
-                <input readonly class="snippet-title-label"
+                <input  class="snippet-title-label"
                     id="title-input"
                     @click=${this.onEditTitle}
                     @blur=${this.onBlurTitle}
@@ -134,7 +141,7 @@ export class CreateSnippet extends BaseElement {
                     value=""
                     />
             </div>
-            <snippet-editor id="editor-component"></snippet-editor>
+            <mp-markdown-editor id="editor-component" .show_render=${false}></mp-markdown-editor>
             <details id="footer" class="footer">
                 <summary><snippet-tag-list .tag_list=${this.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
@@ -149,3 +156,5 @@ export class CreateSnippet extends BaseElement {
     `;
   }
 }
+
+            // <snippet-editor id="editor-component"></snippet-editor>

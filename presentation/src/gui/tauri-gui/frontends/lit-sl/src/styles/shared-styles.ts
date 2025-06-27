@@ -41,11 +41,14 @@ export default css`
         gap: var(--spacing-small);
         border-radius: var(--border-radius-medium);
         font-size: var(--font-size-small);
-
         cursor: pointer;
         &.disabled {
             cursor: not-allowed;
             opacity: 0.5;
+        }
+
+        div {
+            line-height: var(--font-size-small);
         }
 
       &.category {
