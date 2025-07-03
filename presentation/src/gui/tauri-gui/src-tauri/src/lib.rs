@@ -9,6 +9,17 @@ use app_config::ConfigState;
 //use tauri_gui_lib::app_config::ConfigState;
 
 //#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run_error(error_str: String) {
+    tauri::Builder::default()
+        .setup(move |app| {
+            let webview = app.get_webview_window("main").unwrap();
+            let info = format!("alert('some error while loading config: {}')", error_str);
+            webview.eval(info)?;
+            Ok(())
+        })
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application"); // println!("run_error in main.rs - not implemented");
+}
 pub fn run(app_state: AppState, config_state: ConfigState) {
     tauri::Builder::default()
         .setup(|app| {

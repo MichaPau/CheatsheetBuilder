@@ -70,6 +70,7 @@ export class TagSearchBar extends LitElement {
 
             var tag = document.createElement("div");
             tag.classList.add("tag");
+            tag.tabIndex = 0;
             t.tag_type == "Category" ? tag.classList.add("category") : tag.classList.add("normal");
 
             tag.innerHTML = `${t.title}`;
@@ -79,6 +80,11 @@ export class TagSearchBar extends LitElement {
             } else {
 
               tag.addEventListener("click", (_e) => this.dispatchEvent(new CustomEvent("add-search-tag", { bubbles: true, composed: true, detail: {tag: t} })));
+              tag.addEventListener("keydown", (e:Event) => {
+                if((e as KeyboardEvent).code  === 'Enter') {
+                  this.dispatchEvent(new CustomEvent("add-search-tag", { bubbles: true, composed: true, detail: {tag: t} }));
+                }
+              });
             }
             this.tagSearchResult.appendChild(tag);
         }
@@ -88,10 +94,15 @@ export class TagSearchBar extends LitElement {
             var tag = document.createElement("div");
             tag.classList.add("tag");
             tag.classList.add("create");
-
+            tag.tabIndex = 0;
             tag.innerHTML = `${pattern}`;
 
             tag.addEventListener("click", (_e) => this.dispatchEvent(new CustomEvent("create-search-tag", { bubbles: true, composed: true, detail: { label: pattern } })));
+            tag.addEventListener("keydown", (e:Event) => {
+              if((e as KeyboardEvent).code  === 'Enter') {
+                this.dispatchEvent(new CustomEvent("create-search-tag", { bubbles: true, composed: true, detail: { label: pattern } }));
+              }
+            });
 
             this.tagSearchResult.appendChild(tag);
           }
@@ -105,11 +116,13 @@ export class TagSearchBar extends LitElement {
     ev.preventDefault();
   }
 
+  focusInput() {
+    this.tagSearchResult.focus();
+  }
   clearResult() {
-        //const search_target = this.shadowRoot?.querySelector("#tag-search-result");
         this.tagSearchResult.replaceChildren();
-        //const search_input = this.shadowRoot?.querySelector(".tag-search-input") as HTMLInputElement;
         this.tagSearchInput.value = "";
+        this.tagSearchInput.focus();
   }
 
   render() {

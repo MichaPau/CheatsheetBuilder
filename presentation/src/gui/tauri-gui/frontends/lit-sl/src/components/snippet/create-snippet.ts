@@ -1,4 +1,4 @@
-import { html, css, PropertyValues, LitElement} from 'lit';
+import { html, css, LitElement} from 'lit';
 import { customElement, state, query } from 'lit/decorators.js';
 
 
@@ -9,7 +9,7 @@ import { Snippet, SnippetInvoker, Tag } from '../../types.js';
 import './snippet-editor.js';
 import './snippet-tag-list.js';
 import '../tag-search-bar.js';
-import { SnippetEditor } from './snippet-editor.js';
+// import { SnippetEditor } from './snippet-editor.js';
 import { TagSearchBar } from '../tag-search-bar.js';
 import { Drawer } from '../drawer.js';
 import { BaseElement } from '../../utils/base-element.js';
@@ -59,6 +59,9 @@ export class CreateSnippet extends BaseElement {
     title_elem.readOnly = true; */
 
   }
+  onBlurFooter = (_ev:Event) => {
+    console.log("blur footer");
+  }
   onTitleKeyDown = (ev: KeyboardEvent) => {
     if (ev.key === "Escape") {
       (ev.target! as HTMLInputElement).value = "";
@@ -92,6 +95,7 @@ export class CreateSnippet extends BaseElement {
   removeTag = async (ev:CustomEvent) => {
     let tags = this.tags.filter((_t => _t.id !== ev.detail.tag_id));
     this.tags = [...tags];
+    this.tagSearchBar.focusInput();
 
   }
   clearAndClose() {
@@ -116,7 +120,7 @@ export class CreateSnippet extends BaseElement {
   }
 
   async onSave(_ev: Event) {
-    const snippet: Snippet = { id: 0, title: this.titleInput.value, text: this.editorComponent.text_data, tags: this.tags, text_type: "Markdown", created_at: 0, updated_at: 0 };
+    const snippet: Snippet = { id: 0, title: this.titleInput.value, text: this.editorComponent.value, tags: this.tags, text_type: "Markdown", created_at: 0, updated_at: 0 };
     await SnippetInvoker.createSnippet(snippet, this)
       .then((_) => {
         this.dispatchEvent(new Event('reload-snippets', { bubbles: true, composed: true}));
@@ -142,7 +146,7 @@ export class CreateSnippet extends BaseElement {
                     />
             </div>
             <mp-markdown-editor id="editor-component" .show_render=${false}></mp-markdown-editor>
-            <details id="footer" class="footer">
+            <details id="footer" class="footer" tabindex="0" @blur=${this.onBlurFooter} >
                 <summary><snippet-tag-list .tag_list=${this.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
                 <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
             </details>

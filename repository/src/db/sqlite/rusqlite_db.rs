@@ -35,7 +35,8 @@ impl Rusqlite {
         Ok(db)
     }
 
-    pub fn open<P: AsRef<Path>>(path: P) -> rusqlite::Result<Self> {
+    // pub fn open<P: AsRef<Path>>(path: P) -> rusqlite::Result<Self> {
+    pub fn open<P: AsRef<Path>>(path: P) -> Result<Self, CheatsheetError> {
         let conn = Connection::open_with_flags(
             path,
             OpenFlags::SQLITE_OPEN_READ_WRITE
@@ -598,8 +599,8 @@ impl TagStore for Rusqlite {
     }
 }
 
-impl From<rusqlite::Error> for CheatsheetError {
+/* impl From<rusqlite::Error> for CheatsheetError {
     fn from(err: rusqlite::Error) -> Self {
         CheatsheetError::StoreError(err.to_string())
     }
-}
+} */
