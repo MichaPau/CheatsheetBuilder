@@ -119,6 +119,11 @@ export class CreateSnippet extends BaseElement {
 
   }
 
+  onDetailsToggle(ev:ToggleEvent) {
+    if (ev.newState === "open") {
+      this.tagSearchBar.focusInput();
+    }
+  }
   async onSave(_ev: Event) {
     const snippet: Snippet = { id: 0, title: this.titleInput.value, text: this.editorComponent.value, tags: this.tags, text_type: "Markdown", created_at: 0, updated_at: 0 };
     await SnippetInvoker.createSnippet(snippet, this)
@@ -146,9 +151,9 @@ export class CreateSnippet extends BaseElement {
                     />
             </div>
             <mp-markdown-editor id="editor-component" .show_render=${false}></mp-markdown-editor>
-            <details id="footer" class="footer" tabindex="0" @blur=${this.onBlurFooter} >
+            <details id="footer" class="footer"  @blur=${this.onBlurFooter} @toggle=${this.onDetailsToggle}>
                 <summary><snippet-tag-list .tag_list=${this.tags} @remove-tag-from-snippet=${this.removeTag}></snippet-tag-list></summary>
-                <tag-search-bar id="tag-search-bar" .recurrent-tags=${this.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
+                <tag-search-bar tabindex="0" id="tag-search-bar" .recurrent-tags=${this.tags} @add-search-tag=${this.addTag} @create-search-tag=${this.createTag}></tag-search-bar>
             </details>
             <div>
                 <button type="button" @click=${this.onCancel}>Cancel</button>

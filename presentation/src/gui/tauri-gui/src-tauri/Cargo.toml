@@ -29,6 +29,7 @@ ron = "0.10.1"
 repository = { path = "../../../../../repository", features= ["serde"] }
 domain = { path = "../../../../../domain",  features= ["serde"] }
 config_io = { path = "../../../../../../../libs/config_io" }
+directories = "6.0.0"
 #presentation = { path = "../../../../../presentation" }
 
 # [[bin]]

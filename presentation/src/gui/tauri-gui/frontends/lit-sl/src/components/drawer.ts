@@ -26,13 +26,13 @@ export class Drawer extends LitElement {
           }
       }
       [popover]:popover-open {
-        min-width: 325px;
+        /* min-width: 325px;
         min-height: 200px;
         top: unset;
         right: 0;
         left: 0;
         position: fixed;
-        bottom: 15px;
+        bottom: 15px; */
         transform: translateY(0);
         opacity: 1;
 
@@ -42,6 +42,8 @@ export class Drawer extends LitElement {
       [popover] {
           min-width: 325px;
           min-height: 200px;
+          max-height: 90vh;
+          max-width: 90vw;
           top: unset;
           right: 0;
           left: 0;
@@ -53,6 +55,9 @@ export class Drawer extends LitElement {
           box-shadow: var(--shadow-medium);
           border: var(--border-style) var(--border-width) var(--border-color);
           border-radius: var(--border-radius-medium);
+
+          resize: both;
+          overflow: auto;
       }
       ::backdrop {
           backdrop-filter: blur(2px);

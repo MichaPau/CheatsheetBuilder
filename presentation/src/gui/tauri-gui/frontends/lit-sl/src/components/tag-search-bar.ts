@@ -117,7 +117,7 @@ export class TagSearchBar extends LitElement {
   }
 
   focusInput() {
-    this.tagSearchResult.focus();
+    this.tagSearchInput.focus();
   }
   clearResult() {
         this.tagSearchResult.replaceChildren();
