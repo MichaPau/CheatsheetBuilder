@@ -4,7 +4,7 @@ use domain::entities::entry::{CreateSnippet, CreateTag, Snippet, SnippetID, Tag,
 // use domain::utils::types::SearchPattern;
 use repository::{
     errors::CheatsheetError,
-    types::{AppState, SearchOrder, SearchPattern},
+    types::{AppState, SearchOrder, SearchPattern, TagItemWithCount},
 };
 use tauri::State;
 
@@ -101,6 +101,17 @@ pub fn get_categories(app_state: State<'_, AppState>) -> Result<Vec<Tag>, Cheats
         .get_tag_list(Some(TagType::Category), None)
     {
         Ok(result) => Ok(result.inner),
+        Err(e) => Err(e),
+    }
+}
+
+#[tauri::command]
+pub fn get_tag_list_full(app_state: State<'_, AppState>) -> Result<Vec<TagItemWithCount>, CheatsheetError> {
+    match app_state
+        .service
+        .get_tag_list_full()
+    {
+        Ok(result) => Ok(result),
         Err(e) => Err(e),
     }
 }

@@ -50,6 +50,7 @@ pub fn run(app_state: AppState, config_state: ConfigState) {
             commands::create_snippet,
             commands::delete_snippet,
             commands::search_snippets,
+            commands::get_tag_list_full,
         ])
         // .menu(menu::build)
         .run(tauri::generate_context!())

@@ -1,4 +1,4 @@
-use domain::entities::entry::CreateTag;
+use domain::entities::entry::{Tag, CreateTag};
 
 use crate::ports::services::Service;
 
@@ -56,6 +56,14 @@ pub enum SearchType {
     StartWith,
     EndWith,
     Contains,
+}
+
+
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Debug)]
+pub struct TagItemWithCount {
+    pub tag: Tag,
+    pub snippet_count: usize,
 }
 
 #[derive(Debug)]

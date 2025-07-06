@@ -3,7 +3,7 @@ use domain::entities::entry::{
     TagType, TextType, Timestamp,
 };
 
-use crate::types::SearchPattern;
+use crate::types::{SearchPattern, TagItemWithCount};
 
 use crate::{db::sqlite::rusqlite_db::Rusqlite, errors::CheatsheetError, types::SearchOrder};
 
@@ -151,6 +151,20 @@ impl Service {
         tag_id_filter: Option<Vec<TagID>>,
     ) -> Result<TagList, CheatsheetError> {
         self.store.get_tag_list(type_filter, tag_id_filter)
+    }
+    pub fn get_tag_list_full(&self) -> Result<Vec<TagItemWithCount>, CheatsheetError> {
+
+        let tags = self.store.get_tag_list(None, None)?;
+        let r: Vec<TagItemWithCount> = tags.iter().map(|tag| {
+            match self.get_snippet_count_for_tag(tag.id) {
+                Ok(count) => Ok(TagItemWithCount {
+                                    tag: tag.clone(),
+                                    snippet_count: count,
+                                }),
+                Err(e) => Err(e),
+            }
+        }).collect::<Result<Vec<TagItemWithCount>, _>>()?;
+        Ok(r)
     }
     pub fn get_tag_hierarchy(&self, tag_id: TagID) -> Result<TagList, CheatsheetError> {
         self.store.get_tag_hierarchy(tag_id)
