@@ -1,5 +1,5 @@
 import { InvokeArgs, InvokeOptions } from "@tauri-apps/api/core";
-import { Snippet, Tag } from "../../types";
+import { Snippet, Tag, TagWithCount } from "../../types";
 
 export let tags: Array<Tag> = [
   { id: 1, title: "First", tag_type: "Category", parent_id: null, tag_style: null },
@@ -49,7 +49,10 @@ export function invoke(cmd:string,args:InvokeArgs = {},_options?:InvokeOptions):
       case "get_tags":
         resolve(get_tags((args as any).tagIdFilter));
         break;
-       //pattern
+      case "get_tag_list_full":
+        resolve(get_tags_full());
+        break;
+      //pattern
       case "search_tags":
         resolve(search_tags((args as any).pattern));
         break;
@@ -79,6 +82,13 @@ export function get_categories(): Array<Tag> {
     result.push(cat);
   }
   return result;
+
+}
+export function get_tags_full(): Array<TagWithCount> {
+  const tag_list = tags.map((tag) => {
+   return  {tag: tag, snippet_count: 1}
+  });
+  return tag_list;
 
 }
 export function get_snippets(params: any) {

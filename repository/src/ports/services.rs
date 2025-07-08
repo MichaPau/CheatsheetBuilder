@@ -155,10 +155,10 @@ impl Service {
     pub fn get_tag_list_full(&self) -> Result<Vec<TagItemWithCount>, CheatsheetError> {
 
         let tags = self.store.get_tag_list(None, None)?;
-        let r: Vec<TagItemWithCount> = tags.iter().map(|tag| {
+        let r: Vec<TagItemWithCount> = tags.iter().cloned().map(|tag| {
             match self.get_snippet_count_for_tag(tag.id) {
                 Ok(count) => Ok(TagItemWithCount {
-                                    tag: tag.clone(),
+                                    tag,
                                     snippet_count: count,
                                 }),
                 Err(e) => Err(e),

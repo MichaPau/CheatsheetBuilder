@@ -9,6 +9,7 @@ import './components/categories.js';
 import './components/header-comp.js';
 import './components/snippet-list.js';
 import './components/settings-logger.js';
+import './components/tag-settings.ts';
 import './components/drawer.js';
 import './components/snippet/create-snippet.js';
 import mainStyles from './styles/mainStyle.js';
@@ -30,6 +31,7 @@ export class App extends LitElement {
     sharedStyles,
     css `
       :host {
+        position: relative;
         display: block;
         border: 1px solid red;
         width: 100%;
@@ -55,6 +57,48 @@ export class App extends LitElement {
       create-snippet {
         width: 75vw;
         height: 46vh;
+      }
+
+      #create-button {
+        position: fixed;
+        bottom: 5px;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      #popover-create:popover-open {
+        
+        position: fixed;
+        inset: unset;
+        bottom: 0;
+        border: none;
+        resize: both;
+        left: 50%;
+        transform: translate(-50%, 0);
+
+        &::backdrop {
+          backdrop-filter: blur(3px);
+        }
+      }
+      #tag-settings-button {
+        position: fixed;
+        top: 5px;
+        right: 5px;
+        transform: translate(-50%, -50%);
+      }
+      #popover-tag-settings:popover-open {
+        
+        position: fixed;
+        inset: unset;
+        top: 0;
+        right: 0;
+        width: 40%;
+        height: 100%;
+        border: none;
+        resize: both;
+
+        &::backdrop {
+          backdrop-filter: blur(3px);
+        }
       }
       /* drawer-comp {
         width: 75%;
@@ -173,10 +217,22 @@ export class App extends LitElement {
           </div>
         </footer>
       </div>
-      <drawer-comp>
+      <div>
+        <button id="create-button" popovertarget="popover-create">Create</button>
+        <div id="popover-create" popover>
           <create-snippet></create-snippet>
-      </drawer-comp>
+        </div>
+      </div>
+      <div>
+      <button id="tag-settings-button" popovertarget="popover-tag-settings">Tag Settings</button>
+      <div id="popover-tag-settings" popover>
+        <tag-settings></tag-settings>
+      </div>
+      </div>
     `;
   }
 }
 // <button @click=${this.toggleStyle}>Test</button>
+      /* <drawer-comp>
+          <create-snippet></create-snippet>
+      </drawer-comp> */

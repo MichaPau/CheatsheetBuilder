@@ -108,9 +108,13 @@ export class CreateSnippet extends BaseElement {
     //this.tagSearchResult.replaceChildren();
 
     const t = this.shadowRoot?.host!;
-    const p = t.parentElement as Drawer;
+    /* const p = t.parentElement as Drawer;
     if(p) {
       p.close();
+    } */
+    const p = t.parentElement;
+    if(p) {
+      p.hidePopover();
     }
 
   }

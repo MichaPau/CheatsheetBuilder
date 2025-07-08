@@ -7,6 +7,11 @@ export type Tag = {
   parent_id: number | null;
   tag_style: object | null;
 };
+
+export type TagWithCount = {
+  snippet_count: number;
+  tag: Tag;
+}
 //"Category" | "Normal" | "Untagged";
 export type Snippet = {
   id: number;
@@ -45,8 +50,8 @@ export enum Log_Level {
 // };
 
 
-export { invoke } from "@tauri-apps/api/core";
-// export { invoke } from "./invokers/mock-invokers/mockData";
+// export { invoke } from "@tauri-apps/api/core";
+export { invoke } from "./invokers/mock-invokers/mockData";
 
 export { default as MainInvoker } from './invokers/main-invoker.js';
 export { default as SnippetInvoker} from './invokers/snippet-invoker.js';

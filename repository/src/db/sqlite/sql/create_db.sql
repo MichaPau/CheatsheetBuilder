@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS Tag (
     updated_at INTEGER DEFAULT (unixepoch ()) NOT NULL
 );
 
+CREATE UNIQUE INDEX tag_name_index ON Tag(title);
+
 CREATE TABLE IF NOT EXISTS Snippet_Tags (
     id INTEGER PRIMARY KEY,
     snippet_id INTEGER NOT NULL,
@@ -48,7 +50,7 @@ CREATE TABLE IF NOT EXISTS Sheet_Items (
     item_id INTEGER NOT NULL,
     FOREIGN KEY (sheet_id) REFERENCES Cheatsheet (sheet_id),
     FOREIGN KEY (item_id) REFERENCES CheatsheetItem (item_id),
-    UNIQUE (sheEt_id, item_id) ON CONFLICT IGNORE
+    UNIQUE (sheet_id, item_id) ON CONFLICT IGNORE
 );
 
 COMMIT;

@@ -3,7 +3,7 @@
 import { invoke } from "../types";
 
 // import { SnippetTagList } from "../components/snippet/snippet-tag-list";
-import { Tag } from "../types";
+import { Tag, TagWithCount } from "../types";
 
 export default class TagListInvoker {
   static async getParentTags(tag_id: number, host: HTMLElement): Promise<Array<Tag>> {
@@ -25,6 +25,17 @@ export default class TagListInvoker {
         resolve(result as Array<Tag>);
       }).catch(err => {
          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "getTags: " + err, cmd: "getTags", args: {tagId: id_list} }, composed: true, bubbles: true}));
+        reject(err);
+      })
+    });
+  }
+  static async getTagsFull(host: HTMLElement): Promise<Array<TagWithCount>> {
+    return new Promise(async (resolve, reject) => {
+      await invoke("get_tag_list_full").then((result) => {
+        host.dispatchEvent(new CustomEvent("invoke-debug", {detail: {info: "get_tag_list_full: success", cmd: "get_tag_list_full", args: {}}, composed: true, bubbles: true}));
+        resolve(result as Array<TagWithCount>);
+      }).catch(err => {
+         host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "get_tag_list_full: " + err, cmd: "get_tag_list_full", args: {} }, composed: true, bubbles: true}));
         reject(err);
       })
     });
