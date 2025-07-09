@@ -42,7 +42,7 @@ export function invoke(cmd:string,args:InvokeArgs = {},_options?:InvokeOptions):
         resolve(get_categories());
         break;
       //tagId
-      case "get_parent_tags": 
+      case "get_parent_tags":
         resolve(get_parent_tags((args as any).tagId));
         break;
       //tagIdFilter,
@@ -56,10 +56,18 @@ export function invoke(cmd:string,args:InvokeArgs = {},_options?:InvokeOptions):
       case "search_tags":
         resolve(search_tags((args as any).pattern));
         break;
+      //tagId, newTitle
+      case "update_tag_title":
+        let result = update_tag_title(args);
+        if (result) {
+          resolve(result);
+        } else {
+          reject(result);
+        }
+        break;
       case "append_tag": //snippetId, tagId
       case "update_snippet_title": //id, newTitle
       case "remove_tag_from_snippet": //snippetId, tagId
-      case "update_tag_title": //tagId, newTitle
       case "get_snippet_count_for_tag": //tagId
       case "delete_category": //tagId
       case "create_category": //parentId, title
@@ -91,6 +99,20 @@ export function get_tags_full(): Array<TagWithCount> {
   return tag_list;
 
 }
+
+export function update_tag_title(params: any): boolean {
+  if (tags.findIndex((tag) => tag.title === params.newTitle) === -1) {
+    let update_index = tags.findIndex((tag) => tag.id === params.tagId);
+    if (update_index !== -1) {
+      tags[update_index].title = params.newTitle;
+      return true;
+    } else {
+      return false;
+    }
+  } else {
+    return false;
+  }
+}
 export function get_snippets(params: any) {
   const result: Array<Snippet> = [];
   for (let snippet of snippets) {
@@ -105,26 +127,26 @@ export function get_snippets(params: any) {
   if (params.order) {
     return order_snippets(result, params.order);
   } else {
-    return result;    
+    return result;
   }
   // return result
 }
 function order_snippets(data: Array<Snippet>, order: Array<{column_name: string, order_dir: number}>): Array<Snippet> {
-  
+
   const searchCompareFn = (a:SearchIndexable, b: SearchIndexable) => {
       let result = 0;
       order.map((item) => {
         if(typeof a[item.column_name] === "string") {
-          if (item.order_dir === 1) {            
+          if (item.order_dir === 1) {
             var exp:number = a[item.column_name].localeCompare(b[item.column_name]);
             result = result || exp;
           } else if (item.order_dir === 2) {
-            
+
             var exp:number = b[item.column_name].localeCompare([item.column_name]);
             result = result || exp;
           }
         } else if (typeof a[item.column_name] === "number") {
-          if (item.order_dir === 1) {            
+          if (item.order_dir === 1) {
             var exp:number = a[item.column_name] - b[item.column_name];
             result = result || exp;
           } else if (item.order_dir === 2) {
@@ -136,7 +158,7 @@ function order_snippets(data: Array<Snippet>, order: Array<{column_name: string,
       return result;
   }
   data.sort(searchCompareFn);
-  return data;  
+  return data;
 }
 function get_parent_tags(tag_id: number) {
   const tag = tags.find((tag) => tag.id === tag_id);
@@ -151,7 +173,7 @@ function get_parent_tags(tag_id: number) {
       parent_id = null;
     }
   }
-  return result;  
+  return result;
 }
 function get_tags(id_list: Array<number>) {
   const result = tags.filter((tag) => id_list.includes(tag.id));

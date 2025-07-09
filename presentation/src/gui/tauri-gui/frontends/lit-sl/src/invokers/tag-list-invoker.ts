@@ -40,4 +40,18 @@ export default class TagListInvoker {
       })
     });
   }
+  static async updateTagTitle(tag_id: number, newTitle: string, host: HTMLElement): Promise<boolean> {
+    const args = { tagId: tag_id, newTitle: newTitle };
+    return new Promise(async (resolve, reject) => {
+      await invoke("update_tag_title", args)
+        .then((result) => {
+          host.dispatchEvent(new CustomEvent("invoke-debug", { detail: { info: "update_tag_title: success", cmd: "update_tag_title", args: args }, composed: true, bubbles: true }));
+          resolve(result);
+        })
+        .catch((err) => {
+          host.dispatchEvent(new CustomEvent("invoke-error", { detail: { info: "update_tag_title: " + err, cmd: "update_tag_title", args: args }, composed: true, bubbles: true }));
+          reject(err);
+        })
+    });
+  }
 }
