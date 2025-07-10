@@ -46,7 +46,7 @@ pub fn run(app_state: AppState, config_state: ConfigState) {
             commands::get_snippet_count_for_tag,
             commands::update_tag_title,
             commands::create_category,
-            commands::delete_category,
+            commands::delete_tag,
             commands::create_snippet,
             commands::delete_snippet,
             commands::search_snippets,

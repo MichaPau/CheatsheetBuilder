@@ -188,7 +188,7 @@ pub fn get_snippet_count_for_tag(
     app_state.service.get_snippet_count_for_tag(tag_id)
 }
 #[tauri::command]
-pub fn delete_category(
+pub fn delete_tag(
     tag_id: usize,
     app_state: State<'_, AppState>,
 ) -> Result<Tag, CheatsheetError> {

@@ -79,12 +79,12 @@ export default class CategoriesInvoker implements ReactiveController {
         let answer = await dlg.confirm();
 
         if(answer) {
-          await invoke("delete_category", { tagId: ev.detail.tag_id }).then((_) => {
+          await invoke("delete_tag", { tagId: ev.detail.tag_id }).then((_) => {
 
-            this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "onDeleteCategory: success", cmd: "delete_category", args: { tagId: ev.detail.tag_id } }, composed: true, bubbles: true}));
+            this.host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "onDeleteCategory: success", cmd: "delete_tag", args: { tagId: ev.detail.tag_id } }, composed: true, bubbles: true}));
             this.reload_categories();
           }).catch((err) => {
-            this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "onDeleteCategory: " + err, cmd: "delete_category", args: { tagId: ev.detail.tag_id } }, composed: true, bubbles: true}));
+            this.host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "onDeleteCategory: " + err, cmd: "delete_tag", args: { tagId: ev.detail.tag_id } }, composed: true, bubbles: true}));
           });
         }
      }).catch((err) => {

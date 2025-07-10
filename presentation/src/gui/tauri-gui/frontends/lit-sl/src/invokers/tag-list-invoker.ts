@@ -54,4 +54,18 @@ export default class TagListInvoker {
         })
     });
   }
+  static async deleteTagConfirmed(tag_id: number, host: HTMLElement): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      await invoke("delete_tag", {tagId: tag_id})
+        .then((_) => {
+  
+            host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "deleteTagConfirmed: success", cmd: "delete_tag", args: { tagId: tag_id } }, composed: true, bubbles: true}));
+            resolve(true);
+        })
+        .catch((err) => {
+            host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "deleteTagConfirmed: " + err, cmd: "delete_tag", args: { tagId: tag_id } }, composed: true, bubbles: true}));
+            reject(false);
+        });
+    });
+  }
 }
