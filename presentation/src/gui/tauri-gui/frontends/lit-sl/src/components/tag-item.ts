@@ -84,7 +84,7 @@ export class TagItem extends LitElement {
     }
   }
   onTriggerParents = (_ev:Event) => {
-    console.log("onTriggeraParents: ", _ev.target, _ev.currentTarget);
+    // console.log("onTriggeraParents: ", _ev.target, _ev.currentTarget);
     this.dispatchEvent(new CustomEvent("get-parent-tags", { bubbles: false, composed: false, detail: { id: this.tag.id } }));
   }
 

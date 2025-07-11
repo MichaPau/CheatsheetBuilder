@@ -140,11 +140,18 @@ pub fn get_parent_tags(
 pub fn set_tag_parent_id(
     tag_id: usize,
     new_parent_id: Option<usize>,
+    new_type: Option<String>,
     app_state: State<'_, AppState>,
 ) -> Result<bool, CheatsheetError> {
-    app_state.service.update_tag_parent(tag_id, new_parent_id)
-}
 
+    let id_result = app_state.service.update_tag_parent(tag_id, new_parent_id)?;
+    if let Some(new_type) = new_type {
+         let type_result = app_state.service.update_tag_type(tag_id, new_type.as_str().into())?;
+         Ok(type_result)     
+    } else {
+        Ok(id_result)
+    }
+}
 #[tauri::command]
 pub fn update_tag_title(
     tag_id: usize,

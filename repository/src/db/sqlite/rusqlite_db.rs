@@ -436,7 +436,7 @@ impl TagStore for Rusqlite {
                     self.create_tag_from_row(r)
                     //self.create_snippet_from_row(r, &c)
                 });
-            println!("{:?}", parent_tag);
+            // println!("{:?}", parent_tag);
             if parent_tag.is_err() {
                 return Err(CheatsheetError::CreateTagError(
                     "parent_id does not exists".into(),
@@ -487,6 +487,8 @@ impl TagStore for Rusqlite {
     ) -> Result<bool, CheatsheetError> {
         let c = self.conn.try_lock().unwrap();
         let ts = u64::from(Timestamp::from_utc_now());
+
+        //parent_id on itself
         if new_parent_id == Some(id) {
             return Ok(false);
         }

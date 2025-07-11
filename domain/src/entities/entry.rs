@@ -227,6 +227,15 @@ impl From<usize> for TagType {
     }
 }
 
+impl From<&str> for TagType {
+    fn from(value: &str) -> Self {
+        match value {
+            "Normal" => TagType::Normal,
+            "Category" => TagType::Category,
+            _ => TagType::Normal,
+        }
+    }
+}
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize))]
 pub enum Color {

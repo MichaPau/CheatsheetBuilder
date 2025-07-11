@@ -65,16 +65,16 @@ export class Tree extends LitElement {
   drag_event_start(data: Tag, ev:DragEvent) {
       ev.stopPropagation();
       ev.dataTransfer?.setData("text/plain", JSON.stringify(data));
-      console.log("Start:", data.title, ";", data.id);
+      // console.log("Start:", data.title, ";", data.id);
   };
   drag_event_over(ev:DragEvent) {
       ev.preventDefault();
   };
   drop_event(data: Tag,ev: DragEvent) {
       ev.stopPropagation();
-      console.log("Drop on:", data.id, ";", data.title);
+      // console.log("Drop on:", data.id, ";", data.title);
       let tag = JSON.parse(ev.dataTransfer?.getData("text/plain")!);
-      console.log("Drop from:", tag.id,  ";", tag.title);
+      // console.log("Drop from:", tag.id,  ";", tag.title);
       const to_id: number | null = data.id != 0 ? data.id : null;
 
       let ce = new CustomEvent('update-parent-category', { detail: { tag_id: tag.id, new_parent_id: to_id }, bubbles: true, composed: true });

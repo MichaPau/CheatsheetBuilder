@@ -10,7 +10,7 @@ export default class TagListInvoker {
     return new Promise(async (resolve, reject) => {
       await invoke("get_parent_tags", { tagId: tag_id}).then((result) => {
         host.dispatchEvent(new CustomEvent("invoke-debug", {detail: {info: "getParentTags: success", cmd: "get_parent_tags", args: {tagId: tag_id}, }, composed: true, bubbles: true}));
-        resolve(result);
+        resolve(result as Array<Tag>);
       }).catch(err => {
          host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "getParentTags: " + err, cmd: "get_parent_tags", args: {tagId: tag_id} }, composed: true, bubbles: true}));
           reject(err);
@@ -68,4 +68,25 @@ export default class TagListInvoker {
         });
     });
   }
+  static async updateParentTag (tag_id: number, new_parent_id: number, new_type: string | null = null,  host: HTMLElement) {
+
+    let args;
+    if(new_type) {
+      args = {tagId: tag_id, newParentId: new_parent_id, newType: new_type};
+    } else {
+      args = {tagId: tag_id, newParentId: new_parent_id};
+    }
+    return new Promise(async (resolve, reject) => {
+      
+      await invoke("set_tag_parent_id", args).then((_) => {
+
+        host.dispatchEvent(new CustomEvent('invoke-debug', {detail: {info: "updateParentTag: success", cmd: "set_tag_parent_id", args: args }, composed: true, bubbles: true}));
+        resolve(true);
+      }).catch((err) => {
+        host.dispatchEvent(new CustomEvent('invoke-error', {detail: {info: "updateParentTag: " + err, cmd: "set_tag_parent_id", args: args }, composed: true, bubbles: true}));
+        reject(false);
+      });
+    });
+  }
+
 }
