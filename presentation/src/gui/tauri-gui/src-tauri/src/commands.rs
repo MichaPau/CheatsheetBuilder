@@ -3,8 +3,7 @@ use std::usize;
 use domain::entities::entry::{CreateSnippet, CreateTag, Snippet, SnippetID, Tag, TagType};
 // use domain::utils::types::SearchPattern;
 use repository::{
-    errors::CheatsheetError,
-    types::{AppState, SearchOrder, SearchPattern, TagItemWithCount},
+    errors::CheatsheetError, ports::stores::TagStore, types::{AppState, SearchOrder, SearchPattern, TagItemWithCount}
 };
 use tauri::State;
 
@@ -152,6 +151,17 @@ pub fn set_tag_parent_id(
         Ok(id_result)
     }
 }
+
+#[tauri::command]
+pub fn update_tag_type(tag_id: usize, tag_type: String, app_state: State<'_, AppState>) -> Result<bool, CheatsheetError> {
+
+    let new_type: TagType = tag_type.as_str().into();
+    if new_type == TagType::Normal {
+        app_state.service.update_tag_parent(tag_id, None)?;
+    }
+    app_state.service.update_tag_type(tag_id, new_type)
+}
+
 #[tauri::command]
 pub fn update_tag_title(
     tag_id: usize,

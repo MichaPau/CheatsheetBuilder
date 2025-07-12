@@ -226,7 +226,7 @@ export class App extends LitElement {
       <div>
       <button id="tag-settings-button" popovertarget="popover-tag-settings">Tag Settings</button>
       <div id="popover-tag-settings" popover>
-        <tag-settings></tag-settings>
+        <tag-settings ></tag-settings>
       </div>
       </div>
     `;
@@ -236,3 +236,4 @@ export class App extends LitElement {
       /* <drawer-comp>
           <create-snippet></create-snippet>
       </drawer-comp> */
+// @reload-categories=${this.main_controller.reload_categories}

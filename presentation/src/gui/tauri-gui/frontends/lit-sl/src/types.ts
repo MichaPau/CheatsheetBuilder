@@ -69,6 +69,7 @@ declare global {
     'invoke-error': CustomEvent<{info: string, cmd: string, args: InvokeArgs, meta_url: string}>,
     'invoke-debug': CustomEvent<{info: string, cmd: string, args: InvokeArgs, meta_url: string}>,
     'reload-snippets': Event;
+    'reload-categories': Event;
     'reload-snippets-settings-change': Event;
     'search-snippets': CustomEvent<{column: String, searchPattern: {search_type: string, pattern: string}}>;
     'update-parent-category': CustomEvent<{tag_id: number, new_parent_id: number}>;

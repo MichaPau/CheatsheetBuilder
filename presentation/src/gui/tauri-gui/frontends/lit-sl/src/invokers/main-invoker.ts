@@ -46,6 +46,10 @@ export default class MainInvoker implements ReactiveController {
   reload_snippets = async (_ev: Event) => {
     this.load_snippets();
   }
+  reload_categories = (_ev: Event) => {
+    console.log("main-invoker::reload_categories");
+    this.categories_invoker.reload_categories();
+  }
 
   search_snippets = async (ev: CustomEvent) => {
     const params = ev.detail;
@@ -97,6 +101,7 @@ export default class MainInvoker implements ReactiveController {
     this.host.addEventListener('reload-snippets', this.reload_snippets);
     this.host.addEventListener('set-selected-categories', this.setSelectedCategories);
     this.host.addEventListener('reload-snippets-settings-change', this.reload_snippets);
+    // this.host.addEventListener('reload-categories', this.categories_invoker.reload_categories);
 
     this.host.addEventListener('invoke-debug', this.invoke_debug);
     this.host.addEventListener('invoke-error', this.invoke_error);

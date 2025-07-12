@@ -26,7 +26,7 @@ export default class CategoriesInvoker implements ReactiveController {
     });
   }
 
-  async reload_categories() {
+  reload_categories= async() => {
     await invoke("get_categories").then((result) => {
       const categories = result as Array<Tag>;
       this.host.appDataCategories = { ... this.host.appDataCategories, categories:  this.buildTreeArray(categories)};
@@ -47,6 +47,7 @@ export default class CategoriesInvoker implements ReactiveController {
     this.host.removeEventListener('update-category-title', this.onUpdateCategoryTitle);
     this.host.removeEventListener('add-category', this.onAddCategory);
     this.host.removeEventListener('delete_category', this.onDeleteCategory);
+    this.host.removeEventListener('reload-categories', this.reload_categories);
   }
 
   init_handlers() {
@@ -54,6 +55,7 @@ export default class CategoriesInvoker implements ReactiveController {
     this.host.addEventListener('update-category-title', this.onUpdateCategoryTitle);
     this.host.addEventListener('add-category', this.onAddCategory);
     this.host.addEventListener('delete_category', this.onDeleteCategory);
+    this.host.addEventListener('reload-categories', this.reload_categories);
   }
 
   onUpdateCategoryTitle = async (ev: CustomEvent) => {
